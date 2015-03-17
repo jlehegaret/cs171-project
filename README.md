@@ -1,6 +1,5 @@
 # CS-171 Project
 ================
-
 Help the W3C (and get your name in lights)!
 
 How would you like to help out the organization that sets the standards for all this web technology we are using and learning?
@@ -29,7 +28,6 @@ Please let me know if you are interested in joining our team.  Thanks!
 
 # More Details
 ==============
-
 # Background Info
 -----------------
 
@@ -102,11 +100,11 @@ Also, this graph only represents the status of the test suite.  However, W3C nee
 
 Here are three examples of those per-working group table reports:
 
-Web Apps Working Group (sample_repts/webapps.html)
+[Web Apps Working Group](sample_repts/webapps.html)
 
-Web Performance Working Group (sample_repts/webperf.html)
+[Web Performance Working Group](sample_repts/webperf.html)
 
-Web RTC Working Group (sample_repts/webrtc.html)
+[Web RTC Working Group](sample_repts/webrtc.html)
 
 In each of these reports, we see, sorted by Spec status (WD = Working Draft, LCWD = "Last Call Working Draft", CR = "Candidate Recommendation", and REC = "Recommendation):
 
@@ -117,14 +115,13 @@ In each of these reports, we see, sorted by Spec status (WD = Working Draft, LCW
 * the number of issues in GitHub, for those specs hosted in GitHub
 * some notes (mainly noting when the published version is much older than the latest update)
 
-As you now know, it would be great to add in more data to this table - data about the test suite and caniuse statuses.
+It would be great to add in more data to this table - for instance, data about the test suite and caniuse statuses.
 
-Even more critically for our purposes, let's see how we can summarize this per-working group information in a more effective visualization.  Even when we may want to be in table view, let's provide some more sorting and filtering options, shall we?!
+Even more critically for **our** purposes, let's see how we can summarize this per-working group information in a more effective visualization.  Even when we may want to be in table view, let's provide some more sorting and filtering options, shall we?!
 
 
 # Come Join Us
 ================
-
 If you have read this far, maybe you would like to join our team.  As you can see, there's a lot we can imagine and a lot we can do.  Please come and contribute!
 
 And thanks!!
