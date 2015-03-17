@@ -19,23 +19,16 @@ with our CS 171 project!  W3C would like to combine a lot of information from a 
 
 All of the data to answer these questions (and any others you may find interesting) is public and, thanks to some W3Cers who are motivated to help us, even in ready-to-use JSON format.
 
-If we come up with something cool enough, not only will we replace that graph, but our work will be presented in Paris to W3's Advisory Committee the same week that we present it to Harvard.
-
 Please let me know if you are interested in joining our team.  Thanks!
 
 
-
-
-# More Details
-==============
 # Background Info
------------------
-
+=================
 W3C works on a huge number of specs.  What we think of as HTML, CSS, and JavaScript is splintered across all of these various documents.  Browser developers use these documents to know how to build their browsers, and we students use them to learn how to write our code so that it will work in the browswers.
 
 Each spec is shepherded along by at least one "working group".  As the ideas in each spec are more and more universally adopted by the various browser vendors (due to the spec changing to reflect market reality as well as enough browsers "catching up" to the spec), the spec moves along from "draft" to "recommendation."  A spec's attainment of "Recommendation" status is what really moves the web forward, as developers everywhere then have a firm and universal bedrock upon which to build.
 
-We are going to help evaluate three forces that help move a spec to "Recommendation" status:
+We are going to help monitor three forces that help move a spec to "Recommendation" status:
 - how many JavaScript tests have been written for that spec
 - how many edits the spec itself has received
 - what does caniuse.com have to say about the implementation of the features in the spec
@@ -63,7 +56,7 @@ These have been tagged with information about
 
 Based on these tags and thanks to the GitHub API, we can determine how many open issues a given spec (or working group) has, who raised the issue, who closed the issue, how long it took to address the issue, and do all of that by difficulty level as well.
 
-Just in case you are interested, here is [some very raw GitHub data about testsuite issues](sample_data/wpt-issues.json), but we will get a more tailored JSON from our W3C connections.
+Just in case you are interested, here is [some very raw GitHub data about testsuite issues](sample_data/wpt-issues.json), but we will get a more tailored JSON.
 
 ### The Specs themselves
 
@@ -81,7 +74,7 @@ Luckily, our friends at the W3C will take care of conglomerating all of the inte
 
 For example, if we look at [SVG fonts](http://caniuse.com/#feat=svg-fonts) and click on the Resources tab at the bottom of the screen, we see **Specification [w3.org]**, which links to the exact section of the appropriate spec detailing that feature.
 
-Our friends at the W3C are going to use the CanIUse API to summarize this data for us, so that we can report, per spec, the status of any and all features that CanIUse has cataloged for that spec.
+The CanIUse API will let us access this data so that we can report, per spec, the status of any and all features that CanIUse has cataloged for that spec.
 
 What Do They Have So Far?
 -------------------------
@@ -90,7 +83,7 @@ Let's look again at that graph:
 
 [http://testthewebforward.org/dashboard/#all](http://testthewebforward.org/dashboard/#all)
 
-By default, this shows (WHAT, ACTUALLY) the amount of code committed to the overall W3C test suite.  Gray is code that is part of the W3C repository, while red marks code that is waiting as a pull request.  Dark gray shows us the overall number of open issues.
+By default, this shows the amount of code committed to the overall W3C test suite.  Gray is code that is part of the W3C repository, while red marks code that is waiting as a pull request.  Dark gray shows us the overall number of open issues.
 
 By using the dropdown box, you can choose to see instead information per-spec or per-working group.  Every item that starts "wg-" is a working group (and each working group may work on many specs), while **every other** item in the dropdown is one particular spec.
 
@@ -127,20 +120,3 @@ If you have read this far, maybe you would like to join our team.  As you can se
 And thanks!!
 
 Jennifer Le Hegaret
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
