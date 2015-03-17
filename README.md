@@ -1,5 +1,5 @@
-# CS-171 Project
-================
+# CS-171 Project Proposal
+=========================
 Help the W3C (and get your name in lights)!
 
 How would you like to help out the organization that sets the standards for all this web technology we are using and learning?
@@ -76,8 +76,8 @@ For example, if we look at [SVG fonts](http://caniuse.com/#feat=svg-fonts) and c
 
 The CanIUse API will let us access this data so that we can report, per spec, the status of any and all features that CanIUse has cataloged for that spec.
 
-What Do They Have So Far?
--------------------------
+# What Do They Have So Far?
+===========================
 
 Let's look again at that graph:
 
@@ -93,11 +93,11 @@ Also, this graph only represents the status of the test suite.  However, W3C nee
 
 Here are three examples of those per-working group table reports:
 
-[Web Apps Working Group](sample_repts/webapps.html)
+[Web Apps Working Group](https://jlehegaret.github.io/cs171-project-lehegaret/sample_repts/webapps.html)
 
-[Web Performance Working Group](sample_repts/webperf.html)
+[Web Performance Working Group](https://jlehegaret.github.io/cs171-project-lehegaret/sample_repts/webperf.html)
 
-[Web RTC Working Group](sample_repts/webrtc.html)
+[Web RTC Working Group](https://jlehegaret.github.io/cs171-project-lehegaret/sample_repts/webrtc.html)
 
 In each of these reports, we see, sorted by Spec status (WD = Working Draft, LCWD = "Last Call Working Draft", CR = "Candidate Recommendation", and REC = "Recommendation):
 
