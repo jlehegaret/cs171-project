@@ -17,9 +17,7 @@ with our CS 171 project!  W3C would like to combine a lot of information from a 
 - what progress has happened over time (overall, or for a particular spec)?
 - can we compare working group's levels of activity to each other?
 
-All of the data to answer these questions (and any others you may find interesting) is public and, thanks to some W3Cers who are motivated to help us, even in ready-to-use JSON format.
-
-Please let me know if you are interested in joining our team.  Thanks!
+All of the data to answer these questions is public and, thanks to some W3Cers who are motivated to help us, even in ready-to-use JSON format.
 
 
 # Background Info
@@ -93,11 +91,11 @@ Also, this graph only represents the status of the test suite.  However, W3C nee
 
 Here are three examples of those per-working group table reports:
 
-[Web Apps Working Group](https://jlehegaret.github.io/cs171-project-lehegaret/sample_repts/webapps.html)
+[Web Apps Working Group](https://jlehegaret.github.io/cs171-project/sample_repts/webapps.html)
 
-[Web Performance Working Group](https://jlehegaret.github.io/cs171-project-lehegaret/sample_repts/webperf.html)
+[Web Performance Working Group](https://jlehegaret.github.io/cs171-project/sample_repts/webperf.html)
 
-[Web RTC Working Group](https://jlehegaret.github.io/cs171-project-lehegaret/sample_repts/webrtc.html)
+[Web RTC Working Group](https://jlehegaret.github.io/cs171-project/sample_repts/webrtc.html)
 
 In each of these reports, we see, sorted by Spec status (WD = Working Draft, LCWD = "Last Call Working Draft", CR = "Candidate Recommendation", and REC = "Recommendation):
 
