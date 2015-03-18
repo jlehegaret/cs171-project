@@ -10,50 +10,52 @@ Five JSON Files:
 
 ### 1. list of working groups
 
-array of { name :  <name>
-           specs : [ {  spec:  <spec>
-                        status: "WD", "CR", "REC", etc
-                        last_pub: mm-dd-yyyy (or whatever date format)
-                      }
-                   ]
-         }
+array of { name :  name  
+           specs : [ {  spec:  spec  
+                        status: "WD", "CR", "REC", etc  
+                        last_pub: mm-dd-y  
+                        yyy (or whatever date format)  
+                      }  
+                   ]  
+         }  
 
 ### 2. GitHub web platform test pull requests
 
-array of {  type: "test"
-            status:  "done" or "pending"
-            spec:  <spec> (or "Infrastructure" or "UNASSIGNED")
+array of {  type: "test"  
+            status:  "done" or "pending"  
+            spec:  spec (or "Infrastructure" or "UNASSIGNED")  
             num_lines: <lines of code affected:  additions + deletions>
-            author: <who opened it>
-            closer: <who closed it>
-            author_date: <date opened>
-            closer_date: <date merged>
+            author: who opened it  
+            closer: who closed it  
+            author_date: date opened  
+            closer_date: date merged  
          }
-
+  
 ### 3. GitHub web platform test issues
-array of {  type: "issue"
-            status:  "done" or "pending"
-            spec:  <spec> (or "Infrastructure" or "UNASSIGNED")
-            difficulty: "easy", "medium", "hard" (or "UNASSIGNED")
-            author: <who opened it>
-            closer: <who closed it>
-            author_date: <date opened>
-            closer_date: <date closed>
+
+array of {  type: "issue"  
+            status:  "done" or "pending"  
+            spec:  spec (or "Infrastructure" or "UNASSIGNED")  
+            difficulty: "easy", "medium", "hard" (or "UNASSIGNED")  
+            author: who opened it  
+            closer: who closed it  
+            author_date: date opened  
+            closer_date: date closed  
          }
 
 ### 4. GitHub W3 Specs
 
-array of { spec: <spec>
-           pull_reqs:  array of <same as above>
-           issues: array of <same as above>
+array of { spec: spec
+           pull_reqs:  array of { same as above }  
+           issues: array of { same as above }  
           }
 
 ### 5. CanIUse data export
 
-array of { name: <feature name>
-           spec: <spec>
-           support: array of { browser: <browser name>
+array of { name: feature-name  
+           spec: spec  
+           support: array of { browser: browser-name  
                                supported: true or false
                                (as of latest version noted)
-                              }
+                              }  
           }
