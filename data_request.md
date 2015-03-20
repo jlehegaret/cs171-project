@@ -22,9 +22,11 @@ array of { name :  name
 ### 2. GitHub web platform test pull requests
 
 array of {  type: "test"  
+            url: url  
+            title: title  
             status:  "done" or "pending"  
             spec:  spec (or "Infrastructure" or "UNASSIGNED")  
-            num_lines: <lines of code affected:  additions + deletions>
+            num_lines: lines of code affected:  additions + deletions
             author: who opened it  
             closer: who closed it  
             author_date: date opened  
@@ -33,7 +35,9 @@ array of {  type: "test"
   
 ### 3. GitHub web platform test issues
 
-array of {  type: "issue"  
+array of {  type: "issue"
+            url: url  
+            title: title  
             status:  "done" or "pending"  
             spec:  spec (or "Infrastructure" or "UNASSIGNED")  
             difficulty: "easy", "medium", "hard" (or "UNASSIGNED")  
@@ -45,7 +49,8 @@ array of {  type: "issue"
 
 ### 4. GitHub W3 Specs
 
-array of { spec: spec
+array of { spec: spec  
+           url: url  
            pull_reqs:  array of { same as above }  
            issues: array of { same as above }  
           }
@@ -54,8 +59,11 @@ array of { spec: spec
 
 array of { name: feature-name  
            spec: spec  
+           url: url
            support: array of { browser: browser-name  
-                               supported: true or false
+                               score: 1 (yes)  
+                                      2 (partial)  
+                                      3 (no/unknown)  
                                (as of latest version noted)
                               }  
           }

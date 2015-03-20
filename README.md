@@ -49,7 +49,7 @@ At the very top of this repository are issues that people have raised about the 
 
 These have been tagged with information about
 - to which spec does the issue pertain (the gray label(s))
-- which working group needs to resolve the issue (the blue label that starts with a "wg"
+- which working group needs to resolve the issue (the blue label that starts with a "wg")
 - how hard is the issue to address - this helps testwriters know which are the low-hanging fruit they can easily take care of
 
 Based on these tags and thanks to the GitHub API, we can determine how many open issues a given spec (or working group) has, who raised the issue, who closed the issue, how long it took to address the issue, and do all of that by difficulty level as well.
