@@ -40,12 +40,13 @@
     var tests = [];
     var allData = {caniuse: [], groups:[], specs:[], tests:[]};
 
+    var dateFormatter = d3.time.format("%Y-%m-%d");
+
     var initVis = function() {
         var brushHandler = new Object();
         timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler);
 
         $(brushHandler).bind("brushChanged", function(event, selectionStart, selectionEnd) {
-            console.log(selectionStart+ " to " + selectionEnd);
         });
 
     };
@@ -55,7 +56,14 @@
             caniuse = _caniuse;
             groups = _groups;
             specs = _specs;
-            tests = _tests;
+            tests = _tests.map(function(d) {
+                d.created_at = new Date(d.created_at);
+                return d;
+            });
+
+
+
+
             allData.caniuse = caniuse;
             allData.groups = groups;
             allData.specs = specs;
