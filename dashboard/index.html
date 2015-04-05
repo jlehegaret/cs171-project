@@ -1,8 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+    <meta charset="utf-8">
+    <title>Web Platform Test Dashboard | Test the Web Forward</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://d3js.org/queue.v1.min.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 </head>
 <body>
+
+<div class="container">
+
+</div>
+
+
+<script>
+    //Global data variables
+    var caniuse = [];
+    var groups = [];
+    var specs = [];
+    var tests = [];
+
+
+    var loadData = function(error, _caniuse, _groups, _specs, _tests) {
+        console.log(_caniuse);
+        if(!error){
+            caniuse = _caniuse;
+            groups = _groups;
+            specs = _specs;
+            tests = _tests;
+        } else {
+            console.log("Error loading data!:" + error);
+        }
+        testData();
+    };
+
+
+    var initDashboard = function() {
+        //asynchronously load data and meta data, then call dataLoaded functionality
+        queue()
+                .defer(d3.json, "data/caniuse.json")
+                .defer(d3.json, "data/groups.json")
+                .defer(d3.json, "data/specs.json")
+                .defer(d3.json, "data/tests.json")
+                .await(loadData);
+    };
+
+    var testData = function() {
+        console.log(caniuse);
+        console.log(groups);
+        console.log(specs);
+        console.log(tests);
+    };
+
+    initDashboard();
+</script>
 </body>
 </html>
