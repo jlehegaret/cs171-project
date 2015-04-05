@@ -3,18 +3,31 @@
 <head>
     <meta charset="utf-8">
     <title>Web Platform Test Dashboard | Test the Web Forward</title>
+    <!--Library code -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="http://d3js.org/queue.v1.min.js"></script>
+    <!--Vis code-->
+    <script src="js/timelinevis.js"></script>
+
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <!-- Styles from http://testthewebforward.org/ -->
     <link rel="stylesheet" href="css/custom.css" type="text/css" media="screen">
+    <!-- Visualization Styles -->
+    <link rel="stylesheet" href="css/vis.css" type="text/css" media="screen">
 </head>
 <body>
 
 <div class="container">
 
     <h1>Web Platform Tests Dashboard</h1>
+
+    <div class="row">
+        <div class="col-md-12" id="timelineVis">
+        </div>
+    </div>
+
 
 </div>
 
@@ -25,24 +38,37 @@
     var groups = [];
     var specs = [];
     var tests = [];
+    var allData = {caniuse: [], groups:[], specs:[], tests:[]};
 
+    var initVis = function() {
+        var brushHandler = new Object();
+        timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler);
+
+        $(brushHandler).bind("brushChanged", function(event, selectionStart, selectionEnd) {
+            console.log(selectionStart+ " to " + selectionEnd);
+        });
+
+    };
 
     var loadData = function(error, _caniuse, _groups, _specs, _tests) {
-        console.log(_caniuse);
         if(!error){
             caniuse = _caniuse;
             groups = _groups;
             specs = _specs;
             tests = _tests;
+            allData.caniuse = caniuse;
+            allData.groups = groups;
+            allData.specs = specs;
+            allData.tests = tests;
         } else {
             console.log("Error loading data!:" + error);
         }
-        testData();
+        logData();
+        initVis();
     };
 
-
-    var initDashboard = function() {
-        //asynchronously load data and meta data, then call dataLoaded functionality
+    var init = function() {
+        //asynchronously load data
         queue()
                 .defer(d3.json, "data/caniuse.json")
                 .defer(d3.json, "data/groups.json")
@@ -51,14 +77,18 @@
                 .await(loadData);
     };
 
-    var testData = function() {
+    var logData = function() {
+        console.log("Can I Use: ");
         console.log(caniuse);
+        console.log("Groups: ");
         console.log(groups);
+        console.log("Specs: ");
         console.log(specs);
+        console.log("Tests: ");
         console.log(tests);
     };
 
-    initDashboard();
+    init();
 </script>
 </body>
 </html>
