@@ -86,17 +86,18 @@ TimelineVis.prototype.wrangleData = function(specs) {
 
     var allIssues = [];
     this.displayData.forEach(function(d) {
-        d.issues.forEach(function(dd) {
-            issuesTotal++;
-            if(dd.state === "closed") {
-                issuesClosed++;
-            } else {
-                issuesOpen++;
-            }
-            dd.title = d.title;
-            allIssues.push(dd);
-        });
-
+        if(d.issues) {
+            d.issues.forEach(function (dd) {
+                issuesTotal++;
+                if (dd.state === "closed") {
+                    issuesClosed++;
+                } else {
+                    issuesOpen++;
+                }
+                dd.title = d.title;
+                allIssues.push(dd);
+            });
+        }
     });
 
     var allIssuesCreated = d3.nest()
