@@ -2,16 +2,14 @@ TimelineVis = function(_parentElement, _data, _eventHandler, _options) {
     this.parentElement = _parentElement;
     this.data = _data;
     this.eventHandler = _eventHandler;
-    this.options = _options;
+    this.options = _options || {width:800, height:100};
     this.displayData = [];
     this.allIssues = [];
 
-    var options = _options || {width:800, height:100};
-
     // defines constants
     this.margin = {top: 20, right: 20, bottom: 20, left: 50};
-    this.width = options.width - this.margin.left - this.margin.right;
-    this.height = options.height - this.margin.top - this.margin.bottom;
+    this.width = this.options.width - this.margin.left - this.margin.right;
+    this.height = this.options.height - this.margin.top - this.margin.bottom;
 
     this.dateFormatter = d3.time.format("%Y-%m-%d");
 
