@@ -41,6 +41,9 @@
     var allData = {caniuse: [], groups:[], specs:[], tests:[]};
 
     var dateFormatter = d3.time.format("%Y-%m-%d");
+    var stripTime = function(dateTime) {
+      return dateFormatter(new Date(dateTime))
+    };
 
     var initVis = function() {
         var brushHandler = new Object();
@@ -55,15 +58,32 @@
         if(!error){
             caniuse = _caniuse;
             groups = _groups;
-            specs = _specs;
-            tests = _tests.map(function(d) {
-                d.created_at = new Date(d.created_at);
+
+            //Filter out all specs without issues
+            specs = _specs.filter(function(d) {
+                return "issues" in d;
+            }).map(function(d) {
+                //coerce date strings into date objects without time
+                d.issues = d.issues.map(function(dd) {
+                    dd.created_at = stripTime(dd.created_at);
+                    if("closed_at" in dd) {
+                        dd.closed_at = stripTime(dd.closed_at);
+                    }
+                    if("merged_at" in dd) {
+                        dd.merged_at = stripTime(dd.merged_at);
+                    }
+                    return dd;
+                });
                 return d;
             });
-
-
-
-
+            //coerce date strings into date objects
+            tests = _tests.map(function(d) {
+                d.created_at = stripTime(d.created_at);
+                if("closed_at" in d) {
+                    d.closed_at = stripTime(d.closed_at);
+                }
+                return d;
+            });
             allData.caniuse = caniuse;
             allData.groups = groups;
             allData.specs = specs;
