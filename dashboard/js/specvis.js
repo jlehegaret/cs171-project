@@ -51,14 +51,27 @@ SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
     var that = this;
 
     //create a lookup table of specs keyed by url
-    this.displayData.lookup_spec = {};
+    this.displayData.spec_lookup = {};
     this.data.specs.forEach(function(d,i) {
         if(that.data.specs[i]){
-            that.displayData.lookup_spec[that.data.specs[i].url] = that.data.specs[i];
+            that.displayData.spec_lookup[that.data.specs[i].url] = that.data.specs[i];
         } else {
             console.log(that.data.specs[i]);
         }
     });
+ //   console.log(this.displayData.spec_lookup);
+
+    this.displayData.test_lookup = {};
+    this.data.tests.forEach(function(test) {
+        test.specs.forEach(function(spec) {
+            //check if an entry already exists, if not create one
+            if(!that.displayData.test_lookup[spec]) {
+                that.displayData.test_lookup[spec] = [];
+            }
+            that.displayData.test_lookup[spec].push(test);
+        })
+    });
+ //   console.log(this.displayData.test_lookup);
 
     this.displayData.root = {name:"W3C", children:[]};
 
@@ -70,11 +83,18 @@ SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
         group.children = [];
         d.specs.forEach(function(dd) {
             var spec = {};
+            spec.name = dd.title;
             spec.url = dd.url;
-            if(that.displayData.lookup_spec[dd.url]) {
-                spec.children = that.displayData.lookup_spec[dd.url].issues;
+            spec.children = [{name:"HTML", children:[]},{name:"Tests", children:[]}];
+            if(that.displayData.spec_lookup[dd.url]) {
+                spec.children[0].children = that.displayData.spec_lookup[dd.url].issues;
             } else {
                 console.log("Spec Not Found Error: " + dd.url);
+            }
+            if(that.displayData.test_lookup[dd.url]) {
+                spec.children[1].children = that.displayData.test_lookup[dd.url];
+            } else {
+                console.log("No Tests for: " + dd.url);
             }
             group.children.push(spec);
         });

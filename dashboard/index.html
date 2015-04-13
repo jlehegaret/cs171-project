@@ -49,8 +49,8 @@
     };
 
     var initVis = function() {
-        var brushHandler = new Object();
-        var selectionHandler = new Object();
+        var brushHandler = {};
+        var selectionHandler = {};
         spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler);
         timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler);
 
