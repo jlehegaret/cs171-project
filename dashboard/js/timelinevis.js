@@ -111,7 +111,7 @@ TimelineVis.prototype.wrangleData = function(specs) {
 
     this.displayData = allIssuesCreated;
 
-    console.log(allIssuesCreated);
+//    console.log(allIssuesCreated);
 //    console.log(allIssuesClosed);
 //    console.log("Total: " + issuesTotal + ", Open: " + issuesOpen + ", Closed: " + issuesClosed);
 };

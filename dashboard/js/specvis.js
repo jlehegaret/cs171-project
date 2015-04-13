@@ -50,9 +50,6 @@ SpecVis.prototype.initVis = function() {
 SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
     var that = this;
 
-    var filteredSpecs = this.filterAndAggregate(_dateFilterFunction);
-    
-
     //create a lookup table of specs keyed by url
     this.displayData.lookup_spec = {};
     this.data.specs.forEach(function(d,i) {
@@ -66,18 +63,18 @@ SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
     this.displayData.root = {name:"W3C", children:[]};
 
     this.data.groups.forEach(function(d) {
-        var group = new Object();
+        var group = {};
         group.name = d.name;
         group.shortname = d.shortname;
         group.url = d.url;
         group.children = [];
         d.specs.forEach(function(dd) {
-            var spec = new Object();
+            var spec = {};
             spec.url = dd.url;
             if(that.displayData.lookup_spec[dd.url]) {
                 spec.children = that.displayData.lookup_spec[dd.url].issues;
             } else {
-                console.log(dd.url);
+                console.log("Spec Not Found Error: " + dd.url);
             }
             group.children.push(spec);
         });

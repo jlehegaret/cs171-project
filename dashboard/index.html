@@ -7,23 +7,21 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="http://d3js.org/queue.v1.min.js"></script>
-    <!--Vis code-->
-    <script src="js/timelinevis.js"></script>
-    <script src="js/specvis.js"></script>
-
-
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
     <!-- Styles from http://testthewebforward.org/ -->
     <link rel="stylesheet" href="css/custom.css" type="text/css" media="screen">
     <!-- Visualization Styles -->
     <link rel="stylesheet" href="css/vis.css" type="text/css" media="screen">
+
+    <!--Vis code-->
+    <script src="js/timelinevis.js"></script>
+    <script src="js/specvis.js"></script>
 </head>
 <body>
 
 <div class="container">
-
     <h1>Web Platform Tests Dashboard</h1>
-
 
     <div class = "row">
         <div class="col-md-12" id="specVis">
@@ -34,8 +32,6 @@
         <div class="col-md-12" id="timelineVis">
         </div>
     </div>
-
-
 </div>
 
 
@@ -64,7 +60,6 @@
         $(selectionHandler).bind("selectionChanged", function(event, specSelection){
 
         });
-
     };
 
     var loadData = function(error, _caniuse, _groups, _specs, _tests) {
@@ -76,7 +71,6 @@
 //                    .filter(function(d) {
 //                        return "issues" in d;
 //                    })
-            console.log(_specs.length);
             specs = _specs
                     .map(function(d) {
                     if(d.issues) {
@@ -93,7 +87,6 @@
                     }
                         return d;
                 });
-            console.log(specs.length);
             //coerce date strings into date objects
             tests = _tests.map(function(d) {
                 d.created_at = stripTime(d.created_at);
@@ -109,6 +102,8 @@
         } else {
             console.log("Error loading data!:" + error);
         }
+
+        //log the data structures, remove for production
         logData();
         initVis();
     };
@@ -123,6 +118,7 @@
                 .await(loadData);
     };
 
+    //debugging method to log all the data structures
     var logData = function() {
         console.log("Can I Use: ");
         console.log(caniuse);
