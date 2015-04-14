@@ -36,102 +36,101 @@
 
 
 <script>
-    //Global data variables
-    var caniuse = [];
-    var groups = [];
-    var specs = [];
-    var tests = [];
-    var allData = {caniuse: [], groups:[], specs:[], tests:[]};
 
-    var dateFormatter = d3.time.format("%Y-%m-%d");
-    var stripTime = function(dateTime) {
-      return dateFormatter(new Date(dateTime))
-    };
+    $(document).ready(function() {
+        //Global data variables
+        var caniuse = [];
+        var groups = [];
+        var specs = [];
+        var tests = [];
+        var allData = {caniuse: [], groups: [], specs: [], tests: []};
 
-    var initVis = function() {
-        var brushHandler = {};
-        var selectionHandler = {};
-        spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler);
-        timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler);
+        var dateFormatter = d3.time.format("%Y-%m-%d");
+        var stripTime = function (dateTime) {
+            return dateFormatter(new Date(dateTime))
+        };
 
-        $(brushHandler).bind("brushChanged", function(event, selectionStart, selectionEnd) {
+        var initVis = function () {
+            var brushHandler = {};
+            var selectionHandler = {};
+            spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler);
+            timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler);
+
+            $(brushHandler).bind("brushChanged", function (event, selectionStart, selectionEnd) {
             spec_vis.onSelectionChange(selectionStart, selectionEnd);
-        });
-
-        $(selectionHandler).bind("selectionChanged", function(event, specSelection){
-
-        });
-    };
-
-    var loadData = function(error, _caniuse, _groups, _specs, _tests) {
-        if(!error){
-            caniuse = _caniuse;
-            groups = _groups;
-
-            //Filter out all specs without issues
-//                    .filter(function(d) {
-//                        return "issues" in d;
-//                    })
-            specs = _specs
-                    .map(function(d) {
-                    if(d.issues) {
-                        d.issues = d.issues.map(function (dd) {
-                            dd.created_at = stripTime(dd.created_at);
-                            if ("closed_at" in dd) {
-                                dd.closed_at = stripTime(dd.closed_at);
-                            }
-                            if ("merged_at" in dd) {
-                                dd.merged_at = stripTime(dd.merged_at);
-                            }
-                            return dd;
-                        });
-                    }
-                        return d;
-                });
-            //coerce date strings into date objects
-            tests = _tests.map(function(d) {
-                d.created_at = stripTime(d.created_at);
-                if("closed_at" in d) {
-                    d.closed_at = stripTime(d.closed_at);
-                }
-                return d;
             });
-            allData.caniuse = caniuse;
-            allData.groups = groups;
-            allData.specs = specs;
-            allData.tests = tests;
-        } else {
-            console.log("Error loading data!:" + error);
-        }
 
-        //log the data structures, remove for production
-        logData();
-        initVis();
-    };
+            $(selectionHandler).bind("selectionChanged", function (event, specSelection) {
 
-    var init = function() {
-        //asynchronously load data
-        queue()
-                .defer(d3.json, "data/caniuse.json")
-                .defer(d3.json, "data/groups.json")
-                .defer(d3.json, "data/specs.json")
-                .defer(d3.json, "data/tests.json")
-                .await(loadData);
-    };
+            });
+        };
 
-    //debugging method to log all the data structures
-    var logData = function() {
-        console.log("Can I Use: ");
-        console.log(caniuse);
-        console.log("Groups: ");
-        console.log(groups);
-        console.log("Specs: ");
-        console.log(specs);
-        console.log("Tests: ");
-        console.log(tests);
-    };
+        var dataLoaded = function (error, _caniuse, _groups, _specs, _tests) {
+            if (!error) {
+                caniuse = _caniuse;
+                groups = _groups;
 
-    init();
+                specs = _specs
+                        .map(function (d) {
+                            if (d.issues) {
+                                d.issues = d.issues.map(function (dd) {
+                                    dd.created_at = stripTime(dd.created_at);
+                                    if ("closed_at" in dd) {
+                                        dd.closed_at = stripTime(dd.closed_at);
+                                    }
+                                    if ("merged_at" in dd) {
+                                        dd.merged_at = stripTime(dd.merged_at);
+                                    }
+                                    return dd;
+                                });
+                            }
+                            return d;
+                        });
+                //coerce date strings into date objects
+                tests = _tests.map(function (d) {
+                    d.created_at = stripTime(d.created_at);
+                    if ("closed_at" in d) {
+                        d.closed_at = stripTime(d.closed_at);
+                    }
+                    return d;
+                });
+                allData.caniuse = caniuse;
+                allData.groups = groups;
+                allData.specs = specs;
+                allData.tests = tests;
+
+                //log the data structures, remove for production
+                logData();
+                initVis();
+            } else {
+                console.log("Error loading data!:" + error);
+            }
+        };
+
+        var init = function () {
+            //asynchronously load data
+            queue()
+                    .defer(d3.json, "data/caniuse.json")
+                    .defer(d3.json, "data/groups.json")
+                    .defer(d3.json, "data/specs.json")
+                    .defer(d3.json, "data/tests.json")
+                    .await(dataLoaded);
+        };
+
+        //debugging method to log all the data structures
+        var logData = function () {
+            console.log("Can I Use: ");
+            console.log(caniuse);
+            console.log("Groups: ");
+            console.log(groups);
+            console.log("Specs: ");
+            console.log(specs);
+            console.log("Tests: ");
+            console.log(tests);
+        };
+
+        init();
+    });
 </script>
 </body>
 </html>
