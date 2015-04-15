@@ -7,23 +7,21 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="http://d3js.org/queue.v1.min.js"></script>
-    <!--Vis code-->
-    <script src="js/timelinevis.js"></script>
-    <script src="js/specvis.js"></script>
-
-
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
     <!-- Styles from http://testthewebforward.org/ -->
     <link rel="stylesheet" href="css/custom.css" type="text/css" media="screen">
     <!-- Visualization Styles -->
     <link rel="stylesheet" href="css/vis.css" type="text/css" media="screen">
+
+    <!--Vis code-->
+    <script src="js/timelinevis.js"></script>
+    <script src="js/specvis.js"></script>
 </head>
 <body>
 
 <div class="container">
-
     <h1>Web Platform Tests Dashboard</h1>
-
 
     <div class = "row">
         <div class="col-md-12" id="specVis">
@@ -34,125 +32,118 @@
         <div class="col-md-12" id="timelineVis">
         </div>
     </div>
-
-
 </div>
 
 
 <script>
-    //Global data variables
-    var caniuse = [];
-    var groups = [];
-    var specs = [];
-    var tests = [];
-    var allData = {caniuse: [], groups:[], specs:[], tests:[]};
 
-    var dateFormatter = d3.time.format("%Y-%m-%d");
-    var stripTime = function(dateTime) {
-      return dateFormatter(new Date(dateTime))
-    };
+    $(document).ready(function() {
+        //Global data variables
+        var caniuse = [];
+        var groups = [];
+        var specs = [];
+        var tests = [];
+        var allData = {caniuse: [], groups: [], specs: [], tests: []};
 
-    var initVis = function() {
-        var brushHandler = new Object();
-        var selectionHandler = new Object();
-        spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler);
-        timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData.specs, brushHandler);
+        var dateFormatter = d3.time.format("%Y-%m-%d");
+        var stripTime = function (dateTime) {
+            return dateFormatter(new Date(dateTime))
+        };
 
-        $(brushHandler).bind("brushChanged", function(event, selectionStart, selectionEnd) {
-        });
+        var initVis = function () {
+            var brushHandler = {};
+            var selectionHandler = {};
+            spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler);
+            timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData.specs, brushHandler);
 
-        $(selectionHandler).bind("selectionChanged", function(event, specSelection){
-
-        });
-
-    };
-
-  var loadData = function(error, _caniuse, _groups, _specs, _tests)
-  {
-    if(!error)
-    {
-      caniuse = _caniuse;
-      groups = _groups;
-
-      //Filter out all specs without issues
-//                    .filter(function(d) {
-//                        return "issues" in d;
-//                    })
-      console.log(_specs.length);
-      specs = _specs.map(function(d)
-              {
-                if(d["last_pub"])
-                {
-                  d.last_pub = stripTime(d["last_pub"]);
-                }
-                if(d.issues)
-                {
-                  d.issues = d.issues.map(function (dd)
-                  {
-                    dd.created_at = stripTime(dd.created_at);
-                    if ("closed_at" in dd)
-                    {
-                      dd.closed_at = stripTime(dd.closed_at);
-                    }
-                    if ("merged_at" in dd)
-                    {
-                      dd.merged_at = stripTime(dd.merged_at);
-                    }
-                    return dd;
-                  });
-                }
-                if(d.commits)
-                {
-                  d.commits = d.commits.map(function(dd)
-                              {
-                                dd.date = stripTime(dd.date);
-                                return dd;
-                              });
-                }
-                return d;
-              });
-            console.log(specs.length);
-            //coerce date strings into date objects
-            tests = _tests.map(function(d) {
-                d.created_at = stripTime(d.created_at);
-                if("closed_at" in d) {
-                    d.closed_at = stripTime(d.closed_at);
-                }
-                return d;
+            $(brushHandler).bind("brushChanged", function (event, selectionStart, selectionEnd) {
+            spec_vis.onSelectionChange(selectionStart, selectionEnd);
             });
-            allData.caniuse = caniuse;
-            allData.groups = groups;
-            allData.specs = specs;
-            allData.tests = tests;
-        } else {
-            console.log("Error loading data!:" + error);
-        }
-        // logData();
-        initVis();
-    };
 
-    var init = function() {
-        //asynchronously load data
-        queue()
-                .defer(d3.json, "cs171-data/caniuse.json")
-                .defer(d3.json, "cs171-data/groups.json")
-                .defer(d3.json, "cs171-data/specs.json")
-                .defer(d3.json, "cs171-data/tests.json")
-                .await(loadData);
-    };
+            $(selectionHandler).bind("selectionChanged", function (event, specSelection) {
 
-    var logData = function() {
-        console.log("Can I Use: ");
-        console.log(caniuse);
-        console.log("Groups: ");
-        console.log(groups);
-        console.log("Specs: ");
-        console.log(specs);
-        console.log("Tests: ");
-        console.log(tests);
-    };
+            });
+        };
 
-    init();
+        var dataLoaded = function (error, _caniuse, _groups, _specs, _tests) {
+            if (!error) {
+                caniuse = _caniuse;
+                groups = _groups;
+
+                specs = _specs
+                        .map(function (d) {
+                            if(d["last_pub"])
+                            {
+                              d.last_pub = stripTime(d["last_pub"]);
+                            }
+                            if (d.issues) {
+                                d.issues = d.issues.map(function (dd) {
+                                    dd.created_at = stripTime(dd.created_at);
+                                    if ("closed_at" in dd) {
+                                        dd.closed_at = stripTime(dd.closed_at);
+                                    }
+                                    if ("merged_at" in dd) {
+                                        dd.merged_at = stripTime(dd.merged_at);
+                                    }
+                                    return dd;
+                                });
+                            }
+                            if(d.commits)
+                            {
+                              d.commits = d.commits.map(function(dd)
+                                          {
+                                            dd.date = stripTime(dd.date);
+                                            return dd;
+                                          });
+                            }
+                            return d;
+                        });
+                //coerce date strings into date objects
+                tests = _tests.map(function (d) {
+                    d.created_at = stripTime(d.created_at);
+                    if ("closed_at" in d) {
+                        d.closed_at = stripTime(d.closed_at);
+                    }
+                    return d;
+                });
+                allData.caniuse = caniuse;
+                allData.groups = groups;
+                allData.specs = specs;
+                allData.tests = tests;
+
+                //log the data structures, remove for production
+                logData();
+                initVis();
+            } else {
+                console.log("Error loading data!:" + error);
+            }
+        };
+
+        var init = function () {
+            //asynchronously load data
+            queue()
+                    .defer(d3.json, "cs171-data/caniuse.json")
+                    .defer(d3.json, "cs171-data/groups.json")
+                    .defer(d3.json, "cs171-data/specs.json")
+                    .defer(d3.json, "cs171-data/tests.json")
+                    .await(dataLoaded);
+        };
+
+        //debugging method to log all the data structures
+        var logData = function () {
+            console.log("Can I Use: ");
+            console.log(caniuse);
+            console.log("Groups: ");
+            console.log(groups);
+            console.log("Specs: ");
+            console.log(specs);
+            console.log("Tests: ");
+            console.log(tests);
+        };
+
+        init();
+    });
+
 </script>
 </body>
 </html>

@@ -17,6 +17,7 @@ TimelineVis = function(_parentElement, _data, _eventHandler, _options) {
 };
 
 TimelineVis.prototype.initVis = function() {
+
     var that = this;
 
     // constructs SVG layout
@@ -24,23 +25,26 @@ TimelineVis.prototype.initVis = function() {
         .attr("width", this.width + this.margin.left + this.margin.right)
         .attr("height", this.height + this.margin.top + this.margin.bottom)
         .append("g")
-        .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+        .attr("transform", "translate(" + this.margin.left
+              + "," + this.margin.top + ")");
 
     // creates scales
-    this.x0 = d3.time.scale.utc()
-        .range([0, this.width]);
-    this.x1 = d3.scale.ordinal()
-                      .domain(["PR", "ISS", "COM"];
-    this.color = d3.scale.ordinal()
-                          .range(["yellow", "red", "blue"]);
+    // this.x0 = d3.time.scale.utc()
+    //                 .range([0, this.width]);
 
-    this.y_lines-code = d3.scale.linear()
-        .range([this.height, 0]);
-        // y=0 is in the middle of our graph, with +/- values
+    // this.x1 = d3.scale.ordinal()
+    //                   .domain(["PR", "ISS", "COM"]);
 
-    this.y_issues = d3.scale.linear()
-        .range([this.height, 0])
-        .domain([1, 2, 3];  // easy, not-easy, unknown
+    // this.color = d3.scale.ordinal()
+    //                       .range(["yellow", "red", "blue"]);
+
+    // this.y_linesCode = d3.scale.linear()
+    //     .range([this.height, 0]);
+    //     // y=0 is in the middle of our graph, with +/- values
+
+    // this.y_issues = d3.scale.linear()
+    //     .range([this.height, 0])
+    //     .domain([1, 2, 3]);  // easy, not-easy, unknown
 
     // create axes
     this.xAxis = d3.svg.axis()
@@ -214,6 +218,7 @@ this.displayData.sort(function(a,b)
 console.log("Message #1: ");
 console.log(this.displayData);
 }
+
 
 TimelineVis.prototype.updateVis = function() {
     var that = this;
