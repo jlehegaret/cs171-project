@@ -99,32 +99,55 @@ SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
 
 
     // Create the root object for the vis data hierarchy
-    var root = {name:"W3C", children:[]};
+    var root = {name:"W3C", key:"root", children:[]};
     var totalIssues2 = 0;
     // Create a group object for every group in the original dataset
     this.data.groups.forEach(function(_group) {
         var group = {};
         group.name = _group.name;
-        group.shortname = _group.shortname;
+        group.key = _group.shortname;
+        group.type = "group";
         group.url = _group.url;
         group.children = [];
         //specs are only keyed by url in each group, spec_lookup will be used to find them in the original specs dataset
         _group.specs.forEach(function(_spec) {
             var spec = {};
             spec.url = _spec.url;
-            //every spec will have two children, a group of issues for the HTML spec and a group of tests
-            spec.children = [{name:"HTML", children:[]},{name:"Tests", children:[]}];
+            spec.key = group.key + _spec.url;
+            spec.type = "spec";
             if(that.displayData.spec_lookup[_spec.url]) {
-                spec.name = that.displayData.spec_lookup[_spec.url].name;
-                spec.children[0].children = that.displayData.spec_lookup[_spec.url].issues;
-                if(spec.children[0].children) {
-                    totalIssues2 += spec.children[0].children.length
+                var _fullSpec = that.displayData.spec_lookup[_spec.url];
+                //every spec will have two children, a group of issues for the HTML spec and a group of tests
+                spec.children = [{name:"HTML", key:spec.key + "HTML", children:[]},{name:"Tests", key:spec.key + "Tests", children:[]}];
+                spec.name = _fullSpec.name;
+                if(_fullSpec.issues) {
+                    _fullSpec.issues.forEach(function (_issue) {
+                        var issue = {};
+                        issue.title = _issue.title;
+                        issue.key = spec.key + _issue.html_url;
+                        issue.type = _issue.type;
+                        issue.state = _issue.state;
+                        issue.created_at = _issue.created_at;
+                        issue.closed_at = _issue.closed_at;
+                        issue.merged_at = _issue.merged_at;
+                        issue.url = _issue.html_url;
+                        spec.children[0].children.push(issue);
+                    });
                 }
             } else {
                 console.log("Spec Not Found Error: " + _spec.url);
             }
             if(that.displayData.test_lookup[_spec.url]) {
-                spec.children[1].children = that.displayData.test_lookup[_spec.url];
+                var _allTests = that.displayData.test_lookup[_spec.url];
+                _allTests.forEach(function(_test) {
+                    var test = {};
+                    test.title = _test.title;
+                    test.key = spec.key + _test.html_url;
+                    test.type = _test.type;
+                    test.state = _test.state;
+                    test.created_at = _test.created_at;
+                    spec.children[1].children.push(test);
+                });
             } else {
                //console.log("No Tests for: " + dd.url);
             }
@@ -132,20 +155,6 @@ SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
         });
         root.children.push(group);
     });
-    console.log(totalIssues2);
-
-    var totalIssues3 = 0;
-    root.children.forEach(function(d) {
-        d.children.forEach(function(dd) {
-            dd.children.forEach(function(ddd) {
-                if(ddd.children) {
-                   // console.log(ddd.children);
-                    totalIssues3+=ddd.children.length;
-                }
-            });
-        });
-    });
-    console.log(totalIssues3);
 
     this.displayData.root = root;
 };
@@ -175,11 +184,19 @@ SpecVis.prototype.updateVis = function() {
     };
 
     var path = this.svg.selectAll("path")
-        .data(this.partition(root))
+        .data(this.partition.nodes(root), function(d) {
+            return d.key;
+        });
+
+    path
         .enter().append("path")
         .attr("d", this.arc)
         .style("fill", function(d) { return that.color((d.children ? d : d.parent).name); })
         .on("click", click);
+
+    //path
+    //    .exit()
+    //    .remove();
 
 
     //var path = this.svg.selectAll("path")
@@ -231,4 +248,26 @@ SpecVis.prototype.arcTween = function(d) {
             ? function(t) { return that.arc(d); }
             : function(t) { that.x.domain(xd(t)); that.y.domain(yd(t)).range(yr(t)); return that.arc(d); };
     };
-}
+};
+
+SpecVis.prototype.countIssues = function() {
+    var totalIssues = 0;
+    this.displayData.children.forEach(function(d) {
+        d.children.forEach(function(dd) {
+            dd.children.forEach(function(ddd) {
+                if(ddd.children) {
+                    totalIssues+=ddd.children.length;
+                }
+            });
+        });
+    });
+    return totalIssues();
+};
+
+
+SpecVis.prototype.checkForDuplicateKeys = function(root) {
+    var keys = [];
+    keys.push.root.key;
+    while(root.children) {}
+
+};
