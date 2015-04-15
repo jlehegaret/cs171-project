@@ -2,7 +2,7 @@ TimelineVis = function(_parentElement, _data, _eventHandler, _options) {
     this.parentElement = _parentElement;
     this.data = _data;
     this.eventHandler = _eventHandler;
-    this.options = _options || {width:800, height:100};
+    this.options = _options || {width:800, height:300};
     this.displayData = [];
     this.allIssues = [];
 
@@ -27,10 +27,20 @@ TimelineVis.prototype.initVis = function() {
         .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
     // creates scales
-    this.x = d3.time.scale.utc()
+    this.x0 = d3.time.scale.utc()
         .range([0, this.width]);
-    this.y = d3.scale.linear()
+    this.x1 = d3.scale.ordinal()
+                      .domain(["PR", "ISS", "COM"];
+    this.color = d3.scale.ordinal()
+                          .range(["yellow", "red", "blue"]);
+
+    this.y_lines-code = d3.scale.linear()
         .range([this.height, 0]);
+        // y=0 is in the middle of our graph, with +/- values
+
+    this.y_issues = d3.scale.linear()
+        .range([this.height, 0])
+        .domain([1, 2, 3];  // easy, not-easy, unknown
 
     // create axes
     this.xAxis = d3.svg.axis()
@@ -40,17 +50,14 @@ TimelineVis.prototype.initVis = function() {
         .scale(this.y)
         .orient("left");
 
-    // create chart
-    this.area = d3.svg.area()
-        .interpolate("monotone")
-        .x(function(d) { return that.x(that.dateFormatter.parse(d.key)); })
-        .y0(this.height)
-        .y1(function(d) { return that.y(d.values.length); });
+    // prepare for display bars
+    this.svg.append("g")
+            .attr("class", "bars");
 
     // Add axes visual elements
     this.svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + this.height + ")");
+        .attr("class", "x axis")  // put it in the middle
+        .attr("transform", "translate(0," + this.height/2 + ")");
     this.svg.append("g")
         .attr("class", "y axis")
         .append("text")
@@ -61,7 +68,8 @@ TimelineVis.prototype.initVis = function() {
     // brushing
     this.brush = d3.svg.brush()
         .on("brush", function(){
-            $(that.eventHandler).trigger("brushChanged", that.brush.extent());
+            $(that.eventHandler).trigger("brushChanged",
+            that.brush.extent());
         });
     this.svg.append("g")
         .attr("class", "brush");
@@ -75,46 +83,137 @@ TimelineVis.prototype.initVis = function() {
 
 
 //TODO: This is still under construction
-TimelineVis.prototype.wrangleData = function(specs) {
-    var that = this;
+TimelineVis.prototype.wrangleData = function() {
 
-    this.displayData = this.data.specs;
+  var that = this;
 
-    var issuesTotal=0;
-    var issuesClosed=0;
-    var issuesOpen=0;
+  var count = 0;
+  var count2 = 0;
 
-    var allIssues = [];
-    this.displayData.forEach(function(d) {
-        if(d.issues) {
-            d.issues.forEach(function (dd) {
-                issuesTotal++;
-                if (dd.state === "closed") {
-                    issuesClosed++;
-                } else {
-                    issuesOpen++;
-                }
-                dd.title = d.title;
-                allIssues.push(dd);
-            });
+  // helper functions
+
+  var stripTime = function(dateTime) {
+      return dateFormatter(new Date(dateTime))
+  };
+
+  function findDate(day)
+  {
+    var found = false;
+    for(var i = 0; i < that.displayData.length; i++)
+    {
+      if(that.displayData[i].date == day)
+      {
+        return i;
+      }
+    }
+
+    // if we're here, we need to create a new element
+    that.displayData.push(
+      { "date"          : day,
+        "specs_pub"     : [],
+        "PRs_created"   : { total: 0, details: [] },
+        "PRs_closed"    : { total: 0, details: [] },
+        "ISS_created"   : { total: 0, details: [] },
+        "ISS_closed"    : { total: 0, details: [] },
+        "Commits"       : { total: 0, details: [] }
+      });
+
+    return (that.displayData.length - 1);
+  }
+
+
+  // MAIN DATA WRANGLING FUNCTION
+
+  // for each "thing" in the data
+  // check the array for an element with that date
+  // create the element if necessary,
+  //  initializing it with blanks for each data type
+  // based on type,
+  //  add/subtract the number of lines to display_lines
+  //  add details to the details_array
+
+  this.displayData = [];
+  this.data.forEach(function(d)
+  {
+    var today;
+    var index;
+    if(d.last_pub)
+    {
+      index = findDate(d.last_pub);
+      today = that.displayData[index];
+      today.specs_pub.push(d);
+    }
+
+    if(d.commits)
+    {
+      d.commits.forEach(function(c)
+      {
+          index = findDate(c.date);
+          today = that.displayData[index];
+          today.Commits.total++;
+          today.Commits.details.push(c);
+      });
+    }
+
+    if(d.issues)
+    {
+      d.issues.forEach(function(c)
+      {
+        // is it a PR or an issue
+        if(c.type === "pull")
+        {
+          // when was it created
+          index = findDate(c.created_at);
+          today = that.displayData[index];
+          today.PRs_created.total +=
+            (c.line_added + c.line_deleted);
+          today.PRs_created.details.push(c);
+          // when was it possibly closed
+          if(c.closed_at)
+          {
+            index = findDate(c.closed_at);
+            today = that.displayData[index];
+            today.PRs_closed.total +=
+              (c.line_added + c.line_deleted);
+            today.PRs_closed.details.push(c);
+          }
         }
-    });
+        else if(c.type === "issue")
+        {
+// if(c.difficulty)
+// {
+// console.log("found difficulty");
+// console.log(today);
+// }
 
-    var allIssuesCreated = d3.nest()
-        .key(function(d) {return d.created_at;})
-        .sortKeys(d3.ascending)
-        .entries(allIssues);
+          // when was it created
+          index = findDate(c.created_at);
+          today = that.displayData[index];
 
-    var allIssuesClosed = d3.nest()
-        .key(function(d) {return d.closed_at;})
-        .entries(allIssues);
+// REVISE THIS FOR DIFFICULTY WHEN ADD TESTS
+          today.ISS_created.total++;
+          today.ISS_created.details.push(c);
+          // when was it possibly closed
+          if(c.closed_at)
+          {
+            index = findDate(c.closed_at);
+            today = that.displayData[index];
 
-    this.displayData = allIssuesCreated;
 
-    console.log(allIssuesCreated);
-//    console.log(allIssuesClosed);
-//    console.log("Total: " + issuesTotal + ", Open: " + issuesOpen + ", Closed: " + issuesClosed);
-};
+// REVISE THIS FOR DIFFICULTY WHEN ADD TESTS
+            today.ISS_closed.total++;
+            today.ISS_closed.details.push(c);
+          }
+        }
+      });
+    } // end of d.issues work
+  });
+
+this.displayData.sort(function(a,b)
+        {return Date.parse(a.date) - Date.parse(b.date); });
+console.log("Message #1: ");
+console.log(this.displayData);
+}
 
 TimelineVis.prototype.updateVis = function() {
     var that = this;
@@ -124,33 +223,15 @@ TimelineVis.prototype.updateVis = function() {
     });
 
 
-    //var startDate = d3.min(this.displayData, function(d) {
-    //    return d3.min(d.issues, function(dd) {
-    //        return dd.created_at;
-    //    });
-    //});
-    //var endDate = d3.max(this.displayData, function(d) {
-    //    return d3.max(d.issues, function(dd) {
-    //        return dd.created_at;
-    //    });
-    //});
-
     // updates scale domain
     this.x.domain(dateRange);
 //    this.x.nice(d3.time.week);
-    this.y.domain(d3.extent(this.displayData, function(d) { return d.values.length; }));
+    this.y.domain(d3.extent(this.displayData,
+            function(d) { return d.values.length; }));
 
 
     // updates graph
-    var path = this.svg.selectAll(".area")
-        .data([this.displayData]);
-    path.enter()
-        .append("path")
-        .attr("class", "area");
-    path
-        .attr("d", this.area);
-    path.exit()
-        .remove();
+
 
     // updates axis
     this.svg.select(".x.axis")

@@ -56,7 +56,7 @@
         var brushHandler = new Object();
         var selectionHandler = new Object();
         spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler);
-        timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler);
+        timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData.specs, brushHandler);
 
         $(brushHandler).bind("brushChanged", function(event, selectionStart, selectionEnd) {
         });
@@ -67,32 +67,50 @@
 
     };
 
-    var loadData = function(error, _caniuse, _groups, _specs, _tests) {
-        if(!error){
-            caniuse = _caniuse;
-            groups = _groups;
+  var loadData = function(error, _caniuse, _groups, _specs, _tests)
+  {
+    if(!error)
+    {
+      caniuse = _caniuse;
+      groups = _groups;
 
-            //Filter out all specs without issues
+      //Filter out all specs without issues
 //                    .filter(function(d) {
 //                        return "issues" in d;
 //                    })
-            console.log(_specs.length);
-            specs = _specs
-                    .map(function(d) {
-                    if(d.issues) {
-                        d.issues = d.issues.map(function (dd) {
-                            dd.created_at = stripTime(dd.created_at);
-                            if ("closed_at" in dd) {
-                                dd.closed_at = stripTime(dd.closed_at);
-                            }
-                            if ("merged_at" in dd) {
-                                dd.merged_at = stripTime(dd.merged_at);
-                            }
-                            return dd;
-                        });
+      console.log(_specs.length);
+      specs = _specs.map(function(d)
+              {
+                if(d["last_pub"])
+                {
+                  d.last_pub = stripTime(d["last_pub"]);
+                }
+                if(d.issues)
+                {
+                  d.issues = d.issues.map(function (dd)
+                  {
+                    dd.created_at = stripTime(dd.created_at);
+                    if ("closed_at" in dd)
+                    {
+                      dd.closed_at = stripTime(dd.closed_at);
                     }
-                        return d;
-                });
+                    if ("merged_at" in dd)
+                    {
+                      dd.merged_at = stripTime(dd.merged_at);
+                    }
+                    return dd;
+                  });
+                }
+                if(d.commits)
+                {
+                  d.commits = d.commits.map(function(dd)
+                              {
+                                dd.date = stripTime(dd.date);
+                                return dd;
+                              });
+                }
+                return d;
+              });
             console.log(specs.length);
             //coerce date strings into date objects
             tests = _tests.map(function(d) {
@@ -109,17 +127,17 @@
         } else {
             console.log("Error loading data!:" + error);
         }
-        logData();
+        // logData();
         initVis();
     };
 
     var init = function() {
         //asynchronously load data
         queue()
-                .defer(d3.json, "data/caniuse.json")
-                .defer(d3.json, "data/groups.json")
-                .defer(d3.json, "data/specs.json")
-                .defer(d3.json, "data/tests.json")
+                .defer(d3.json, "cs171-data/caniuse.json")
+                .defer(d3.json, "cs171-data/groups.json")
+                .defer(d3.json, "cs171-data/specs.json")
+                .defer(d3.json, "cs171-data/tests.json")
                 .await(loadData);
     };
 
