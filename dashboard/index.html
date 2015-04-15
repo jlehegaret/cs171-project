@@ -122,10 +122,10 @@
         var init = function () {
             //asynchronously load data
             queue()
-                    .defer(d3.json, "cs171-data/caniuse.json")
-                    .defer(d3.json, "cs171-data/groups.json")
-                    .defer(d3.json, "cs171-data/specs.json")
-                    .defer(d3.json, "cs171-data/tests.json")
+                    .defer(d3.json, "data/caniuse.json")
+                    .defer(d3.json, "data/groups.json")
+                    .defer(d3.json, "data/specs.json")
+                    .defer(d3.json, "data/tests.json")
                     .await(dataLoaded);
         };
 
