@@ -162,19 +162,13 @@ SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
 SpecVis.prototype.updateVis = function() {
     var that = this;
 
-    //TODO: UGLY UGLY HACK: creates a deep copy of the root object, because the partition layout creates all sorts of funky
-    //values on the live root object. Maybe there are issues with live object references?
-    var rootJSONString = JSON.stringify(this.displayData.root);
-    var root = JSON.parse(rootJSONString);
-
-
+    var root = this.displayData.root;
 
     // Setup for switching data: stash the old values for transition.
     var stash = function(d) {
         d.x0 = d.x;
         d.dx0 = d.dx;
     };
-
 
     var click = function(d) {
         console.log(d);
@@ -194,9 +188,9 @@ SpecVis.prototype.updateVis = function() {
         .style("fill", function(d) { return that.color((d.children ? d : d.parent).name); })
         .on("click", click);
 
-    //path
-    //    .exit()
-    //    .remove();
+    path
+        .exit()
+        .remove();
 
 
     //var path = this.svg.selectAll("path")
@@ -262,12 +256,4 @@ SpecVis.prototype.countIssues = function() {
         });
     });
     return totalIssues();
-};
-
-
-SpecVis.prototype.checkForDuplicateKeys = function(root) {
-    var keys = [];
-    keys.push.root.key;
-    while(root.children) {}
-
 };
