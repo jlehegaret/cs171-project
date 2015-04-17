@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="css/vis.css" type="text/css" media="screen">
 
     <!--Vis code-->
-    <script src="js/timelinevis_initial.js"></script>
+    <script src="js/timelinevis.js"></script>
     <script src="js/specvis.js"></script>
 </head>
 <body>
@@ -54,7 +54,7 @@
             var brushHandler = {};
             var selectionHandler = {};
             spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler);
-            timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler);
+            timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData.specs, brushHandler);
 
             $(brushHandler).bind("brushChanged", function (event, selectionStart, selectionEnd) {
             spec_vis.onSelectionChange(selectionStart, selectionEnd);

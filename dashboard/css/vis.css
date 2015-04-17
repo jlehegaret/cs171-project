@@ -22,6 +22,38 @@
     pointer-events: none;
 }
 
+/* spec published */
+.PUB {
+    fill: darkgrey;
+}
+
+/* commit made */
+.COM {
+    fill: blue;
+}
+
+/* Pull Request opened */
+.PR_O {
+    fill: orange;
+}
+
+/* Pull Request closed */
+.PR_C {
+    fill: yellow;
+}
+
+/* issue opened */
+.ISS_O {
+    fill: red;
+}
+
+/* issue closed */
+.ISS_C {
+    fill: crimson;
+}
+
+
+
 path {
     stroke: #fff;
     fill-rule: evenodd;

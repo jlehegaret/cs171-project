@@ -3,9 +3,8 @@ TimelineVis = function(_parentElement, _data, _eventHandler, _options) {
     this.data = _data;
     this.displayData = [];
     this.vizData = [];
-    this.vizDates = [];
     this.eventHandler = _eventHandler;
-    this.options = _options || {width:800, height:300};
+    this.options = _options || {width:1200, height:300};
 
     // defines constants
     this.margin = {top: 20, right: 20, bottom: 20, left: 50};
@@ -14,7 +13,7 @@ TimelineVis = function(_parentElement, _data, _eventHandler, _options) {
 
     this.dateFormatter = d3.time.format("%Y-%m-%d");
 
-    this.reorderData();
+    this.reorderData(); // creates .displayData by date but complete
     this.initVis();
 };
 
@@ -36,26 +35,20 @@ TimelineVis.prototype.initVis = function() {
                     .range([0, this.width]);
 
     this.x1 = d3.scale.ordinal()
-                      .domain(["PR_O", "PR_C",
-                              "ISS_O", "ISS_C",
+                      .domain(["ISS_O", "ISS_C",
+                               "PR_O", "PR_C",
                               "COM", "PUB"])
-                      .rangeRoundBands([0, this.x0.range()]);
+                      .range([0, 0, 1, 1, 2, 3]);
 
-    this.color = d3.scale.ordinal()
-                         .domain(["PR_O", "PR_C",
-                                  "ISS_O", "ISS_C",
-                                  "COM", "PUB"])
-                          .range(["yellow", "yellow",
-                                  "red", "red",
-                                  "blue", "gray"]);
-
-    this.y_linesCode = d3.scale.linear()
-        .range([this.height, 0]);
+    this.y_count = d3.scale.linear()
+        .range([this.height/2, 0]);
+        // need to divide height by 2 as need to go up and down
         // domain is based on data
 
-    this.y_issues = d3.scale.linear()
-        .range([this.height, 0])
-        .domain([1, 2, 3]);  // easy, not-easy, unknown
+    // also need to figure out how to scale for
+    //  - lines of code
+    //  - difficulty level of issues
+    //  for now, just going with simple counts
 
     // create x axis  - saving y-axis for later if ever
     this.xAxis = d3.svg.axis()
@@ -82,7 +75,7 @@ TimelineVis.prototype.initVis = function() {
 
 
     // filter, aggregate, modify data
-    this.wrangleData(null);
+    this.wrangleData(null); // will create filtered VizData
     // call the update method
     this.updateVis();
 };
@@ -90,63 +83,93 @@ TimelineVis.prototype.initVis = function() {
 TimelineVis.prototype.updateVis = function() {
     var that = this;
 
+console.log("In updateVis #2");
+
     // update scales
-    this.x0.domain(d3.extent(this.displayData, function(d)
-                    { return d.date; } ));
+    this.x0.domain(d3.extent(this.vizData, function(d)
+                    { return Date.parse(d.date); } ));
 
     var biggest_value;
-    biggest_value = d3.max(this.displayData.map(function(d)
-                        {
-                          return d3.max([d.Commits.total,
-                                          d.PRs_created.total,
-                                          d.PRs_closed.total]);
-                        }));
+    biggest_value = d3.max(this.vizData.map(function(d)
+                      { return d3.max(d.actions,
+                                function(dd)
+                                  { return dd.total; }
+                                );
+                      }));
 
-    this.y_linesCode.domain([-biggest_value, biggest_value]);
+    this.y_count.domain([-biggest_value, biggest_value]);
 
     // update graph:
-    var dates = this.svg.selectAll(".date")
+    var dates = this.svg.select(".bars")
+                        .selectAll(".date")
                         .data(this.vizData, function(d)
                           { return d.date; });
 
     // create necessary containers for new dates
     dates.enter()
           .append("g")
-          .attr("class", "group")
+          .attr("class", "date")
+          .attr("transform", function(d)
+                {
+                  return "translate("
+                          + that.x0(Date.parse(d.date))
+                          + ",0)";
+                });
 
-    // move the new date containers as needed
+    // create new bars within each date
+    var bars = dates.selectAll("rect")
+          .data(function(d) { return d.actions; })
+          .enter()
+          .append("rect")
+          .attr("class", "timebar")
+          .attr("class", function(d) { return d.type; });
 
-    // create necessary containers for new dates
-    dates.enter()
-        .append("rect")
-        .attr("class", "bars")
-        .fill(function(d) { return color(d.type) });
-        // add more later for details in tooltip on click, etc.
-        //  don't think I need the following here
-        // .x0(0)
-        // .x1(0)
-        // .y(height/2)
-        // .width(1)
-        // .height(0)
-
-    // change existing bars to match data
-    bars.
-.width
-.height
+    // for all bars, new and changing
+    bars.attr("width", 1)
+        .attr("height", function(d)
+                  {
+                    if(d.type == "PUB")
+                    {
+                      return that.height;
+                    }
+                    else
+                    {
+                      return that.y_count(d.total);
+                    }
+                  })
+        .attr("x", function(d) { return that.x1(d.type); })
+        .attr("y", function(d)
+                  {
+                    if(d.type == "PUB")
+                    {
+                      return 0;
+                    }
+                    else if(d.type == "COM"
+                            || d.type == "PR_C"
+                            || d.type == "ISS_C")
+                    {
+                      return that.height/2 - that.y_count(d.total);
+                    }
+                    else  // opened issues or PRs
+                    {
+                      return that.height - that.y_count(d.total);
+                    }
+                  });
 
     // remove any not-needed-bars
 
 
     // update axis
-    this.svg.select(".x.axis")
-        .call(this.xAxis);
+    // this.svg.select(".x.axis")
+    //     .call(this.xAxis);
 
     //update brush
-    this.brush.x(this.x);
-    this.svg.select(".brush")
-        .call(this.brush)
-        .selectAll("rect")
-        .attr("height", this.height);
+    // this.brush.x(this.x);
+    // this.svg.select(".brush")
+    //     .call(this.brush)
+    //     .selectAll("rect")
+    //     .attr("height", this.height);
+console.log("Finished updateVis");
 };
 
 
@@ -227,7 +250,7 @@ TimelineVis.prototype.reorderData = function() {
       today.actions[0].details.push(d);
     }
 
-    if(d.commits)
+    if(d.commits)  // WE DO NOT HAVE REAL #S FOR LINES OF CODE OF COMMITS
     {
       d.commits.forEach(function(c)
       {
@@ -238,7 +261,7 @@ TimelineVis.prototype.reorderData = function() {
       });
     }
 
-    if(d.issues)
+    if(d.issues)  // HERE WE ARE NOT YET USING # LINES OF CODE
     {
       d.issues.forEach(function(c)
       {
@@ -248,16 +271,14 @@ TimelineVis.prototype.reorderData = function() {
           // when was it created
           index = findDate(c.created_at);
           today = that.displayData[index];
-          today.actions[2].total +=
-            (c.line_added + c.line_deleted);
+          today.actions[2].total++;
           today.actions[2].details.push(c);
           // when was it possibly closed
           if(c.closed_at)
           {
             index = findDate(c.closed_at);
             today = that.displayData[index];
-            today.actions[3].total +=
-              (c.line_added + c.line_deleted);
+            today.actions[3].total++;
             today.actions[3].details.push(c);
           }
         }
@@ -275,7 +296,7 @@ TimelineVis.prototype.reorderData = function() {
 
 // REVISE THIS FOR DIFFICULTY WHEN ADD TESTS
           today.actions[4].total++;
-          today.ISS_created.details.push(c);
+          today.actions[4].details.push(c);
           // when was it possibly closed
           if(c.closed_at)
           {
@@ -284,8 +305,8 @@ TimelineVis.prototype.reorderData = function() {
 
 
 // REVISE THIS FOR DIFFICULTY WHEN ADD TESTS
-            today.ISS_closed.total++;
-            today.ISS_closed.details.push(c);
+            today.actions[5].total++;
+            today.actions[5].details.push(c);
           }
         }
       });
@@ -309,111 +330,10 @@ TimelineVis.prototype.wrangleData = function(filters)
   var that = this;
   that.vizData = [];
 
-console.log("In Wrangle");
-console.log(this.displayData);
+  // this is where we will apply filters and recalculate totals
 
-  // eventually, we will drop certain records based on the
-  //   filters provided
-  // (we'll need to establish the nomenclature)
+  // however, for now, we just use this.displayData
+  this.vizData = this.displayData;
 
-  // in the meantime, we'll show all
-  // build a flat array, prime for showing graphically
-  this.displayData.forEach(function(d)
-  {
-    var bar;
-
-    // at some point, will try to make this more intelligent code
-    if(d.Commits.details.length > 0)
-    {
-      bar = {};
-
-      bar.date = d.date;
-      bar.type = "COM";
-      bar.total = d.Commits.details.length;
-      bar.details = d.Commits.details;
-
-      that.vizData.push(bar);
-    }
-    if(d.ISS_created.details.length > 0)
-    {
-      bar = {};
-
-      bar.date = d.date;
-      bar.type = "ISS_O";
-      bar.total = 0;
-      d.ISS_created.details.forEach(function (dd)
-      {
-        bar.total++;  // will make this more complicated
-                      // when do test data
-      });
-      bar.details = d.ISS_created.details;
-
-      that.vizData.push(bar);
-    }
-    if(d.ISS_closed.details.length > 0)
-    {
-      bar = {};
-
-      bar.date = d.date;
-      bar.type = "ISS_C";
-      bar.total = 0;
-      d.ISS_closed.details.forEach(function (dd)
-      {
-        bar.total++;  // will make this more complicated
-                      // when do test data
-      });
-      bar.details = d.ISS_closed.details;
-
-      that.vizData.push(bar);
-    }
-    if(d.PRs_created.details.length > 0)
-    {
-      bar = {};
-
-      bar.date = d.date;
-      bar.type = "PR_O";
-      bar.total = 0;
-      d.PRs_created.details.forEach(function (dd)
-      {
-        bar.total += (dd.line_added + dd.line_deleted);
-      });
-      bar.details = d.PRs_created.details;
-
-      that.vizData.push(bar);
-    }
-    if(d.PRs_closed.details.length > 0)
-    {
-      bar = {};
-
-      bar.date = d.date;
-      bar.type = "PR_C";
-      bar.total = 0;
-      d.PRs_closed.details.forEach(function (dd)
-      {
-        bar.total += (dd.line_added + dd.line_deleted);
-      });
-      bar.details = d.PRs_closed.details;
-
-      that.vizData.push(bar);
-    }
-    if(d.specs_pub.length > 0)
-    {
-      bar = {};
-
-      bar.date = d.date;
-      bar.type = "PUB";
-      bar.total = d.specs_pub.length;
-      bar.details = d.specs_pub;
-
-      that.vizData.push(bar);
-    }
-  });
-
-// remove later for performance sake
-this.vizData.sort(function(a,b)
-        {return Date.parse(a.date) - Date.parse(b.date); });
-
-  console.log("vizData:");
-  console.log(that.vizData);
 }
 
