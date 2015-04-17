@@ -40,28 +40,3 @@ Each of these pieces allow the user to redefine the data that is displayed by al
 
 For more details, please read our [main document](/process_doc/toc.md).
 
-### The Timeline For Doing It
-
-3/30 - 4/3
-* Jennifer sets up the project's infrastructure
-* Zona designs
-* John comes on board
-
-4/4 - 4/16
-* John creates the sunburst and timeline graphs
-* Zona creates the "who" graph, begins storytelling, and continues design decisions
-* Jennifer creates the process doc and continues the timeline graph
-
-4/17 - 4/21
-* Team continues prototype improvements ahead of 4/21 review
-* Jennifer solicits W3C feedback
-
-4/22 - 4/29
-* John increases interactivity and functionality of the three graphs
-* Zona works on storytelling features and overall look
-* Jennifer works on process document and code as is most helpful
-
-4/30 - 5/2
-* Team finalizes the model, documentation, and websites
-* Team creates screencast
-
