@@ -1,6 +1,7 @@
 # Section 4 - Our Design Process
 
 *return to [Section 3, What W3C Has So Far](existing.md)*
+
 *proceed to [Section 5, Our Proposed Feature Set](proposal.md)*
 
 First, Jennifer's very rough ideas
