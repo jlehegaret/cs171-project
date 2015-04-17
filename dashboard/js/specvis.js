@@ -53,18 +53,15 @@ SpecVis.prototype.initVis = function() {
 };
 
 
-//TODO: This is still under construction
 SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
     var that = this;
 
     //setup the default date filter function (right now filtering from march 1, 2015 to now)
-    var dateFilterFunction = function(d){return new Date(d.created_at) >= new Date("2015-03-01") && new Date(d.created_at) <= new Date()};
+    var dateFilterFunction = function(d){return new Date(d.created_at) >= new Date("2014-01-01") && new Date(d.created_at) <= new Date()};
     if (_dateFilterFunction != null){
         dateFilterFunction = _dateFilterFunction;
     }
 
-
-    var totalIssues1 = 0;
     //create a lookup table of specs keyed by spec url
     this.displayData.spec_lookup = {};
     this.data.specs.forEach(function(d) {
@@ -73,14 +70,10 @@ SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
         spec.url = d.url;
         spec.name = d.title;
         if(d.issues) {
-            //console.log(d.issues.filter(dateFilterFunction));
             spec.issues = d.issues.filter(dateFilterFunction);
-            totalIssues1 += spec.issues.length;
         }
         that.displayData.spec_lookup[d.url] = spec;
     });
-    //console.log(this.displayData.spec_lookup);
-    //console.log(totalIssues1);
 
     //creates a lookup table of tests keyed by spec url
     this.displayData.test_lookup = {};
@@ -95,36 +88,61 @@ SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
             })
         }
     });
-   //console.log(this.displayData.test_lookup);
 
 
     // Create the root object for the vis data hierarchy
-    var root = {name:"W3C", children:[]};
-    var totalIssues2 = 0;
+    var root = {name:"W3C", key:"root", children:[]};
+
     // Create a group object for every group in the original dataset
+    // It is VERY important that every item has a unique key, or the layout will have undesirable behavior
+    // This is especially true because certain specs belong to more than one group
     this.data.groups.forEach(function(_group) {
         var group = {};
         group.name = _group.name;
-        group.shortname = _group.shortname;
+        group.key = _group.shortname;
+        group.type = "group";
         group.url = _group.url;
         group.children = [];
         //specs are only keyed by url in each group, spec_lookup will be used to find them in the original specs dataset
         _group.specs.forEach(function(_spec) {
             var spec = {};
             spec.url = _spec.url;
-            //every spec will have two children, a group of issues for the HTML spec and a group of tests
-            spec.children = [{name:"HTML", children:[]},{name:"Tests", children:[]}];
+            spec.key = group.key + _spec.url;
+            spec.type = "spec";
             if(that.displayData.spec_lookup[_spec.url]) {
-                spec.name = that.displayData.spec_lookup[_spec.url].name;
-                spec.children[0].children = that.displayData.spec_lookup[_spec.url].issues;
-                if(spec.children[0].children) {
-                    totalIssues2 += spec.children[0].children.length
+                var _fullSpec = that.displayData.spec_lookup[_spec.url];
+                //every spec will have two children, a group of issues for the HTML spec and a group of tests
+                spec.children = [{name:"HTML", key:spec.key + "HTML", children:[]},{name:"Tests", key:spec.key + "Tests", children:[]}];
+                spec.name = _fullSpec.name;
+                if(_fullSpec.issues) {
+                    _fullSpec.issues.forEach(function (_issue) {
+                        var issue = {};
+                        issue.title = _issue.title;
+                        issue.key = spec.key + _issue.html_url;
+                        issue.type = _issue.type;
+                        issue.state = _issue.state;
+                        issue.created_at = _issue.created_at;
+                        issue.closed_at = _issue.closed_at;
+                        issue.merged_at = _issue.merged_at;
+                        issue.url = _issue.html_url;
+                        spec.children[0].children.push(issue);
+                    });
                 }
             } else {
                 console.log("Spec Not Found Error: " + _spec.url);
             }
+            //looks for tests in the test lookup table, creates copies if found
             if(that.displayData.test_lookup[_spec.url]) {
-                spec.children[1].children = that.displayData.test_lookup[_spec.url];
+                var _allTests = that.displayData.test_lookup[_spec.url];
+                _allTests.forEach(function(_test) {
+                    var test = {};
+                    test.title = _test.title;
+                    test.key = spec.key + _test.html_url;
+                    test.type = _test.type;
+                    test.state = _test.state;
+                    test.created_at = _test.created_at;
+                    spec.children[1].children.push(test);
+                });
             } else {
                //console.log("No Tests for: " + dd.url);
             }
@@ -132,20 +150,6 @@ SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
         });
         root.children.push(group);
     });
-    console.log(totalIssues2);
-
-    var totalIssues3 = 0;
-    root.children.forEach(function(d) {
-        d.children.forEach(function(dd) {
-            dd.children.forEach(function(ddd) {
-                if(ddd.children) {
-                   // console.log(ddd.children);
-                    totalIssues3+=ddd.children.length;
-                }
-            });
-        });
-    });
-    console.log(totalIssues3);
 
     this.displayData.root = root;
 };
@@ -153,42 +157,33 @@ SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
 SpecVis.prototype.updateVis = function() {
     var that = this;
 
-    //TODO: UGLY UGLY HACK: creates a deep copy of the root object, because the partition layout creates all sorts of funky
-    //values on the live root object. Maybe there are issues with live object references?
-    var rootJSONString = JSON.stringify(this.displayData.root);
-    var root = JSON.parse(rootJSONString);
-
-
-
-    // Setup for switching data: stash the old values for transition.
-    var stash = function(d) {
-        d.x0 = d.x;
-        d.dx0 = d.dx;
-    };
-
+    var root = this.displayData.root;
 
     var click = function(d) {
         console.log(d);
         path.transition()
             .duration(750)
-            .attrTween("d", that.arcTween(d));
+            .attrTween("d", that.arcTweenZoom(d));
     };
 
     var path = this.svg.selectAll("path")
-        .data(this.partition(root))
+        .data(this.partition.nodes(root), function(d) {
+            return d.key;
+        });
+
+    path
         .enter().append("path")
-        .attr("d", this.arc)
+        //if a leaf node, take the color of parent, otherwise take a new color
         .style("fill", function(d) { return that.color((d.children ? d : d.parent).name); })
         .on("click", click);
+ //       .each(this.stash);
 
+    path.attr("d", this.arc);
+ //       .attrTween("d", this.arcTweenData);
 
-    //var path = this.svg.selectAll("path")
-    //    .data(this.partition.nodes(this.displayData.root))
-    //    .enter().append("path")
-    //    .attr("display", function(d) { return d.depth ? null : "none"; }) // hide inner ring
-    //    .each(stash);
-
-//    path.attrTween("d", arcTweenData);
+    path
+        .exit()
+        .remove();
 
     //var text = this.svg.selectAll("text").data(this.partition.nodes);
     //var textEnter = text.enter().append("text")
@@ -215,13 +210,12 @@ SpecVis.prototype.updateVis = function() {
 };
 
 SpecVis.prototype.onSelectionChange = function(selectionStart, selectionEnd) {
-    console.log("select from " + selectionStart + " to " + selectionEnd);
     this.wrangleData(function(d) {return new Date(d.created_at) >= selectionStart && new Date(d.created_at) <=selectionEnd});
     this.updateVis();
 };
 
 // Interpolate the scales!
-SpecVis.prototype.arcTween = function(d) {
+SpecVis.prototype.arcTweenZoom = function(d) {
     var that = this;
     var xd = d3.interpolate(this.x.domain(), [d.x, d.x + d.dx]),
         yd = d3.interpolate(this.y.domain(), [d.y, 1]),
@@ -231,4 +225,47 @@ SpecVis.prototype.arcTween = function(d) {
             ? function(t) { return that.arc(d); }
             : function(t) { that.x.domain(xd(t)); that.y.domain(yd(t)).range(yr(t)); return that.arc(d); };
     };
-}
+};
+
+// Setup for switching data: stash the old values for transition.
+SpecVis.prototype.stash = function(d) {
+    d.x0 = d.x;
+    d.dx0 = d.dx;
+};
+
+// When switching data: interpolate the arcs in data space.
+SpecVis.prototype.arcTweenData = function(a, i) {
+    var oi = d3.interpolate({x: a.x0, dx: a.dx0}, a);
+    function tween(t) {
+        var b = oi(t);
+        a.x0 = b.x;
+        a.dx0 = b.dx;
+        return arc(b);
+    }
+    if (i == 0) {
+        // If we are on the first arc, adjust the x domain to match the root node
+        // at the current zoom level. (We only need to do this once.)
+        var xd = d3.interpolate(x.domain(), [node.x, node.x + node.dx]);
+        return function(t) {
+            x.domain(xd(t));
+            return tween(t);
+        };
+    } else {
+        return tween;
+    }
+};
+
+//Utility method to count issues (all the leaves)
+SpecVis.prototype.countIssues = function() {
+    var totalIssues = 0;
+    this.displayData.children.forEach(function(d) {
+        d.children.forEach(function(dd) {
+            dd.children.forEach(function(ddd) {
+                if(ddd.children) {
+                    totalIssues+=ddd.children.length;
+                }
+            });
+        });
+    });
+    return totalIssues();
+};

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Web Platform Test Dashboard | Test the Web Forward</title>
+    <!--Library code -->
+    
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://d3js.org/queue.v1.min.js"></script>
+    
+    <style>
+
+    .axis text {
+    font: 10px sans-serif;
+    }
+
+    .axis line,
+    .axis path {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+    }
+
+    </style>
+
+<body>
+
+<script>
+    
+      //Global data variables
+    var caniuse = [];
+    var groups = [];
+    var specs = [];
+    var tests = [];
+    var allData = {caniuse: [], groups:[], specs:[], tests:[]};
+
+    var dateFormatter = d3.time.format("%Y-%m-%d");
+    var stripTime = function(dateTime) {
+      return dateFormatter(new Date(dateTime))
+    };
+
+    var loadData = function(error, _caniuse, _groups, _specs, _tests) {
+        if(!error){
+            caniuse = _caniuse;
+            groups = _groups;
+
+            console.log(_specs.length);
+            specs = _specs
+                    .map(function(d) {
+                    if(d.issues) {
+                        d.issues = d.issues.map(function (dd) {
+                            dd.created_at = stripTime(dd.created_at);
+                            if ("closed_at" in dd) {
+                                dd.closed_at = stripTime(dd.closed_at);
+                            }
+                            if ("merged_at" in dd) {
+                                dd.merged_at = stripTime(dd.merged_at);
+                            }
+                            return dd;
+                        });
+                    }
+                        return d;
+                });
+            console.log(specs.length);
+            
+            tests = _tests.map(function(d) {
+                d.created_at = stripTime(d.created_at);
+                if("closed_at" in d) {
+                    d.closed_at = stripTime(d.closed_at);
+                }
+                return d;
+            });
+            allData.caniuse = caniuse;
+            allData.groups = groups;
+            allData.specs = specs;
+            allData.tests = tests;
+        } else {
+            console.log("Error loading data!:" + error);
+        }
+        logData();
+       
+    };
+
+    var init = function() {
+        //asynchronously load data
+        queue()
+                .defer(d3.json, "data/caniuse.json")
+                .defer(d3.json, "data/groups.json")
+                .defer(d3.json, "data/specs.json")
+                .defer(d3.json, "data/tests.json")
+                .await(loadData);
+    };
+
+    var logData = function() {
+
+        var authors = [];    
+
+        specs.forEach(function(d){
+
+            //console.log(d)
+
+            if(d.issues != undefined){
+
+            d.issues.map(function(d){
+
+                    if(d.line_added != undefined){
+
+                authors.push({
+
+                    author: d.author["login"],
+                    sum: d.line_deleted +  d.line_added
+
+             })
+            }
+          })
+        }
+      }) 
+
+        var authorSorted = function(){
+
+          var temp = {};
+          var obj = null;
+          var result = [];
+
+                for(var i=0; i < authors.length; i++) {
+                   obj=authors[i];
+
+                   if(!temp[obj.author]) {
+                       temp[obj.author] = obj;
+                   } else {
+                       temp[obj.author].sum += obj.sum;
+                   }
+                }
+                
+                for (var prop in temp){
+
+                    result.push(temp[prop]);
+                    result.sort(function(a, b) {return b.sum - a.sum});
+
+                }
+                    
+
+               return result.slice(0,19);
+
+        }
+
+        ///////////// D3 //////////////
+
+        var margin = {top: 50, bottom: 10, left:150, right: 40};
+        var width = 900 - margin.left - margin.right;
+        var height = 300 - margin.top - margin.bottom;
+     
+        var svg = d3.select("body").append("svg")
+                    .attr("width", width+margin.left+margin.right)
+                    .attr("height", height+margin.top+margin.bottom);
+
+        var div = d3.select("body").append("div")
+               .attr("class", "div")
+               .style("margin-left", width/2+40+"px");
+
+       var change_btn = d3.select("div").append("button")
+               .html("Top 20 per SPEC")
+               .attr("state", 0);
+
+        change_btn.on("click", function(){
+
+           var self = d3.select(this);
+           var state = +self.attr("state");
+           var txt = "Switch: ";
+
+           if(state === 0)
+           {
+        
+               state = 1;
+               txt = "Top 20 contributors";
+
+           }
+
+           else if(state === 1)
+           {
+               
+               state = 0;
+               txt = "Top 20 per SPEC";
+
+           }
+
+           self.attr("state", state);
+           self.html(txt);
+
+       });
+            
+        var data = authorSorted();
+
+        var xScale = d3.scale.linear().range([0, width/2]);
+        var yScale = d3.scale.ordinal().rangeRoundBands([0, height], .2, 0);
+
+        var color = d3.scale.ordinal()
+        .range(["#062B59", "#09458F", "#073874", "#09458F", "#0B52AA", "#0C5FC5"]);
+
+        var max = d3.max(data, function(d) { return d.sum; } );
+        var min = d3.min(data, function(d) { return d.sum; } );
+
+        xScale.domain([min, max]);
+        yScale.domain(data.map(function(d) { return d.author; }));
+
+        var xAxis = d3.svg.axis()
+        .scale(xScale)
+        .ticks(5)
+        .orient("top");
+
+        var g = svg.append("g")
+                .attr("transform", "translate("+margin.left+","+margin.top+")"); 
+
+        g.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + -10 + ")"); 
+
+        g.select(".x.axis")
+        .call(xAxis)
+        .selectAll("text");     
+
+        var authorGroup = g.selectAll(".authors")
+            .data(data)
+            .enter()
+            .append("g")
+            .attr("transform", function(d){
+
+                return "translate(0," + yScale(d.author) + ")";
+
+            });
+
+        var rect = authorGroup
+            .append("rect")
+            .attr("height", 10)
+            .attr("x", 0)
+            .attr("y", 0)
+            .style("fill", function(d){
+                return color(d.author)
+            })
+            .transition()
+            .delay(function(d, i) { return i * 10; })
+            .attr("width", function(d) { return xScale(d.sum); });
+            
+
+        var txt = authorGroup
+            .append("text")
+            .text(function(d){return d.author})
+            .style("font-size", "9px")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", "0.8em")
+            .style("font-family", "sans-serif");        
+
+    };
+   
+
+    init();
+
+</script>
+</body>
+</html>
