@@ -2,9 +2,7 @@
 
 **The CS 171 Group Project created by**
 
-Jennifer Le Hegaret
-Zona Kostic
-John Greeley
+Jennifer Le Hegaret, Zona Kostic, and John Greeley
 
 
 ## What We Want To Do

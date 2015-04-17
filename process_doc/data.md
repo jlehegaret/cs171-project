@@ -1,7 +1,7 @@
 # Section 2 - The Data
 
-* return to Section 1, Background *
-* proceed to Section 3, What W3C Has So Far *
+*return to [Section 1, Background, Motivation and Objectives](background.md)*
+*proceed to [Section 3, What W3C Has So Far](existing.md)*
 
 ## What's Out There
 

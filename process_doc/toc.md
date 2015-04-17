@@ -1,10 +1,8 @@
 # W3C - Test the Web Forward
 
-** The CS 171 Group Project created by **
+**The CS 171 Group Project created by**
 
-Jennifer Le Hegaret
-Zona Kostic
-John Greeley
+Jennifer Le Hegaret, Zona Kostic, and John Greeley
 
 ## Table of Contents
 
