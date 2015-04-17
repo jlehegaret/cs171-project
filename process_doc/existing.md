@@ -1,8 +1,7 @@
 # Section 3 - What W3C Has So Far
 
-*return to [Section 2, The Data](data.md)*
-
-*proceed to [Section 4, Our Design Ideas](design.md)*
+* *return to [Section 2, The Data](data.md)*
+* *proceed to [Section 4, Our Design Ideas](design.md)*
 
 
 W3C currently relies upon this graph:

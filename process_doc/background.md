@@ -3,7 +3,7 @@
 
 ## Section 1 - Background and Objectives
 
-*proceed to [Section 2, the Data](data.md)*
+* *proceed to [Section 2, the Data](data.md)*
 
 For our project, we propose to assist the W3C in its work to develop the standards for the web platform by helping it visualize its progress developing and testing its various specifications for web standards.
 
