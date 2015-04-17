@@ -53,18 +53,15 @@ SpecVis.prototype.initVis = function() {
 };
 
 
-//TODO: This is still under construction
 SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
     var that = this;
 
     //setup the default date filter function (right now filtering from march 1, 2015 to now)
-    var dateFilterFunction = function(d){return new Date(d.created_at) >= new Date("2015-03-01") && new Date(d.created_at) <= new Date()};
+    var dateFilterFunction = function(d){return new Date(d.created_at) >= new Date("2014-01-01") && new Date(d.created_at) <= new Date()};
     if (_dateFilterFunction != null){
         dateFilterFunction = _dateFilterFunction;
     }
 
-
-    var totalIssues1 = 0;
     //create a lookup table of specs keyed by spec url
     this.displayData.spec_lookup = {};
     this.data.specs.forEach(function(d) {
@@ -73,14 +70,10 @@ SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
         spec.url = d.url;
         spec.name = d.title;
         if(d.issues) {
-            //console.log(d.issues.filter(dateFilterFunction));
             spec.issues = d.issues.filter(dateFilterFunction);
-            totalIssues1 += spec.issues.length;
         }
         that.displayData.spec_lookup[d.url] = spec;
     });
-    //console.log(this.displayData.spec_lookup);
-    //console.log(totalIssues1);
 
     //creates a lookup table of tests keyed by spec url
     this.displayData.test_lookup = {};
@@ -95,13 +88,14 @@ SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
             })
         }
     });
-   //console.log(this.displayData.test_lookup);
 
 
     // Create the root object for the vis data hierarchy
     var root = {name:"W3C", key:"root", children:[]};
-    var totalIssues2 = 0;
+
     // Create a group object for every group in the original dataset
+    // It is VERY important that every item has a unique key, or the layout will have undesirable behavior
+    // This is especially true because certain specs belong to more than one group
     this.data.groups.forEach(function(_group) {
         var group = {};
         group.name = _group.name;
@@ -137,6 +131,7 @@ SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
             } else {
                 console.log("Spec Not Found Error: " + _spec.url);
             }
+            //looks for tests in the test lookup table, creates copies if found
             if(that.displayData.test_lookup[_spec.url]) {
                 var _allTests = that.displayData.test_lookup[_spec.url];
                 _allTests.forEach(function(_test) {
@@ -164,17 +159,11 @@ SpecVis.prototype.updateVis = function() {
 
     var root = this.displayData.root;
 
-    // Setup for switching data: stash the old values for transition.
-    var stash = function(d) {
-        d.x0 = d.x;
-        d.dx0 = d.dx;
-    };
-
     var click = function(d) {
         console.log(d);
         path.transition()
             .duration(750)
-            .attrTween("d", that.arcTween(d));
+            .attrTween("d", that.arcTweenZoom(d));
     };
 
     var path = this.svg.selectAll("path")
@@ -184,22 +173,17 @@ SpecVis.prototype.updateVis = function() {
 
     path
         .enter().append("path")
-        .attr("d", this.arc)
+        //if a leaf node, take the color of parent, otherwise take a new color
         .style("fill", function(d) { return that.color((d.children ? d : d.parent).name); })
         .on("click", click);
+ //       .each(this.stash);
+
+    path.attr("d", this.arc);
+ //       .attrTween("d", this.arcTweenData);
 
     path
         .exit()
         .remove();
-
-
-    //var path = this.svg.selectAll("path")
-    //    .data(this.partition.nodes(this.displayData.root))
-    //    .enter().append("path")
-    //    .attr("display", function(d) { return d.depth ? null : "none"; }) // hide inner ring
-    //    .each(stash);
-
-//    path.attrTween("d", arcTweenData);
 
     //var text = this.svg.selectAll("text").data(this.partition.nodes);
     //var textEnter = text.enter().append("text")
@@ -226,13 +210,12 @@ SpecVis.prototype.updateVis = function() {
 };
 
 SpecVis.prototype.onSelectionChange = function(selectionStart, selectionEnd) {
-    console.log("select from " + selectionStart + " to " + selectionEnd);
     this.wrangleData(function(d) {return new Date(d.created_at) >= selectionStart && new Date(d.created_at) <=selectionEnd});
     this.updateVis();
 };
 
 // Interpolate the scales!
-SpecVis.prototype.arcTween = function(d) {
+SpecVis.prototype.arcTweenZoom = function(d) {
     var that = this;
     var xd = d3.interpolate(this.x.domain(), [d.x, d.x + d.dx]),
         yd = d3.interpolate(this.y.domain(), [d.y, 1]),
@@ -244,6 +227,35 @@ SpecVis.prototype.arcTween = function(d) {
     };
 };
 
+// Setup for switching data: stash the old values for transition.
+SpecVis.prototype.stash = function(d) {
+    d.x0 = d.x;
+    d.dx0 = d.dx;
+};
+
+// When switching data: interpolate the arcs in data space.
+SpecVis.prototype.arcTweenData = function(a, i) {
+    var oi = d3.interpolate({x: a.x0, dx: a.dx0}, a);
+    function tween(t) {
+        var b = oi(t);
+        a.x0 = b.x;
+        a.dx0 = b.dx;
+        return arc(b);
+    }
+    if (i == 0) {
+        // If we are on the first arc, adjust the x domain to match the root node
+        // at the current zoom level. (We only need to do this once.)
+        var xd = d3.interpolate(x.domain(), [node.x, node.x + node.dx]);
+        return function(t) {
+            x.domain(xd(t));
+            return tween(t);
+        };
+    } else {
+        return tween;
+    }
+};
+
+//Utility method to count issues (all the leaves)
 SpecVis.prototype.countIssues = function() {
     var totalIssues = 0;
     this.displayData.children.forEach(function(d) {
