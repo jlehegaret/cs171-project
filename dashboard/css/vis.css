@@ -24,22 +24,27 @@
 
 /* spec published */
 .PUB {
-    fill: darkgrey;
+    fill: lightgrey;
+}
+
+.PUB.REC {
+    fill: black;
+
 }
 
 /* commit made */
 .COM {
-    fill: blue;
+    fill: yellow;
 }
 
 /* Pull Request opened */
 .PR_O {
-    fill: orange;
+    fill: darkblue;
 }
 
 /* Pull Request closed */
 .PR_C {
-    fill: yellow;
+    fill: blue;
 }
 
 /* issue opened */

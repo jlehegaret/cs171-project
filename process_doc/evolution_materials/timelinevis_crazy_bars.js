@@ -20,7 +20,6 @@ TimelineVis = function(_parentElement, _data, _eventHandler, _options) {
 TimelineVis.prototype.initVis = function() {
 
     var that = this;
-    var space = this.height/8; // REMOVE HARD-# IF FINAL LAYOUT
 
     // constructs SVG layout
     this.svg = this.parentElement.append("svg")
@@ -35,34 +34,21 @@ TimelineVis.prototype.initVis = function() {
     this.x0 = d3.time.scale.utc()
                     .range([0, this.width]);
 
-//  PROBABLY DEFUNCT DUE TO SO MUCH DATA
     this.x1 = d3.scale.ordinal()
                       .domain(["ISS_O", "ISS_C",
                                "PR_O", "PR_C",
                               "COM", "PUB"])
-                      .range([0, 0, 1, 1, 0, 0]);
+                      .range([0, 0, 1, 1, 2, 3]);
 
-    this.y_axisType = d3.scale.ordinal()
-                      .domain([
-                               "spec code",
-                               "spec count",
-                               "test code",
-                               "test count"
-                              ])
-                      .range([
-                              space,
-                              3*space,
-                              5*space,
-                              7*space
-                              ]);
+    this.y_count = d3.scale.linear()
+        .range([this.height/2, 0]);
+        // need to divide height by 2 as need to go up and down
+        // domain is based on data
 
-// how high should the bar be?  We actually calc. the bar here.
-    this.height_lines = d3.scale.pow()
-        .exponent(.2)
-        .range([0, space]);
-    this.height_count = d3.scale.pow()
-        .exponent(.5)
-        .range([0, space]);
+    // also need to figure out how to scale for
+    //  - lines of code
+    //  - difficulty level of issues
+    //  for now, just going with simple counts
 
     // create x axis  - saving y-axis for later if ever
     this.xAxis = d3.svg.axis()
@@ -76,7 +62,7 @@ TimelineVis.prototype.initVis = function() {
     // Add axes visual elements
     this.svg.append("g")
         .attr("class", "x axis")  // put it in the middle
-        .attr("transform", "translate(0," + this.height + ")");
+        .attr("transform", "translate(0," + this.height/2 + ")");
 
     // brushing
     this.brush = d3.svg.brush()
@@ -97,19 +83,26 @@ TimelineVis.prototype.initVis = function() {
 TimelineVis.prototype.updateVis = function() {
     var that = this;
 
-console.log("In updateVis #3");
+console.log("In updateVis #2");
 
     // update scales
-    this.x0.domain(d3.extent(this.vizData.dates, function(d)
+    this.x0.domain(d3.extent(this.vizData, function(d)
                     { return Date.parse(d.date); } ));
 
-    this.height_lines.domain([0, this.vizData.max_linesCode]);
-    this.height_count.domain([0, this.vizData.max_numIssues]);
+    var biggest_value;
+    biggest_value = d3.max(this.vizData.map(function(d)
+                      { return d3.max(d.actions,
+                                function(dd)
+                                  { return dd.total; }
+                                );
+                      }));
+
+    this.y_count.domain([-biggest_value, biggest_value]);
 
     // update graph:
     var dates = this.svg.select(".bars")
                         .selectAll(".date")
-                        .data(this.vizData.dates, function(d)
+                        .data(this.vizData, function(d)
                           { return d.date; });
 
     // create necessary containers for new dates
@@ -128,19 +121,8 @@ console.log("In updateVis #3");
           .data(function(d) { return d.actions; })
           .enter()
           .append("rect")
-          .attr("class", function(d)
-                  {
-                    var res = "timebar " + d.type;
-                    if(d.type == "PUB" && d.details.length
-                         == d.details.filter(function(dd)
-                            { return dd.status == "REC"; }
-                            ).length )
-                    {
-                            res = res + " REC";
-                    }
-                    return res;
-                  }
-                );
+          .attr("class", "timebar")
+          .attr("class", function(d) { return d.type; });
 
     // for all bars, new and changing
     bars.attr("width", 1)
@@ -148,46 +130,30 @@ console.log("In updateVis #3");
                   {
                     if(d.type == "PUB")
                     {
-                      d.height = that.height;
-                    }
-                    else if(d.scale == "code")
-                    {
-                      d.height = that.height_lines(d.total);
+                      return that.height;
                     }
                     else
                     {
-                      d.height =  that.height_count(d.total);
+                      return that.y_count(d.total);
                     }
-// console.log("for " + d.type + " total " + + d.total
-//               + ", height = " + d.height);
-                    return d.height;
                   })
-        .attr("x", function(d) {
-                                  // return 0; // for stacked charts
-                                  // for grouped bar
-                                  return that.x1(d.type);
-                                })
+        .attr("x", function(d) { return that.x1(d.type); })
         .attr("y", function(d)
                   {
                     if(d.type == "PUB")
                     {
-                      d.y = 0;
+                      return 0;
                     }
-                    else
+                    else if(d.type == "COM"
+                            || d.type == "PR_C"
+                            || d.type == "ISS_C")
                     {
-                      if(d.dir == "up")
-                      {
-                        d.y = that.y_axisType(d.cat + " " + d.scale)
-                              - d.height;
-                      }
-                      else  // opened issues or PRs
-                      {
-                        d.y = that.y_axisType(d.cat + " " + d.scale);
-                      }
+                      return that.height/2 - that.y_count(d.total);
                     }
-// console.log("for " + d.type + " total " + + d.total
-//               + ", y = " + y);
-                    return d.y;
+                    else  // opened issues or PRs
+                    {
+                      return that.height - that.y_count(d.total);
+                    }
                   });
 
     // remove any not-needed-bars
@@ -214,8 +180,7 @@ TimelineVis.prototype.onSelectionChange = function(specs) {
 
 TimelineVis.prototype.reorderData = function() {
 
-  var that = this;
-  var category = "spec";  // TEMPORARY until revise for tests too
+   var that = this;
 
   // helper functions
 
@@ -237,38 +202,22 @@ TimelineVis.prototype.reorderData = function() {
     // if we're here, we need to create a new element
     that.displayData.push(
       { "date"          : day,
-        "actions"       : [ { "cat"   : category,
-                              "type"  : "PUB",
+        "actions"       : [ { "type" : "PUB",
                               "total" : 0,
                               "details" : [] },
-                            { "cat"   : category,
-                              "type"  : "COM",
-                              "scale" : "code",
-                              "dir"   : "up",
+                            { "type" : "COM",
                               "total" : 0,
                               "details" : [] },
-                            { "cat"  : category,
-                              "type" : "PR_O",
-                              "scale": "code",
-                              "dir"   : "down",
+                            { "type" : "PR_O",
                               "total" : 0,
                               "details" : [] },
-                            { "cat"  : category,
-                              "type" : "PR_C",
-                              "scale": "code",
-                              "dir"   : "up",
+                            { "type" : "PR_C",
                               "total" : 0,
                               "details" : [] },
-                            { "cat"  : category,
-                              "type" : "ISS_O",
-                              "scale": "count",
-                              "dir"   : "down",
+                            { "type" : "ISS_O",
                               "total" : 0,
                               "details" : [] },
-                            { "cat"  : category,
-                              "type" : "ISS_C",
-                              "scale": "count",
-                              "dir"   : "up",
+                            { "type" : "ISS_C",
                               "total" : 0,
                               "details" : [] } ]
 
@@ -301,13 +250,13 @@ TimelineVis.prototype.reorderData = function() {
       today.actions[0].details.push(d);
     }
 
-    if(d.commits)
+    if(d.commits)  // WE DO NOT HAVE REAL #S FOR LINES OF CODE OF COMMITS
     {
       d.commits.forEach(function(c)
       {
           index = findDate(c.date);
           today = that.displayData[index];
-          today.actions[1].total += (c.line_added + c.line_deleted);
+          today.actions[1].total++;
           today.actions[1].details.push(c);
       });
     }
@@ -322,14 +271,14 @@ TimelineVis.prototype.reorderData = function() {
           // when was it created
           index = findDate(c.created_at);
           today = that.displayData[index];
-          today.actions[2].total += (c.line_added + c.line_deleted);
+          today.actions[2].total++;
           today.actions[2].details.push(c);
           // when was it possibly closed
           if(c.closed_at)
           {
             index = findDate(c.closed_at);
             today = that.displayData[index];
-            today.actions[3].total += (c.line_added + c.line_deleted);
+            today.actions[3].total++;
             today.actions[3].details.push(c);
           }
         }
@@ -367,8 +316,9 @@ TimelineVis.prototype.reorderData = function() {
 // remove later for performance sake
 this.displayData.sort(function(a,b)
         {return Date.parse(a.date) - Date.parse(b.date); });
-// console.log("displayData");
-// console.log(displayData);
+console.log("displayData: ");
+console.log(this.displayData);
+
 }
 
 TimelineVis.prototype.onSelectionChange = function(specs) {
@@ -377,80 +327,13 @@ TimelineVis.prototype.onSelectionChange = function(specs) {
 
 TimelineVis.prototype.wrangleData = function(filters)
 {
-  // this is where we will apply filters and recalculate totals
-  // and remove all bits that don't have any data in them anyway
-  //
   var that = this;
-  that.vizData = { max_linesCode : 0,
-                  // max_codedate : "",
-                  // max_issdate : "",
-                   max_numIssues : 0,
-                   dates         : []
-                 };
+  that.vizData = [];
 
-  // TEMPORARY, UNTIL WE COORDINATE
-  filters = { "start_date"  : "2000-01-01",
-              "end_date"    : "2015-05-05",
-              "categories"  : ["spec", "test"],
-              "actions"     : ["ISS_O", "ISS_C",
-                               "PR_O", "PR_C",
-                               "COM", "PUB"],
-              "who"         : []
-            }
+  // this is where we will apply filters and recalculate totals
 
-  this.displayData.forEach(function(d)
-  {
-    var day = {};
+  // however, for now, we just use this.displayData
+  this.vizData = this.displayData;
 
-    // if we're in the timeframe
-    if( ((!filters.start_date) || (d.date >= filters.start_date))
-        &&
-        ((!filters.end_date) || (d.date <= filters.end_date)) )
-    {
-      day = { "date"    : d.date,
-              "actions" : []
-            };
-
-      // evaluate data for this date
-      d.actions.forEach(function(dd)
-      {
-        if (dd.total > 0)  // we have some data we might want to see
-        {
-          if(    filters.categories.indexOf(dd.cat) !== -1
-              && filters.actions.indexOf(dd.type) !== -1)
-// ADD WHO LATER
-          {
-// if added who, need to recalculate TOTAL
-            day.actions.push(dd);
-            // check if either maximum needs to be updated
-            if(dd.scale == "code")
-            {
-              if (dd.total > that.vizData.max_linesCode)
-              {
-                that.vizData.max_linesCode = dd.total;
-                // that.vizData.max_codedate = d.date;
-              }
-            }
-            else
-            {
-              if (dd.total > that.vizData.max_numIssues)
-              {
-                that.vizData.max_numIssues = dd.total;
-                // that.vizData.max_issdate = d.date;
-              }
-            }
-          }
-        }
-      });
-    }
-
-    // we found data meeting the criteria
-    if(day.actions && day.actions.length > 0)
-    {
-      that.vizData.dates.push(day);
-    }
-  });
-console.log("vizData: ");
-console.log(this.vizData);
 }
 
