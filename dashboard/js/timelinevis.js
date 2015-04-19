@@ -92,6 +92,43 @@ TimelineVis.prototype.initVis = function() {
       .attr("x2", this.width)
       .attr("y2", function(d) { return d; });
 
+    // define our tooltip function
+    this.tip = d3.tip()
+                  .offset([0,0])
+                  .html(function(d)
+                    {
+                      var fields = [];
+                      var text = "<ul class='d3-tip'>";
+                      d.details.forEach(function(dd)
+                      {
+                        text = text + "<li>";
+
+                        // define how to access this dd
+                        if(d.type == "PUB")
+                        {
+                          text = text + "<a href='" + dd.url + "'>"
+                                + dd.title + "</a><br>" +
+                                dd.status;
+                        }
+                        else if(d.cat === "spec" && d.type === "COM")
+                        {
+                          text = text + "<a href='" + dd.html_url + "'>"
+                                + dd.title + "</a>";
+                        }
+                        else
+                        {
+                          text = text + "<a href='" + dd.html_url + "'>"
+                                + dd.title + "</a><br>"
+                                + dd.state;
+                        }
+
+                        text = text + "</li>";
+                      });
+                      text = text + "</ul>";
+
+                      return text;
+                    });
+
     // brushing
     this.brush = d3.svg.brush()
         .on("brush", function(){
@@ -142,7 +179,9 @@ console.log("In updateVis #7");
                 });
 
     // create new bars within each date
-    var bars = dates.selectAll("rect.timebar")
+    var bars
+    = dates.call(this.tip)
+          .selectAll("rect.timebar")
           .data(function(d) { return d.actions; })
           .enter()
           .append("rect")
@@ -158,7 +197,10 @@ console.log("In updateVis #7");
                     }
                     return res;
                   }
-                );
+                )
+          .on("mouseover", this.tip.show)
+          .on("click", this.tip.show);
+          // .on("mouseout", this.tip.hide);
 
     // for all bars, new and changing
     bars.attr("width", 1)
