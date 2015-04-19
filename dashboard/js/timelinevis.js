@@ -56,7 +56,7 @@ TimelineVis.prototype.initVis = function() {
                               7*space
                               ]);
 
-// how high should the bar be?  We actually calc. the bar here.
+// how high should each bar be?
     this.height_lines = d3.scale.pow()
         .exponent(.2)
         .range([0, space]);
@@ -66,7 +66,7 @@ TimelineVis.prototype.initVis = function() {
 
     // create x axis  - saving y-axis for later if ever
     this.xAxis = d3.svg.axis()
-        .scale(this.x)
+        .scale(this.x0)
         .orient("bottom");
 
     // prepare for display bars
@@ -77,6 +77,20 @@ TimelineVis.prototype.initVis = function() {
     this.svg.append("g")
         .attr("class", "x axis")  // put it in the middle
         .attr("transform", "translate(0," + this.height + ")");
+
+    // draw the various x-axis lines
+    d3.select("g.timeline")
+      .append("g")
+      .attr("class", "categoryLines")
+      .selectAll(".categoryLine")
+      .data(this.y_axisType.range())
+      .enter()
+      .append("line")
+      .attr("class", "categoryLine")
+      .attr("x1", 0)
+      .attr("y1", function(d) { return d; })
+      .attr("x2", this.width)
+      .attr("y2", function(d) { return d; });
 
     // brushing
     this.brush = d3.svg.brush()
@@ -97,7 +111,7 @@ TimelineVis.prototype.initVis = function() {
 TimelineVis.prototype.updateVis = function() {
     var that = this;
 
-console.log("In updateVis #3");
+console.log("In updateVis #7");
 
     // update scales
     this.x0.domain(d3.extent(this.vizData.dates, function(d)
@@ -105,6 +119,10 @@ console.log("In updateVis #3");
 
     this.height_lines.domain([0, this.vizData.max_linesCode]);
     this.height_count.domain([0, this.vizData.max_numIssues]);
+
+    // update axis
+   d3.select(".x.axis")
+      .call(this.xAxis);
 
     // update graph:
     var dates = this.svg.select(".bars")
@@ -124,7 +142,7 @@ console.log("In updateVis #3");
                 });
 
     // create new bars within each date
-    var bars = dates.selectAll("rect")
+    var bars = dates.selectAll("rect.timebar")
           .data(function(d) { return d.actions; })
           .enter()
           .append("rect")
@@ -158,8 +176,6 @@ console.log("In updateVis #3");
                     {
                       d.height =  that.height_count(d.total);
                     }
-// console.log("for " + d.type + " total " + + d.total
-//               + ", height = " + d.height);
                     return d.height;
                   })
         .attr("x", function(d) {
@@ -185,17 +201,14 @@ console.log("In updateVis #3");
                         d.y = that.y_axisType(d.cat + " " + d.scale);
                       }
                     }
-// console.log("for " + d.type + " total " + + d.total
-//               + ", y = " + y);
                     return d.y;
                   });
 
     // remove any not-needed-bars
+    // d3.selectAll("rect.timebar").exit().remove();
 
-
-    // update axis
-    // this.svg.select(".x.axis")
-    //     .call(this.xAxis);
+    // remove any not-needed-dates
+    dates.exit().remove();
 
     //update brush
     // this.brush.x(this.x);
@@ -215,7 +228,6 @@ TimelineVis.prototype.onSelectionChange = function(specs) {
 TimelineVis.prototype.reorderData = function() {
 
   var that = this;
-  var category = "spec";  // TEMPORARY until revise for tests too
 
   // helper functions
 
@@ -237,46 +249,78 @@ TimelineVis.prototype.reorderData = function() {
     // if we're here, we need to create a new element
     that.displayData.push(
       { "date"          : day,
-        "actions"       : [ { "cat"   : category,
+        "actions"       : [ { "cat"   : "spec",
                               "type"  : "PUB",
                               "total" : 0,
                               "details" : [] },
-                            { "cat"   : category,
+                            { "cat"   : "spec",
                               "type"  : "COM",
                               "scale" : "code",
                               "dir"   : "up",
                               "total" : 0,
                               "details" : [] },
-                            { "cat"  : category,
+                            { "cat"  : "spec",
                               "type" : "PR_O",
                               "scale": "code",
                               "dir"   : "down",
                               "total" : 0,
                               "details" : [] },
-                            { "cat"  : category,
+                            { "cat"  : "spec",
                               "type" : "PR_C",
                               "scale": "code",
                               "dir"   : "up",
                               "total" : 0,
                               "details" : [] },
-                            { "cat"  : category,
+                            { "cat"  : "spec",
                               "type" : "ISS_O",
                               "scale": "count",
                               "dir"   : "down",
                               "total" : 0,
                               "details" : [] },
-                            { "cat"  : category,
+                            { "cat"  : "spec",
+                              "type" : "ISS_C",
+                              "scale": "count",
+                              "dir"   : "up",
+                              "total" : 0,
+                              "details" : [] },
+                            { "cat"   : "test",
+                              "type"  : "PUB",
+                              "total" : 0,
+                              "details" : [] },
+                            { "cat"   : "test",
+                              "type"  : "COM",
+                              "scale" : "code",
+                              "dir"   : "up",
+                              "total" : 0,
+                              "details" : [] },
+                            { "cat"  : "test",
+                              "type" : "PR_O",
+                              "scale": "code",
+                              "dir"   : "down",
+                              "total" : 0,
+                              "details" : [] },
+                            { "cat"  : "test",
+                              "type" : "PR_C",
+                              "scale": "code",
+                              "dir"   : "up",
+                              "total" : 0,
+                              "details" : [] },
+                            { "cat"  : "test",
+                              "type" : "ISS_O",
+                              "scale": "count",
+                              "dir"   : "down",
+                              "total" : 0,
+                              "details" : [] },
+                            { "cat"  : "test",
                               "type" : "ISS_C",
                               "scale": "count",
                               "dir"   : "up",
                               "total" : 0,
                               "details" : [] } ]
-
       });
 
     return (that.displayData.length - 1);
   }
-
 
   // MAIN DATA WRANGLING FUNCTION
 
@@ -287,81 +331,105 @@ TimelineVis.prototype.reorderData = function() {
   // based on type,
   //  add/subtract the number of lines to display_lines
   //  add details to the details_array
-
-  this.displayData = [];
-  this.data.forEach(function(d)
+  function processData(d, category)
   {
     var today;
     var index;
+    var plus;  // need to change element number depending
+                // on category being processed
+    (category === "spec")
+    ? plus = 0
+    : plus = 6;
+
     if(d.last_pub)
     {
-      index = findDate(d.last_pub);
-      today = that.displayData[index];
-      today.actions[0].total++;
-      today.actions[0].details.push(d);
+
+      today = that.displayData[findDate(d.last_pub)].actions[0 + plus];
+      today.total++;
+      today.details.push(d);
     }
 
     if(d.commits)
     {
       d.commits.forEach(function(c)
       {
-          index = findDate(c.date);
-          today = that.displayData[index];
-          today.actions[1].total += (c.line_added + c.line_deleted);
-          today.actions[1].details.push(c);
+          today = that.displayData[findDate(c.date)].actions[1 + plus];
+          today.total += (c.line_added + c.line_deleted);
+          today.details.push(c);
       });
     }
 
-    if(d.issues)  // HERE WE ARE NOT YET USING # LINES OF CODE
+    if( (category == "spec" && d.issues)
+        || category == "test")
     {
-      d.issues.forEach(function(c)
+      var process;
+
+      (d.issues)
+      ? process = d.issues
+      : process = [d];
+      process.forEach(function(c)
       {
         // is it a PR or an issue
-        if(c.type === "pull")
+        if(c.type === "pull" || c.type === "test")
         {
           // when was it created
-          index = findDate(c.created_at);
-          today = that.displayData[index];
-          today.actions[2].total += (c.line_added + c.line_deleted);
-          today.actions[2].details.push(c);
+          today = that.displayData[findDate(c.created_at)].actions[2 + plus];
+          today.total += (c.line_added + c.line_deleted);
+          today.details.push(c);
           // when was it possibly closed
           if(c.closed_at)
           {
-            index = findDate(c.closed_at);
-            today = that.displayData[index];
-            today.actions[3].total += (c.line_added + c.line_deleted);
-            today.actions[3].details.push(c);
+            today = that.displayData[findDate(c.closed_at)].actions[3 + plus];
+            today.total += (c.line_added + c.line_deleted);
+            today.details.push(c);
           }
         }
         else if(c.type === "issue")
         {
-// if(c.difficulty)
-// {
-// console.log("found difficulty");
-// console.log(today);
-// }
-
           // when was it created
-          index = findDate(c.created_at);
-          today = that.displayData[index];
+          today = that.displayData[findDate(c.created_at)].actions[4 + plus];
 
-// REVISE THIS FOR DIFFICULTY WHEN ADD TESTS
-          today.actions[4].total++;
-          today.actions[4].details.push(c);
+          // how hard is it
+          var value;
+          if(c.difficulty)
+          {
+            (c.difficulty === "easy")
+            ? value = 1
+            : value = 2
+          }
+          else // not flagged, flag it this way
+          {
+            value = 3;
+          }
+          today.total += value;
+          c.difficulty_value = value;
+          today.details.push(c);
           // when was it possibly closed
           if(c.closed_at)
           {
-            index = findDate(c.closed_at);
-            today = that.displayData[index];
-
-
-// REVISE THIS FOR DIFFICULTY WHEN ADD TESTS
-            today.actions[5].total++;
-            today.actions[5].details.push(c);
+            today = that.displayData[findDate(c.closed_at)].actions[5 + plus];
+            today.total += value;
+            today.details.push(c);
           }
         }
+        else { console.log("What is this?"); console.log(c); }
       });
     } // end of d.issues work
+  }
+
+
+  // CREATE DISPLAYDATA by CALLING
+  // the main data-wrangling function on each
+  //   set of data we have
+  this.displayData = [];
+  this.data.specs.forEach(function(d)
+  {
+    processData(d, "spec");
+  });
+console.log(this.data.tests);
+  this.data.tests.forEach(function(d)
+  {
+    processData(d, "test");
   });
 
 // remove later for performance sake
@@ -389,7 +457,7 @@ TimelineVis.prototype.wrangleData = function(filters)
                  };
 
   // TEMPORARY, UNTIL WE COORDINATE
-  filters = { "start_date"  : "2000-01-01",
+  filters = { "start_date"  : "2014-01-01",
               "end_date"    : "2015-05-05",
               "categories"  : ["spec", "test"],
               "actions"     : ["ISS_O", "ISS_C",

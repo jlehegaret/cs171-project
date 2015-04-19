@@ -50,7 +50,7 @@
             var brushHandler = {};
             var selectionHandler = {};
             spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler);
-            timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData.specs, brushHandler);
+            timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler);
 
             $(brushHandler).bind("brushChanged", function (event, selectionStart, selectionEnd) {
             spec_vis.onSelectionChange(selectionStart, selectionEnd);

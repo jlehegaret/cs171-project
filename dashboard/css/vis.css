@@ -22,6 +22,11 @@
     pointer-events: none;
 }
 
+path {
+    stroke: #fff;
+    fill-rule: evenodd;
+}
+
 /* spec published */
 .PUB {
     fill: lightgrey;
@@ -57,9 +62,8 @@
     fill: crimson;
 }
 
-
-
-path {
-    stroke: #fff;
-    fill-rule: evenodd;
+.categoryLine{
+    stroke: darkgrey;
+    stroke-width: 1;
 }
+
