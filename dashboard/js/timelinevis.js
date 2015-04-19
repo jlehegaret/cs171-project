@@ -35,7 +35,8 @@ TimelineVis.prototype.initVis = function() {
     this.x0 = d3.time.scale.utc()
                     .range([0, this.width]);
 
-//  PROBABLY DEFUNCT DUE TO SO MUCH DATA
+//  Right now, have pull requests next to commits
+//    but perhaps we can/should stack those eventually
     this.x1 = d3.scale.ordinal()
                       .domain(["ISS_O", "ISS_C",
                                "PR_O", "PR_C",
@@ -246,18 +247,20 @@ console.log("In updateVis #7");
                     return d.y;
                   });
 
+// WILL NEED TO DO THIS WHEN START FILTERING
     // remove any not-needed-bars
     // d3.selectAll("rect.timebar").exit().remove();
 
     // remove any not-needed-dates
     dates.exit().remove();
 
-    //update brush
-    // this.brush.x(this.x);
-    // this.svg.select(".brush")
-    //     .call(this.brush)
-    //     .selectAll("rect")
-    //     .attr("height", this.height);
+    // update brush
+    this.brush.x(this.x0);
+    this.svg.select(".brush")
+        .call(this.brush)
+        .selectAll("rect")
+        .attr("height", this.height);
+
 console.log("Finished updateVis");
 };
 
@@ -474,9 +477,9 @@ console.log(this.data.tests);
     processData(d, "test");
   });
 
-// remove later for performance sake
-this.displayData.sort(function(a,b)
-        {return Date.parse(a.date) - Date.parse(b.date); });
+// removed for performance sake
+// this.displayData.sort(function(a,b)
+        // {return Date.parse(a.date) - Date.parse(b.date); });
 // console.log("displayData");
 // console.log(displayData);
 }
@@ -554,7 +557,7 @@ TimelineVis.prototype.wrangleData = function(filters)
       });
     }
 
-    // we found data meeting the criteria
+    // IF we found data meeting the criteria, add it to vizData
     if(day.actions && day.actions.length > 0)
     {
       that.vizData.dates.push(day);
