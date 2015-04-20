@@ -45,6 +45,27 @@ SpecVis.prototype.initVis = function() {
         .innerRadius(function(d) { return Math.max(0, that.y(d.y)); })
         .outerRadius(function(d) { return Math.max(0, that.y(d.y + d.dy)); });
 
+    // set up tooltips
+    this.tip = d3.tip()
+                  .offset([0,0])
+                  .html(function(d)
+                    {
+                        var text;
+
+                        if(d.name)
+                        { if(d.name == "HTML")
+                            {text = "Spec"; }
+                            else
+                            {text = d.name; }
+                        }
+                        else
+                        { text = d.title; }
+// console.log(d);
+                        return "<div class='d3-tip'>"
+                        + "<a href='" + d.url
+                        + "'>" + text
+                        + "</a></div>";
+                    });
 
     // filter, aggregate, modify data
     this.wrangleData();
@@ -172,8 +193,7 @@ SpecVis.prototype.updateVis = function() {
             return d.key;
         });
 
-    path
-        .enter().append("path")
+    path.enter().append("path").call(this.tip)
         //if a leaf node, take the color of parent, otherwise take a new color
         .attr("class", function(d) {
             if(d.type)
@@ -201,7 +221,8 @@ SpecVis.prototype.updateVis = function() {
 // console.log(d);
             }
         })
-        .on("click", click);
+        .on("click", click)
+        .on("mouseover", this.tip.show);
  //       .each(this.stash);
 
     path.attr("d", this.arc);

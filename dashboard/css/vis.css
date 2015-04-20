@@ -28,7 +28,6 @@ path {
 }
 
 .d3-tip{
-    font-size: 6px;
     background-color: lightyellow;
 }
 
@@ -49,7 +48,7 @@ path {
 }
 
 .sunburst.Tests {
-    fill: yellow;
+    fill: lightgrey;
 }
 
 
@@ -64,27 +63,27 @@ path {
 }
 
 /* commit made */
-.COM {
+.commit, .COM {
     fill: yellow;
 }
 
 /* Pull Request opened */
-.PR_O {
-    fill: darkblue;
-}
-
-/* Pull Request closed */
-.PR_C {
+.pull.open, .test.open, .PR_O {
     fill: blue;
 }
 
+/* Pull Request closed */
+.pull.closed, .test.closed, .PR_C {
+    fill: darkblue;
+}
+
 /* issue opened */
-.ISS_O {
+.issue.open, .ISS_O {
     fill: red;
 }
 
 /* issue closed */
-.ISS_C {
+.issue.closed, .ISS_C {
     fill: crimson;
 }
 
