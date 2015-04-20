@@ -69,6 +69,7 @@ SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
         spec = {};
         spec.url = d.url;
         spec.name = d.title;
+        spec.score = d.score;  // this is here now, but I don't see it showing up elsewhere
         if(d.issues) {
             spec.issues = d.issues.filter(dateFilterFunction);
         }
@@ -174,7 +175,32 @@ SpecVis.prototype.updateVis = function() {
     path
         .enter().append("path")
         //if a leaf node, take the color of parent, otherwise take a new color
-        .style("fill", function(d) { return that.color((d.children ? d : d.parent).name); })
+        .attr("class", function(d) {
+            if(d.type)
+            { //console.log(d);
+                if(d.type == "group" || d.type == "spec") // inner layers
+                {
+                    return "sunburst " + d.type;
+                }
+                else
+                {
+                    return "sunburst " + d.type + " " + d.state;
+                }
+            }
+            else if(d.name)  // "HTML" or "Tests", for second-outermost-layer
+            { //console.log(d);
+              return "sunburst " + d.name; }
+            else
+            { //console.log(d); // a mystery
+              return "sunburst"; }
+          })
+        .style("opacity", function(d)
+        {
+            if(d.type === "spec")
+            {
+// console.log(d);
+            }
+        })
         .on("click", click);
  //       .each(this.stash);
 

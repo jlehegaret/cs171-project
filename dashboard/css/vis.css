@@ -32,6 +32,27 @@ path {
     background-color: lightyellow;
 }
 
+.sunburst.W3C {
+    fill: darkblue;
+}
+
+.sunburst.group {
+    fill: gray;
+}
+
+.sunburst.spec {
+    fill: crimson;
+}
+
+.sunburst.HTML {
+    fill: blue;
+}
+
+.sunburst.Tests {
+    fill: yellow;
+}
+
+
 /* spec published */
 .PUB {
     fill: lightgrey;
