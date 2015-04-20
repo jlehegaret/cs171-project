@@ -5,7 +5,7 @@
 
 ## Currently
 
-The best way to get a sense of our design and the thinking behind it is to read [this Word document](designW3C.docx).
+The best way to get a sense of our design and the thinking behind it is to read [this PDF document](designW3C.pdf).
 
 
 ### for future editing / elaboration
