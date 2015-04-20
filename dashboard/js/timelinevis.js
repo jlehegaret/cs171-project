@@ -159,7 +159,7 @@ TimelineVis.prototype.updateVis = function() {
     this.height_count.domain([0, this.vizData.max_numIssues]);
 
     // update axis
-   d3.select(".x.axis")
+   this.svg.select(".x.axis")
       .call(this.xAxis);
 
     // update graph:
