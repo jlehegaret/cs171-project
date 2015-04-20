@@ -149,7 +149,7 @@ TimelineVis.prototype.initVis = function() {
 TimelineVis.prototype.updateVis = function() {
     var that = this;
 
-console.log("In updateVis #7");
+// console.log("In updateVis #7");
 
     // update scales
     this.x0.domain(d3.extent(this.vizData.dates, function(d)
@@ -261,7 +261,7 @@ console.log("In updateVis #7");
         .selectAll("rect")
         .attr("height", this.height);
 
-console.log("Finished updateVis");
+// console.log("Finished updateVis");
 };
 
 
@@ -471,7 +471,7 @@ TimelineVis.prototype.reorderData = function() {
   {
     processData(d, "spec");
   });
-console.log(this.data.tests);
+// console.log(this.data.tests);
   this.data.tests.forEach(function(d)
   {
     processData(d, "test");
@@ -563,7 +563,7 @@ TimelineVis.prototype.wrangleData = function(filters)
       that.vizData.dates.push(day);
     }
   });
-console.log("vizData: ");
-console.log(this.vizData);
+// console.log("vizData: ");
+// console.log(this.vizData);
 }
 

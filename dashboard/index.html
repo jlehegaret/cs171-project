@@ -16,8 +16,8 @@
     <link rel="stylesheet" href="css/vis.css" type="text/css" media="screen">
 
     <!--Vis code-->
+    <script src="js/specvis_wCanIUse.js"></script>
     <script src="js/timelinevis.js"></script>
-    <script src="js/specvis.js"></script>
 </head>
 <body>
 
@@ -92,6 +92,53 @@
                                             dd.date = stripTime(dd.date);
                                             return dd;
                                           });
+                            }
+                            // also calculate CanIUse score
+                            //  THE RATIONAL:
+                            //  The CanIUse score of a spec
+                            //          = ( the sum of all the CanIUse
+                            //              scores of the elements )
+                            //            divided by
+                            //            ( the number of elements
+                            //              evaluated )
+                            //  The CanIUse score of an element
+                            //          = the average score across
+                            //              all browsers
+                            //  Score per Browser:  0 unknown
+                            //                      0 not
+                            //                      1 partial
+                            //                      2 yes
+                            var elements = caniuse.filter(function(e)
+                            {
+                                return e.spec == d.url;
+                            });
+                            if(elements.length == 0)
+                            {
+                                d.CanIUseScore = 0;
+                            }
+                            else
+                            {
+                                elements.forEach(function(e)
+                                {
+                                    e.CIUresult = 0;
+                                    e.stats.forEach(function(browser)
+                                    {
+                                        if(browser.support === "yes")
+                                        {
+                                            e.CIUresult += 2;
+                                        }
+                                        else if(browser.support === "partial")
+                                        {
+                                            e.CIUresult += 1;
+                                        } // else nothing
+                                    });
+                                    e.CIUresult = e.CIUresult / e.stats.length;
+                                });
+                                // we have now stored element-by-element
+                                //  results in our spec-specific array
+                                // average this
+                                d.CanIUseScore = d3.sum(elements, function(e)
+                                                    { return e.CIUresult; })/elements.length;
                             }
                             return d;
                         });
