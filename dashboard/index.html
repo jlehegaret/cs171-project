@@ -17,6 +17,7 @@
 
     <!--Vis code-->
     <script src="js/specvis.js"></script>
+    <script src="js/whovis.js"></script>
     <script src="js/timelinevis.js"></script>
 </head>
 <body>
@@ -31,6 +32,8 @@
 
 </div>
 <div id="timelineVis"></div>
+
+<div id="whoVis"></div>
 
 <script>
 
@@ -51,6 +54,9 @@
             var brushHandler = {};
             var selectionHandler = {};
             spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler);
+            
+            who_vis = new WhoVis(d3.select("#whoVis"), allData, selectionHandler);
+
             timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler);
 
             $(brushHandler).bind("brushChanged", function (event, selectionStart, selectionEnd) {
