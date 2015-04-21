@@ -20,7 +20,11 @@ SpecVis.prototype.initVis = function() {
     this.dateFormatter = d3.time.format("%Y-%m-%d");
     this.radius = Math.min(this.width, this.height) / 2;
 
-    this.color = d3.scale.category20c();
+    //this.color = d3.scale.category20c();
+
+     this.colorGroups = d3.scale.ordinal()
+    .range(['#485F7A','#2A3C4E', '#1E3248']);
+
     this.x = d3.scale.linear()
         .range([0, 2 * Math.PI]);
     this.y = d3.scale.sqrt()
@@ -214,12 +218,73 @@ SpecVis.prototype.updateVis = function() {
             { //console.log(d); // it's a mystery what this is
               return "sunburst"; }
           })
-        .style("opacity", function(d)
-        {
+//         .style("opacity", function(d)
+//         {
+//             if(d.type === "spec")
+//             {
+// // console.log(d);  TRYING TO INCORPORATE CANIUSE SCORE HERE
+//             }
+//         })
+.style("fill", function(d, i){
+
+            if(d.type === "group")
+            {
+                return that.colorGroups(i);
+                
+            }
+
+            if(d.type == "test"){
+
+                return "#D71C39";
+            }
+
+            if(d.type == "pull"){
+
+                return "#560b16";
+            }
+
             if(d.type === "spec")
             {
-// console.log(d);  TRYING TO INCORPORATE CANIUSE SCORE HERE
+                    //console.log(d.parent.name)
+                    //console.log(d)
+                    if(d.parent.name == "Web Applications Working Group")
+                    return '#97A2B8'
+
+                    if(d.parent.name == "HTML Working Group")
+                    return '#8F9299'
+
+                    if(d.parent.name == "Device APIs Working Group")
+                    return '#6CAED7'
+                    
+                    if(d.parent.name == "Web Performance Working Group")
+                    return '#C9B3A2'
+
+                    if(d.parent.name == "Web Real-Time Communications Working Group")
+                    return '#888499'
+
+                    if(d.parent.name == "Web Application Security Working Group")
+                    return '#6CAED7'
+
+                else{
+
+                var colors = ['#97A2B8', '#B2BDC7'];
+                var random_color = colors[Math.floor(Math.random() * colors.length)];
+                return random_color;
+                
+                }
+               
             }
+
+             if(d.type === "issue")
+            {
+                return "white"
+            }
+
+             if(d.type === "issue")
+            {
+                return "white"
+            }
+
         })
         .on("click", click)
         .on("mouseover", this.tip.show);

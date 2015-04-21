@@ -5,7 +5,7 @@
 .axis line,
 .axis path {
     fill: none;
-    stroke: #000;
+    /*stroke: #000;*/
     shape-rendering: crispEdges;
 }
 
@@ -17,26 +17,26 @@
 }
 
 .brush{
-    fill: darkgrey;
+    fill: #134E84;
     fill-opacity: .5;
     pointer-events: none;
 }
 
-path {
+/*path {
     stroke: #fff;
     fill-rule: evenodd;
-}
+}*/
 
 .d3-tip{
     background-color: lightyellow;
 }
 
 .sunburst.W3C {
-    fill: darkblue;
+    fill: white;
 }
 
 .sunburst.group {
-    fill: gray;
+    fill: #1E3248;
 }
 
 .sunburst.spec {
@@ -44,13 +44,12 @@ path {
 }
 
 .sunburst.HTML {
-    fill: blue;
+    fill: #145184;
 }
 
 .sunburst.Tests {
-    fill: lightgrey;
+    fill: #142335;
 }
-
 
 /* spec published */
 .PUB {
@@ -87,8 +86,8 @@ path {
     fill: crimson;
 }
 
-.categoryLine{
+/*.categoryLine{
     stroke: darkgrey;
     stroke-width: 1;
 }
-
+*/
