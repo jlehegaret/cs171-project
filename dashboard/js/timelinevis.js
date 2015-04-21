@@ -484,7 +484,7 @@ TimelineVis.prototype.reorderData = function() {
 // console.log(displayData);
 }
 
-TimelineVis.prototype.onSelectionChange = function(specs) {
+TimelineVis.prototype.onSelectionChange = function() {
 
 };
 
@@ -508,8 +508,10 @@ TimelineVis.prototype.wrangleData = function(filters)
               "actions"     : ["ISS_O", "ISS_C",
                                "PR_O", "PR_C",
                                "COM", "PUB"],
-              "who"         : []
-            }
+              "specs"       : [],
+              "who"         : [],
+              "number_who"  : 20
+            };
 
   this.displayData.forEach(function(d)
   {
@@ -531,7 +533,7 @@ TimelineVis.prototype.wrangleData = function(filters)
         {
           if(    filters.categories.indexOf(dd.cat) !== -1
               && filters.actions.indexOf(dd.type) !== -1)
-// ADD WHO LATER
+// ADD WHO LATER, AND SPECS!!
           {
 // if added who, need to recalculate TOTAL
             day.actions.push(dd);

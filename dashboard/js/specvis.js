@@ -211,14 +211,14 @@ SpecVis.prototype.updateVis = function() {
             { //console.log(d);
               return "sunburst " + d.name; }
             else
-            { //console.log(d); // a mystery
+            { //console.log(d); // it's a mystery what this is
               return "sunburst"; }
           })
         .style("opacity", function(d)
         {
             if(d.type === "spec")
             {
-// console.log(d);
+// console.log(d);  TRYING TO INCORPORATE CANIUSE SCORE HERE
             }
         })
         .on("click", click)
