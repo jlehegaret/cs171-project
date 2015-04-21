@@ -63,12 +63,12 @@
 
 /* commit made */
 .commit, .COM {
-    fill: yellow;
+    fill: #D58800;
 }
 
 /* Pull Request opened */
 .pull.open, .test.open, .PR_O {
-    fill: blue;
+    fill: #145085;
 }
 
 /* Pull Request closed */
@@ -78,12 +78,12 @@
 
 /* issue opened */
 .issue.open, .ISS_O {
-    fill: red;
+    fill: #D81839;
 }
 
 /* issue closed */
 .issue.closed, .ISS_C {
-    fill: crimson;
+    fill: #4c0814;
 }
 
 /*.categoryLine{
