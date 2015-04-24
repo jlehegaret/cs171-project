@@ -22,6 +22,16 @@ SpecVis.prototype.initVis = function () {
 
     //this.color = d3.scale.category20c();
 
+    var sortTypes = function(a,b) {
+        if(a.type === "issue") {
+            return -1;
+        } else if (a.type === "pull") {
+            return 1;
+        } else {
+            return d3.descending(a, b);
+        }
+    };
+
     this.colorGroups = d3.scale.ordinal()
         .range(['#485F7A', '#2A3C4E', '#1E3248']);
 
@@ -43,7 +53,8 @@ SpecVis.prototype.initVis = function () {
 //        .size([2 * Math.PI, this.radius * this.radius])
         .value(function (d) {
             return 1;
-        });
+        })
+        .sort(sortTypes);
 
     //sets up the arc generator for the radial sunburst
     this.arc = d3.svg.arc()
@@ -77,7 +88,6 @@ SpecVis.prototype.initVis = function () {
             else {
                 text = d.title;
             }
-// console.log(d);
             return "<div class='d3-tip'>"
                 + "<a href='" + d.url
                 + "'>" + text
