@@ -35,7 +35,8 @@ SpecVis.prototype.initVis = function () {
         .attr("width", this.width + this.margin.left + this.margin.right)
         .attr("height", this.height + this.margin.top + this.margin.bottom)
         .append("g")
-        .attr("transform", "translate(" + (this.margin.left + this.margin.right + this.width) / 2 + "," + (this.margin.top + this.margin.bottom + this.height) / 2 + ")");
+        .classed("sunburst", true)
+        .attr("transform", "translate(" + (this.margin.left + this.margin.right + this.width) / 2 + "," + (this.margin.top + this.margin.bottom + this.height) / 2 + ")")
 
     //sets up the partition layout
     this.partition = d3.layout.partition()
@@ -131,7 +132,7 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
 
 
     // Create the root object for the vis data hierarchy
-    var root = {name: "W3C", key: "root", children: []};
+    var root = {name: "W3C", key: "root", type:"root", children: []};
 
     // Create a group object for every group in the original dataset
     // It is VERY important that every item has a unique key, or the layout will have undesirable behavior
@@ -151,12 +152,11 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
             spec.type = "spec";
             if (that.displayData.spec_lookup[_spec.url]) {
                 var _fullSpec = that.displayData.spec_lookup[_spec.url];
+
                 //every spec will have two children, a group of issues for the HTML spec and a group of tests
-                spec.children = [{name: "HTML", key: spec.key + "HTML", children: []}, {
-                    name: "Tests",
-                    key: spec.key + "Tests",
-                    children: []
-                }];
+                spec.children = [{name: "HTML", type:"HTML", key: spec.key + "HTML", children: []},
+                        {name: "Tests", type:"Tests", key: spec.key + "Tests", children: []}];
+
                 spec.name = _fullSpec.name;
                 if (_fullSpec.issues) {
                     _fullSpec.issues.forEach(function (_issue) {
@@ -217,24 +217,8 @@ SpecVis.prototype.updateVis = function () {
 
     path.enter().append("path")
         //.call(this.tip)
-        //if a leaf node, take the color of parent, otherwise take a new color
         .attr("class", function (d) {
-            if (d.type) { //console.log(d);
-                if (d.type == "group" || d.type == "spec") // inner layers
-                {
-                    return "sunburst " + d.type;
-                }
-                else {
-                    return "sunburst " + d.type + " " + d.state;
-                }
-            }
-            else if (d.name)  // "HTML" or "Tests", for second-outermost-layer
-            { //console.log(d);
-                return "sunburst " + d.name;
-            }
-            else { //console.log(d); // it's a mystery what this is
-                return "sunburst";
-            }
+            return d.type;
         })
 //         .style("opacity", function(d)
 //         {
