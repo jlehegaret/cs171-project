@@ -220,13 +220,10 @@ SpecVis.prototype.updateVis = function () {
         .attr("class", function (d) {
             return d.type;
         })
-//         .style("opacity", function(d)
-//         {
-//             if(d.type === "spec")
-//             {
-// // console.log(d);  TRYING TO INCORPORATE CANIUSE SCORE HERE
-//             }
-//         })
+         .style("opacity", function(d)
+         {
+             return that.caniuse(d);
+         })
         .style("fill", function (d, i) {
 
             if (d.type === "group") {
@@ -388,4 +385,14 @@ SpecVis.prototype.countIssues = function () {
         });
     });
     return totalIssues();
+};
+
+//Can i use function
+//TODO: always returns 1 as a placeholder for future function
+SpecVis.prototype.caniuse = function (d) {
+    if(d.type=="spec") {
+        return 1;
+    } else {
+        return 1;
+    }
 };
