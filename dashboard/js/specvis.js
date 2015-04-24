@@ -225,22 +225,9 @@ SpecVis.prototype.updateVis = function () {
              return that.caniuse(d);
          })
         .style("fill", function (d, i) {
-
             if (d.type === "group") {
                 return that.colorGroups(i);
-
             }
-
-            if (d.type == "test") {
-
-                return "#D71C39";
-            }
-
-            if (d.type == "pull") {
-
-                return "#560b16";
-            }
-
             if (d.type === "spec") {
                 //console.log(d.parent.name)
                 //console.log(d)
@@ -261,25 +248,12 @@ SpecVis.prototype.updateVis = function () {
 
                 if (d.parent.name == "Web Application Security Working Group")
                     return '#6CAED7';
-
                 else {
-
                     var colors = ['#97A2B8', '#B2BDC7'];
                     var random_color = colors[Math.floor(Math.random() * colors.length)];
                     return random_color;
-
                 }
-
             }
-
-            if (d.type === "issue") {
-                return "white"
-            }
-
-            if (d.type === "issue") {
-                return "white"
-            }
-
         })
         .on("click", click);
     //      .on("mouseover", this.tip.show);

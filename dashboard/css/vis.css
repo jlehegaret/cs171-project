@@ -52,6 +52,17 @@
     fill: #142335;
 }
 
+.sunburst .test {
+    fill: #D71C39
+}
+
+.sunburst .pull {
+    fill: #560b16
+}
+
+.sunburst .issue {
+    fill: white
+}
 
 /* spec published */
 .PUB {
