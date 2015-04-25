@@ -22,6 +22,8 @@ SpecVis.prototype.initVis = function () {
 
     //this.color = d3.scale.category20c();
 
+    //use standard descending ordering for all elements
+    //except group issues and pulls separately
     var sortTypes = function(a,b) {
         if(a.type === "issue") {
             return -1;
@@ -150,6 +152,7 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
     this.data.groups.forEach(function (_group) {
         var group = {};
         group.name = _group.name;
+        group.shortname = _group.shortname;
         group.key = _group.shortname;
         group.type = "group";
         group.url = _group.url;
@@ -214,7 +217,7 @@ SpecVis.prototype.updateVis = function () {
     var root = this.displayData.root;
 
     var click = function (d) {
-        console.log(d);
+        $(that.eventHandler).trigger("selectionChanged", d);
         path.transition()
             .duration(750)
             .attrTween("d", that.arcTweenZoom(d));
@@ -226,7 +229,7 @@ SpecVis.prototype.updateVis = function () {
         });
 
     path.enter().append("path")
-        //.call(this.tip)
+//        .call(this.tip)
         .attr("class", function (d) {
             return d.type;
         })
@@ -265,11 +268,12 @@ SpecVis.prototype.updateVis = function () {
                 }
             }
         })
-        .on("click", click);
-    //      .on("mouseover", this.tip.show);
+        .on("click", click)
+        .on("mouseover", this.tip.show);
     //       .each(this.stash);
 
-    path.attr("d", this.arc);
+    path.attr("d", this.arc)
+        .call(this.tip);
     //       .attrTween("d", this.arcTweenData);
 
     path
@@ -300,7 +304,7 @@ SpecVis.prototype.updateVis = function () {
     //    .text(function(d) { return d.depth ? d.name.split(" ")[1] || "" : ""; });
 };
 
-SpecVis.prototype.onSelectionChange = function (selectionStart, selectionEnd) {
+SpecVis.prototype.onTimelineChange = function (selectionStart, selectionEnd) {
     this.wrangleData(function (d) {
         return new Date(d.created_at) >= selectionStart && new Date(d.created_at) <= selectionEnd
     });
