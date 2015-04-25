@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="utf-8">
+    <title>Web Platform Test Dashboard | Test the Web Forward</title>
+    <!--Library code -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://d3js.org/queue.v1.min.js"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+<!-- Styles from http://testthewebforward.org/ -->
+<link rel="stylesheet" href="css/custom.css" type="text/css" media="screen">
+
+<!-- Visualization Styles -->
+<link rel="stylesheet" href="css/vis.css" type="text/css" media="screen">
+
+<!--Vis code-->
+<script src="js/specvis.js"></script>
+<script src="js/whovis.js"></script>
+<script src="js/timelinevis.js"></script>
+   
+<!--Other code--> 
+    
+<script src="js/jquery.js"></script>
+<script src="js/jquery.easing.1.3.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/jquery.fancybox.pack.js"></script>
+<script src="js/jquery.fancybox-media.js"></script>
+<script src="js/google-code-prettify/prettify.js"></script>
+<script src="js/portfolio/jquery.quicksand.js"></script>
+<script src="js/portfolio/setting.js"></script>
+<script src="js/jquery.flexslider.js"></script>
+<script src="js/animate.js"></script>
+<script src="js/custom.js"></script>
+
+<!-- css -->
+<link href="css/bootstrap.min.css" rel="stylesheet" />
+<link href="css/style.css" rel="stylesheet" />
+<link href="skins/default.css" rel="stylesheet" />
+
+</head>
+<body>
+<div id="wrapper">
+
+	<!-- header -->
+    
+	<header>
+      
+        <div class="navbar navbar-default navbar-static-top">
+            <div class="container">
+                <div class="navbar-header"></div>
+                <h1><span class="navbar-header"><img src="w3c predlog.jpg" width="218" height="48"></span></h1>
+               
+                <div class="navbar-collapse collapse ">
+                
+                    <ul class="nav navbar-nav">
+                     <h1>Web Platform Tests Dashboard</h1>
+                    </ul>
+                </div>
+            </div>
+        </div>
+	</header>
+   
+    <!-- main D3 stuff -->
+    
+  <div class="container">
+
+    <div id='cssmenu'>
+<ul>
+   <li class='active has-sub'><a href='#'><span>Sort by</span></a>
+    <ul>
+         <li class='has-sub'><a href='#'><span>Working Group</span></a>
+           
+         </li>
+         <li class='has-sub'><a href='#'><span>Spec</span></a>
+         </li>
+      </ul>
+      </li>
+   <li class='active has-sub'><a href='#'><span>Filer by</span></a>
+      <ul>
+         <li class='has-sub'><a href='#'><span>Issue</span></a>
+           
+         </li>
+         <li class='has-sub'><a href='#'><span>Pull Request</span></a>
+         </li>
+      </ul>
+   </li>
+   
+   <li><a href='#'><span>Choose Year</span></a></li>
+   
+<li><a href='#'><span> </span></a></li>
+<li><a href='#'><span> </span></a></li>
+<li><a href='#'><span> </span></a></li>
+<li><a href='#'><span> </span></a></li>
+<li><a href='#'><span> </span></a></li>
+<li><a href='#'><span> </span></a></li>
+<li><a href='#'><span> </span></a></li>
+<li><a href='#'><span> </span></a></li>
+<li><a href='#'><span> </span></a></li>
+<li><a href='#'><span> </span></a></li>
+<li><a href='#'><span> </span></a></li>
+<li><a href='#'><span> </span></a></li>
+<li><a href='#'><span> </span></a></li>
+<li><a href='#'><span> </span></a></li>
+<li><a href='#'><span> </span></a></li>
+<li><a href='#'><span> </span></a></li>
+
+         
+   <li class='last'><a href='#'><span>About</span></a></li>
+</ul>
+</div>
+    <div style="float:left" id="specVis"></div>
+ 
+        <div id="whoVis"></div>
+        
+        <div id="timelineVis"></div>
+
+  </div>
+   
+
+</div>
+
+<footer id="foot">
+
+<!--<div id="socnet">
+    <ul class="social-network">
+      <li><a href="#" data-placement="top" title="Facebook"><i class="fa fa-facebook"></i></a></li>
+      <li><a href="#" data-placement="top" title="Twitter"><i class="fa fa-twitter"></i></a></li>
+      <li><a href="#" data-placement="top" title="Linkedin"><i class="fa fa-linkedin"></i></a></li>
+      <li><a href="#" data-placement="top" title="Pinterest"><i class="fa fa-pinterest"></i></a></li>
+      <li><a href="#" data-placement="top" title="Google plus"><i class="fa fa-google-plus"></i></a></li>
+    </ul>
+    </div>-->
+
+   <!-- <div class="copyright">
+      <p> <span>&copy; </span>W3C 2015 All right reserved. </p>
+      
+      
+      
+    </div>-->
+
+  
+
+</footer>
+<script>
+
+    $(document).ready(function() {
+        //Global data variables
+        var caniuse = [];
+        var groups = [];
+        var specs = [];
+        var tests = [];
+        var allData = {caniuse: [], groups: [], specs: [], tests: []};
+
+        var dateFormatter = d3.time.format("%Y-%m-%d");
+        var stripTime = function (dateTime) {
+            return dateFormatter(new Date(dateTime))
+        };
+
+        var initVis = function () {
+            var brushHandler = {};
+            var selectionHandler = {};
+            spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler);
+
+            who_vis = new WhoVis(d3.select("#whoVis"), allData, selectionHandler);
+
+            timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler);
+
+            $(brushHandler).bind("brushChanged", function (event, selectionStart, selectionEnd) {
+            spec_vis.onSelectionChange(selectionStart, selectionEnd);
+            });
+
+            $(selectionHandler).bind("selectionChanged", function (event, specSelection) {
+
+            });
+        };
+
+        var dataLoaded = function (error, _caniuse, _groups, _specs, _tests) {
+            if (!error) {
+                caniuse = _caniuse;
+                groups = _groups;
+
+                specs = _specs
+                        .map(function (d) {
+                            if(d["last_pub"])
+                            {
+                              d.last_pub = stripTime(d["last_pub"]);
+                            }
+                            if (d.issues) {
+                                d.issues = d.issues.map(function (dd) {
+                                    dd.created_at = stripTime(dd.created_at);
+                                    if ("closed_at" in dd) {
+                                        dd.closed_at = stripTime(dd.closed_at);
+                                    }
+                                    if ("merged_at" in dd) {
+                                        dd.merged_at = stripTime(dd.merged_at);
+                                    }
+                                    return dd;
+                                });
+                            }
+                            if(d.commits)
+                            {
+                              d.commits = d.commits.map(function(dd)
+                                          {
+                                            dd.date = stripTime(dd.date);
+                                            return dd;
+                                          });
+                            }
+                            // also calculate CanIUse score
+                            //  THE RATIONAL:
+                            //  The CanIUse score of a spec
+                            //          = ( the sum of all the CanIUse
+                            //              scores of the elements )
+                            //            divided by
+                            //            ( the number of elements
+                            //              evaluated )
+                            //  The CanIUse score of an element
+                            //          = the average score across
+                            //              all browsers
+                            //  Score per Browser:  0 unknown
+                            //                      0 not
+                            //                      1 partial
+                            //                      2 yes
+                            var elements = caniuse.filter(function(e)
+                            {
+                                return e.spec == d.url;
+                            });
+                            if(elements.length == 0)
+                            {
+                                d.score = 0;
+                            }
+                            else
+                            {
+                                elements.forEach(function(e)
+                                {
+                                    e.CIUresult = 0;
+                                    e.stats.forEach(function(browser)
+                                    {
+                                        if(browser.support === "yes")
+                                        {
+                                            e.CIUresult += 2;
+                                        }
+                                        else if(browser.support === "partial")
+                                        {
+                                            e.CIUresult += 1;
+                                        } // else nothing
+                                    });
+                                    e.CIUresult = e.CIUresult / e.stats.length;
+                                });
+                                // we have now stored element-by-element
+                                //  results in our spec-specific array
+                                // average this
+                                d.score = d3.sum(elements, function(e)
+                                                    { return e.CIUresult; })/elements.length;
+                            }
+                            return d;
+                        });
+                //coerce date strings into date objects
+                tests = _tests.map(function (d) {
+                    d.created_at = stripTime(d.created_at);
+                    if ("closed_at" in d) {
+                        d.closed_at = stripTime(d.closed_at);
+                    }
+                    return d;
+                });
+                allData.caniuse = caniuse;
+                allData.groups = groups;
+                allData.specs = specs;
+                allData.tests = tests;
+
+                //log the data structures, remove for production
+                // logData();
+                initVis();
+            } else {
+                console.log("Error loading data!:" + error);
+            }
+        };
+
+        var init = function () {
+            //asynchronously load data
+            queue()
+                    .defer(d3.json, "data/caniuse.json")
+                    .defer(d3.json, "data/groups.json")
+                    .defer(d3.json, "data/specs.json")
+                    .defer(d3.json, "data/tests.json")
+                    .await(dataLoaded);
+        };
+
+        //debugging method to log all the data structures
+        var logData = function () {
+            console.log("Can I Use: ");
+            console.log(caniuse);
+            console.log("Groups: ");
+            console.log(groups);
+            console.log("Specs: ");
+            console.log(specs);
+            console.log("Tests: ");
+            console.log(tests);
+        };
+
+        init();
+    });
+
+</script>
+
+</body>
+</html>
