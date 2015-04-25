@@ -32,5 +32,5 @@ We are going to help monitor three forces that help move a spec to "Recommendati
 
 We aim to provide different views of the status of various pull requests and raised issues by working group, by spec, and by who is contributing.  We would also like to incorporate available CanIUse.com data as a barometer measuring a given spec’s implementation level.
 
-In this way, we hope to help W3C and other interested parties are able to “Test the Web Forward” as effectively as possible.  If we succeed in creating something truly useful to them, they will use it on their website:  www.testthewebforward.org/dashboard.
+In this way, we hope to help W3C and other interested parties are able to “Git the Web Forward” as effectively as possible.  If we succeed in creating something truly useful to them, they will use it on their website:  www.testthewebforward.org/dashboard.
 
