@@ -1,0 +1,93 @@
+.axis text {
+    font: 10px sans-serif;
+}
+
+.axis line,
+.axis path {
+    fill: none;
+    /*stroke: #000;*/
+    shape-rendering: crispEdges;
+}
+
+.boundingBox{
+    cursor: pointer;
+    fill: grey;
+    fill-opacity: .3;
+    pointer-events: all;
+}
+
+.brush{
+    fill: #134E84;
+    fill-opacity: .5;
+    pointer-events: none;
+}
+
+/*path {
+    stroke: #fff;
+    fill-rule: evenodd;
+}*/
+
+.d3-tip{
+    background-color: lightyellow;
+}
+
+.sunburst.W3C {
+    fill: white;
+}
+
+.sunburst.group {
+    fill: #1E3248;
+}
+
+.sunburst.spec {
+    fill: crimson;
+}
+
+.sunburst.HTML {
+    fill: #145184;
+}
+
+.sunburst.Tests {
+    fill: #142335;
+}
+
+/* spec published */
+.PUB {
+    fill: lightgrey;
+}
+
+.PUB.REC {
+    fill: black;
+
+}
+
+/* commit made */
+.commit, .COM {
+    fill: #DC7A2E;
+}
+
+/* Pull Request opened */
+.pull.open, .test.open, .PR_O {
+    fill: #B2BDC7;
+}
+
+/* Pull Request closed */
+.pull.closed, .test.closed, .PR_C {
+    fill: rgb(91, 87, 106);
+}
+
+/* issue opened */
+.issue.open, .ISS_O {
+    fill: #C2384E;
+}
+
+/* issue closed */
+.issue.closed, .ISS_C {
+    fill: #43161D;
+}
+
+/*.categoryLine{
+    stroke: darkgrey;
+    stroke-width: 1;
+}
+*/
