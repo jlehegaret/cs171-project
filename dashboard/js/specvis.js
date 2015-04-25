@@ -229,12 +229,16 @@ SpecVis.prototype.updateVis = function () {
         });
 
     path.enter().append("path")
-//        .call(this.tip)
         .attr("class", function (d) {
             return d.type;
         })
-         .style("opacity", function(d)
-         {
+        .classed("open", function(d) {
+            return d.state === "open"
+        })
+        .classed("closed", function(d) {
+            return d.state === "closed"
+        })
+        .style("opacity", function(d) {
              return that.caniuse(d);
          })
         .style("fill", function (d, i) {
