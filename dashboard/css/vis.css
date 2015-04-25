@@ -22,16 +22,16 @@
     pointer-events: none;
 }
 
-/*path {
-    stroke: #fff;
-    fill-rule: evenodd;
-}*/
-
 .d3-tip{
     background-color: lightyellow;
 }
 
 /* sunburst styles */
+/*.sunburst path {*/
+    /*stroke: #fff;*/
+    /*fill-rule: evenodd;*/
+/*}*/
+
 .sunburst .root {
     fill: white;
 }
@@ -61,7 +61,7 @@
 }
 
 .sunburst .issue {
-    fill: white
+    fill: lightgrey
 }
 
 /* spec published */
