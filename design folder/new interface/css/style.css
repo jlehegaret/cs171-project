@@ -16,11 +16,12 @@
 ==================================== */
 
 body {
-	font-family:'Open Sans', Arial, sans-serif;
-	font-size:14px;
-	font-weight:300;
-	line-height:1.6em;
-	color:#656565;
+	font-family: 'Open Sans', Arial, sans-serif;
+	font-size: 14px;
+	font-weight: 300;
+	background-image:url(../img/pozadinas.jpg);
+	background-repeat:no-repeat;
+	background-position:center;
 }
 
 a:active {
@@ -1520,8 +1521,8 @@ ul.time-post li.time{
 ================================ */
 
 footer{
-	margin-top:50px;
-	padding:50px 0 0 0;
+	margin-top:0px;
+	padding:60px 0 0 0;
 	color:#f8f8f8;
 }
 
@@ -1980,7 +1981,7 @@ article img.pull-right, article .align-right{
 
 }
 #wrapper .container #specVis {
-	padding-left: 150px;
+	padding-left: 180px;
 	margin-top:0;
 }
 
@@ -2112,4 +2113,3 @@ article img.pull-right, article .align-right{
   border-bottom: 10px solid transparent;
   border-top: 10px solid transparent;
 }
-
