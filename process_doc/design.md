@@ -6,12 +6,12 @@
 ### History
 * The Seed
 * Zona's take
-* Delving into the details
+* [Delving into the details](design_details.md)
 * Evolution
-  * of the overall page
-  * of the sunburst
-  * of the timeline
-  * of the who graph
+  * [of the overall page](design_index.md)
+  * [of the sunburst](design_sunburst.md)
+  * [of the timeline](design_timeline.md)
+  * [of the who graph](design_who.md)
 
 ## The Seed
 
@@ -19,7 +19,12 @@ As Jennifer spoke with W3 about what they wanted to see that was different than 
 
 As a result, she came up with these rough and unsatisfactory sketches:
 
+
 <table>
+  <thead>
+    <tr><th>Sketch</th><th>Notes</th></tr>
+  </thead>
+  <tbody>
   <tr>
     <td><img src="images/Sketch1.jpg" width="300"/></td>
     <td>Here, Jennifer imagines an array of Working-Group specific bar charts, each one showing the number of closed items and open items in groups depending on if the items are pull requests or issues, and spec-related or test-suite related.  This is obviously completely unscalable, even if it might give a sense of which Working Groups are juggling the most work.  It also fails to give any sense of what is done <i>over time</i>i>.
@@ -45,7 +50,8 @@ As a result, she came up with these rough and unsatisfactory sketches:
     <td><img src="images/Sketch6.png" width="300"/></td>
     <td>Here is Jennifer's attempt to coalesce the prior ideas into one system.  However, this system still involved a lot of switching from view to view, limitations in terms of how much data could be seen and compared at once, and still just seemed overly amateur.</td>
   </tr>
-
+  </tbody>
+</table>
 
 Luckily for W3C and this project, Zona has a designer's flair.  After discussing the background of W3C and the objective for this project with Jennifer, she took the project's design to the stratosphere.  Read on...
 
@@ -64,36 +70,24 @@ With this W3C data, we need to understand it layer by layer.
 As Zona processed this hierarchy, she imagined this storytelling process:
 
 <p align="center">
-    <img src="images/intro_storyboard.jpg" width="700"/>
+    <img src="images/intro storyboard.jpg" width="600"/>
 </p>
 
 The idea of introducing our interface using step-by-step animation is to simplify the main view. Going through the different steps, we can tell a story about W3C and at the same time introduce users to our different visual variables and what they represent.
 
+These are the steps, per row of her diagram:
+1. Display W3C as one circle
+2. Introduce working groups and specs per working group
+3. From specs to overall W3C contribution
+4. Represent overall W3C contribution.
 
+For the main page, which needs to show thousands of datapoints across multiple categories, Zona envisioned the dashboard along these lines:
 
+<p align="center">
+    <img src="images/w3 sketces proposal.jpg" width="600"/>
+</p>
 
-## Currently
+Of these ideas, she chose the first as our first visual target.
 
-The best way to get a sense of our design and the thinking behind it is to read [this PDF document](designW3C.pdf).
-
-
-### for future editing / elaboration
-
-
-## First, Jennifer's very rough ideas
-
-(will embed those rough sketches, with some notes as to thoughts)
-
-## Then, Zona's wonderful proposal
-
-( How did you do it?? )
-
-(embedding the same images as in our proposal)
-
-( And then a bit more discussion why you decided to stick with the first picture and not pursue the "gauge-like" diagrams in the upper left of your second figure. )
-
-## And more details, based on our discussion in the Science Center Library's study room
-
-(Jennifer will try to add this based on her notes.)
-
+Continue on to the [next section](design_details.md) to learn more...
 
