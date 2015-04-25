@@ -22,16 +22,16 @@
     pointer-events: none;
 }
 
-/*path {
-    stroke: #fff;
-    fill-rule: evenodd;
-}*/
-
-.d3-tip {
+.d3-tip{
     background-color: lightyellow;
 }
 
 /* sunburst styles */
+/*.sunburst path {*/
+    /*stroke: #fff;*/
+    /*fill-rule: evenodd;*/
+/*}*/
+
 .sunburst .root {
     fill: white;
 }
@@ -52,17 +52,20 @@
     fill: #142335;
 }
 
-.sunburst .test {
+.sunburst .test, .sunburst .test.open, .sunburst .test.closed {
     fill: #D71C39
 }
 
-.sunburst .pull {
+.sunburst .pull, .sunburst .pull.open, .sunburst .pull.closed {
     fill: #560b16
 }
 
-.sunburst .issue {
-    fill: white
+.sunburst .issue, .sunburst .issue.open, .sunburst .issue.closed {
+    fill: lightgrey
 }
+
+
+/* timeline styles */
 
 /* spec published */
 .PUB {
@@ -80,22 +83,22 @@
 }
 
 /* Pull Request opened */
-.pull.open, .test.open, .PR_O {
+.timeline .pull.open, .test.open, .PR_O {
     fill: #145085;
 }
 
 /* Pull Request closed */
-.pull.closed, .test.closed, .PR_C {
+.timeline .pull.closed, .test.closed, .PR_C {
     fill: darkblue;
 }
 
 /* issue opened */
-.issue.open, .ISS_O {
+.timeline .issue.open, .ISS_O {
     fill: #D81839;
 }
 
 /* issue closed */
-.issue.closed, .ISS_C {
+.timeline .issue.closed, .ISS_C {
     fill: #4c0814;
 }
 

@@ -269,8 +269,9 @@ console.log(this.displayData);
 
 
 
-TimelineVis.prototype.onSelectionChange = function(specs) {
-
+TimelineVis.prototype.onSelectionChange = function(sunburstSelection) {
+    //TODO: This function is triggered by a selection of an arc on a sunburst, wrangle data needs to be called on this selection
+    console.log("Filter by " + sunburstSelection.type + " " + sunburstSelection.name);
 };
 
 TimelineVis.prototype.reorderData = function() {
@@ -488,7 +489,7 @@ TimelineVis.prototype.reorderData = function() {
 // console.log(displayData);
 }
 
-TimelineVis.prototype.onSelectionChange = function() {
+TimelineVis.prototype.onTimelineChange = function() {
 
 };
 

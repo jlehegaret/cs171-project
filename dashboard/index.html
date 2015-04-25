@@ -52,6 +52,7 @@
             var selectionHandler = {};
             //Handles whovis author selection changing
             var authorHandler = {};
+
             spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler);
             who_vis = new WhoVis(d3.select("#whoVis"), allData, authorHandler);
             timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler);

@@ -141,7 +141,7 @@ console.log(this.displayData);
 
     };
 
-WhoVis.prototype.onSelectionChange = function(selectionStart, selectionEnd) {
+WhoVis.prototype.onTimelineChange = function(selectionStart, selectionEnd) {
     this.wrangleData();
     this.updateVis();
 };
