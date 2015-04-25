@@ -1,5 +1,5 @@
-# Section 9- Evaluation
+# Section 8- Evaluation
 
-*return to [Section 8, Interesting Discoveries](discoveries.md)*
+*return to [Section 7, Interesting Discoveries](discoveries.md)*
 
 TBD

@@ -1,4 +1,4 @@
-# Section 4 - Our Design Process - the Details about the Pieces
+# Section 4 cont. - Our Design Process - Continued Overview
 
 * *return to [The Seed and Zona's take](design.md)*
 * *proceed to [Evolution](design_index.md)*
@@ -6,6 +6,10 @@
 ## Understanding the Visualization, 3/31/15
 
 In its first iteration, the dashboard consisted of two parts:  a sunburst tree diagram and a timeline.
+
+<p align="center">
+    <img src="images/w3_proposal.jpg" width="600"/>
+</p>
 
 ### Sunburst
 
@@ -59,19 +63,21 @@ By organizing components like this, we successfully establish a visual balance. 
 
 ## W3C Feedback, 4/23/15
 
-We were fortunate to receive feedback directly from W3C as to our three-part Visualization so far:
+We were fortunate to receive feedback directly from W3C as to our three-part Visualization as it stood so far:
 
 *Given the data that we have, what are the questions you envision
 asking of it most often?*
 
 <blockquote>
+<p>
 I don't know if it's "most often", but I would certainly be interested in seeing trends, for both people and projects.
-
+</p><p>
 Basically, if a specification is seeing increased work over the past few weeks it probably means that something interesting is going on with it, I'll want to go see it. Conversely if the activity level on a spec dwindles it might mean that it's in trouble and requires intervention.
-
+</p><p>
 Similar reasoning applies to contributors. We regularly need fresh faces to e.g chair a group or participate in a workshop, the TAG, etc. It would be useful to be able to find out that someone has over the past three months become pretty active. Conversely, some people are listened to because of their past contributions, despite the fact that they haven't actually been contributing in a while. This could be a tool for honesty there.
-
+</p><p>
 Seeing the collaborations graph would be interesting too. Basically having a vertex per contributor and an edge whenever two contributors have both contributed to the same directory (I'm guessing as some form of force-directed graph). This should allow us to see communication breakdowns (e.g. how people in one area don't at all collaborate with people in another) to remedy. If, as I would expect, the resulting graph is more or less a Small-World system it should allow us to detect highly connected people who basically make the organisation effective. Again this is useful to find good participants for some functions, as well as to assess the damage (and therefore what needs be done) when someone leaves.
+</p>
 </blockquote>
 
 *What's missing?*
@@ -84,9 +90,11 @@ timeline view to popup the pale yellow thing, I can't seem to get it to close.
 *How would you want to use the "who" list?*
 
 <blockquote>
+<p>
 At the very least hovering there should probably highlight the relevant parts of the circle thing? Also, the "who" list should sync with the circle view: if I'm only looking at a group or spec I should only see the relevant who?
-
+</p><p>
 Maybe also sorting people by different criteria: PRs, issues, comments, lines of code, etc. I'm not necessarily interested in a leaderboard, but more in getting a sense for who contributes how. Someone who files a lot of issues or writes a lot of tests should likely be acknowledged in the specification even if they haven't written one line of it, for instance.
+</p>
 </blockquote>
 
 *How might you want to change the timeline view?*
@@ -111,7 +119,7 @@ Yes, aside from the small bugs I mentioned it's really nice and usable.
 
 * Continue our work to add interaction and filtering across views.
 * Continue our work to improve the overall visual experience (including tooltip formatting as well as adding legends and other instructional guides).
-* If we can add Commits information back in, we should.
+* If we can add Commits information back in, we should, even though we have only one side of it.
 * In the existing who graph, try to add viewing and sorting by issue as well as by number of lines of code affected.
 * Once the visualization is in place, pay especial attention to how it helps view contributions over time.  Does the timeline / other graph interaction help identify trends easily enough?
 * Consider adding a fourth, network graph if at all possible.

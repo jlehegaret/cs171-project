@@ -3,10 +3,8 @@
 * *return to [Section 3, What W3C Has So Far](existing.md)*
 * *proceed to [Section 5, Our Proposed Feature Set](proposal.md)*
 
-### History
-* The Seed
-* Zona's take
-* [Delving into the details](design_details.md)
+* The History:  The Seed, and Zona's Take
+* [The Continued Overview](design_details.md)
 * Evolution
   * [of the overall page](design_index.md)
   * [of the sunburst](design_sunburst.md)
@@ -84,7 +82,7 @@ These are the steps, per row of her diagram:
 For the main page, which needs to show thousands of datapoints across multiple categories, Zona envisioned the dashboard along these lines:
 
 <p align="center">
-    <img src="images/w3 sketces proposal.jpg" width="600"/>
+    <img src="images/w3_proposal.jpg" width="600"/>
 </p>
 
 Of these ideas, she chose the first as our first visual target.
