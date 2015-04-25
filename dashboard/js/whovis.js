@@ -122,10 +122,10 @@ WhoVis.prototype.updateVis = function()
         .transition()
         .delay(function(d, i) { return i * 10; })
         .attr("width", function(d) {
-console.log("d.total_code is");
-console.log(d.total_code);
-console.log("result is");
-console.log(that.x(d.total_code));
+//console.log("d.total_code is");
+//console.log(d.total_code);
+//console.log("result is");
+//console.log(that.x(d.total_code));
           return that.x(d.total_code); });
 
 
@@ -139,11 +139,14 @@ console.log(that.x(d.total_code));
 
     };
 
-WhoVis.prototype.onSelectionChange = function(selectionStart, selectionEnd) {
+WhoVis.prototype.onTimelineChange = function(selectionStart, selectionEnd) {
     this.wrangleData();
     this.updateVis();
 };
 
+WhoVis.prototype.onSelectionChange = function(sunburstSelection) {
+
+};
 
 
 WhoVis.prototype.wrangleData = function()
@@ -392,8 +395,8 @@ WhoVis.prototype.wrangleData = function()
     });
   }
 
-console.log("Who data before sort");
-console.log(this.displayData);
+//console.log("Who data before sort");
+//console.log(this.displayData);
 
   this.displayData.sort(function(a, b)
                   { return b.total_code - a.total_code; });
@@ -401,7 +404,7 @@ console.log(this.displayData);
   //   BY HAND TAKE OUT HIS HUGEST MOVE OF THE REPOS
   this.displayData = this.displayData.slice(1, this.options.number_who);
 
-console.log("Who data after sort");
-console.log(this.displayData);
+//console.log("Who data after sort");
+//console.log(this.displayData);
 }
 
