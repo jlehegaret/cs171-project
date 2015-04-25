@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+
+</head>
+<body>
+
+
+<script type="text/javascript">
+
+ var data = d3.json("../cs171-data/tests.json", function(data) {
+
+      var open_issues = [];
+      var open_pull = [];
+      var merged = [];
+
+      data.forEach(function(d){
+
+        if(d.type == "issue"){
+
+            open_issues.push(d);
+
+        }
+
+        else if(d.type == "test" && d.state == "open"){
+
+            open_pull.push(d);
+          
+        }
+
+        else if(d.type == "test" && d.state == "closed"){
+
+            merged.push(d);
+          
+        }
+
+      })
+
+      var len1 = open_issues.length, len2 = open_pull.length, len3 = merged.length; 
+      
+      var svg = d3
+      .select("body")
+      .append("svg")
+      .attr("width", 500)
+      .attr("height",500);
+
+      var dat = [1, 2, 3]
+
+      var color = d3.scale.ordinal()
+        .range(["hotpink"]);
+
+      var color2 = d3.scale.ordinal()
+        .range(["lightgray"]);  
+
+      var color3 = d3.scale.ordinal()
+        .range(["#8a89b7"]);
+
+      var arc = d3.svg.arc()
+        .outerRadius(120)
+        .innerRadius(140)
+        .startAngle(0.6) 
+        .endAngle(0.6*Math.PI);;
+
+      var pie = d3.layout.pie()
+          .sort(null)
+          .value(function(d) { return d; });
+
+      var g = svg.selectAll(".arc")
+          .data(pie(dat))
+        .enter().append("g")
+          .attr("class", "arc")
+          .attr("transform", "translate(200,200)");
+
+      g.append("path")
+          .attr("d", arc)
+          .style("fill", function(d) { return color(d.data); });
+
+      var arc2 = d3.svg.arc()
+        .outerRadius(120)
+        .innerRadius(140)
+        .startAngle(3.5) 
+        .endAngle(1.9*Math.PI);;
+
+      var pie2 = d3.layout.pie()
+          .sort(null)
+          .value(function(d) { return d; });
+
+      var g2 = svg.selectAll(".arc2")
+          .data(pie2(dat))
+        .enter().append("g")
+          .attr("class", "arc2")
+          .attr("transform", "translate(200,200)");
+
+      g2.append("path")
+          .attr("d", arc2)
+          .style("fill", function(d) { return color2(d.data); });    
+
+      var arc3 = d3.svg.arc()
+        .outerRadius(120)
+        .innerRadius(130)
+        .startAngle(3.3) 
+        .endAngle(1.5*Math.PI);;
+
+      var pie3 = d3.layout.pie()
+          .sort(null)
+          .value(function(d) { return d; });
+
+      var g3 = svg.selectAll(".arc3")
+          .data(pie2(dat))
+        .enter().append("g")
+          .attr("class", "arc3")
+          .attr("transform", "translate(200,200)");
+
+      g3.append("path")
+          .attr("d", arc3)
+          .style("fill", function(d) { return color3(d.data); });     
+
+      var circle1  = svg.append("circle")
+      .attr("transform", "translate(200,200)")
+      .attr("r", len3/10)
+      .style("fill", "lightblue")
+      .style("opacity", 0.5); 
+
+      var circle2  = svg.append("circle")
+      .attr("transform", "translate(100,400)")
+      .attr("r", len2)
+      .style("fill", "gray"); 
+
+      var circle3  = svg.append("circle")
+      .attr("transform", "translate(300,400)")
+      .attr("r", len1)
+      .style("fill", "hotpink");     
+
+});
+ 
+</script>
+</body>
+</html>
