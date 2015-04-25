@@ -1,8 +1,8 @@
-SpecVis = function (_parentElement, _data, _eventHandler, _options) {
+SpecVis = function(_parentElement, _data, _eventHandler, _options) {
     this.parentElement = _parentElement;
     this.data = _data;
     this.eventHandler = _eventHandler;
-    this.options = _options || {width: 800, height: 800};
+    this.options = _options || {width:800, height:800};
     this.displayData = {};
     this.allIssues = [];
 
@@ -14,7 +14,7 @@ SpecVis = function (_parentElement, _data, _eventHandler, _options) {
     this.initVis();
 };
 
-SpecVis.prototype.initVis = function () {
+SpecVis.prototype.initVis = function() {
     var that = this;
 
     this.dateFormatter = d3.time.format("%Y-%m-%d");
@@ -22,18 +22,8 @@ SpecVis.prototype.initVis = function () {
 
     //this.color = d3.scale.category20c();
 
-    var sortTypes = function(a,b) {
-        if(a.type === "issue") {
-            return -1;
-        } else if (a.type === "pull") {
-            return 1;
-        } else {
-            return d3.descending(a, b);
-        }
-    };
-
-    this.colorGroups = d3.scale.ordinal()
-        .range(['#485F7A', '#2A3C4E', '#1E3248']);
+     this.colorGroups = d3.scale.ordinal()
+    .range(['#485F7A','#2A3C4E', '#1E3248']);
 
     this.x = d3.scale.linear()
         .range([0, 2 * Math.PI]);
@@ -46,53 +36,42 @@ SpecVis.prototype.initVis = function () {
         .attr("height", this.height + this.margin.top + this.margin.bottom)
         .append("g")
         .classed("sunburst", true)
-        .attr("transform", "translate(" + (this.margin.left + this.margin.right + this.width) / 2 + "," + (this.margin.top + this.margin.bottom + this.height) / 2 + ")")
+        .attr("transform", "translate(" + (this.margin.left + this.margin.right + this.width)/2
+                + "," +(this.margin.top + this.margin.bottom + this.height)/2 + ")");
 
     //sets up the partition layout
     this.partition = d3.layout.partition()
 //        .size([2 * Math.PI, this.radius * this.radius])
-        .value(function (d) {
-            return 1;
-        })
-        .sort(sortTypes);
+        .value(function(d) { return 1; });
 
     //sets up the arc generator for the radial sunburst
     this.arc = d3.svg.arc()
-        .startAngle(function (d) {
-            return Math.max(0, Math.min(2 * Math.PI, that.x(d.x)));
-        })
-        .endAngle(function (d) {
-            return Math.max(0, Math.min(2 * Math.PI, that.x(d.x + d.dx)));
-        })
-        .innerRadius(function (d) {
-            return Math.max(0, that.y(d.y));
-        })
-        .outerRadius(function (d) {
-            return Math.max(0, that.y(d.y + d.dy));
-        });
+        .startAngle(function(d) { return Math.max(0, Math.min(2 * Math.PI, that.x(d.x))); })
+        .endAngle(function(d) { return Math.max(0, Math.min(2 * Math.PI, that.x(d.x + d.dx))); })
+        .innerRadius(function(d) { return Math.max(0, that.y(d.y)); })
+        .outerRadius(function(d) { return Math.max(0, that.y(d.y + d.dy)); });
 
     // set up tooltips
     this.tip = d3.tip()
-        .offset([0, 0])
-        .html(function (d) {
-            var text;
+                  .offset([0,0])
+                  .html(function(d)
+                    {
+                        var text;
 
-            if (d.name) {
-                if (d.name == "HTML") {
-                    text = "Spec";
-                }
-                else {
-                    text = d.name;
-                }
-            }
-            else {
-                text = d.title;
-            }
-            return "<div class='d3-tip'>"
-                + "<a href='" + d.url
-                + "'>" + text
-                + "</a></div>";
-        });
+                        if(d.name)
+                        { if(d.name == "HTML")
+                            {text = "Spec"; }
+                            else
+                            {text = d.name; }
+                        }
+                        else
+                        { text = d.title; }
+// console.log(d);
+                        return "<div class='d3-tip'>"
+                        + "<a href='" + d.url
+                        + "'>" + text
+                        + "</a></div>";
+                    });
 
     // filter, aggregate, modify data
     this.wrangleData();
@@ -101,26 +80,24 @@ SpecVis.prototype.initVis = function () {
 };
 
 
-SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
+SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
     var that = this;
 
     //setup the default date filter function (right now filtering from march 1, 2015 to now)
-    var dateFilterFunction = function (d) {
-        return new Date(d.created_at) >= new Date("2014-01-01") && new Date(d.created_at) <= new Date()
-    };
-    if (_dateFilterFunction != null) {
+    var dateFilterFunction = function(d){return new Date(d.created_at) >= new Date("2014-01-01") && new Date(d.created_at) <= new Date()};
+    if (_dateFilterFunction != null){
         dateFilterFunction = _dateFilterFunction;
     }
 
     //create a lookup table of specs keyed by spec url
     this.displayData.spec_lookup = {};
-    this.data.specs.forEach(function (d) {
+    this.data.specs.forEach(function(d) {
         //new spec objects need to be created to not filter out items from allData
         spec = {};
         spec.url = d.url;
         spec.name = d.title;
         spec.score = d.score;  // this is here now, but I don't see it showing up elsewhere
-        if (d.issues) {
+        if(d.issues) {
             spec.issues = d.issues.filter(dateFilterFunction);
         }
         that.displayData.spec_lookup[d.url] = spec;
@@ -128,8 +105,8 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
 
     //creates a lookup table of tests keyed by spec url
     this.displayData.test_lookup = {};
-    this.data.tests.forEach(function (test) {
-        if (dateFilterFunction(test)) {
+    this.data.tests.forEach(function(test) {
+        if(dateFilterFunction(test)) {
             test.specs.forEach(function (spec) {
                 //check if an entry already exists, if not create one
                 if (!that.displayData.test_lookup[spec]) {
@@ -142,12 +119,12 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
 
 
     // Create the root object for the vis data hierarchy
-    var root = {name: "W3C", key: "root", type:"root", children: []};
+    var root = {name:"W3C", key:"root", children:[]};
 
     // Create a group object for every group in the original dataset
     // It is VERY important that every item has a unique key, or the layout will have undesirable behavior
     // This is especially true because certain specs belong to more than one group
-    this.data.groups.forEach(function (_group) {
+    this.data.groups.forEach(function(_group) {
         var group = {};
         group.name = _group.name;
         group.key = _group.shortname;
@@ -155,20 +132,17 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
         group.url = _group.url;
         group.children = [];
         //specs are only keyed by url in each group, spec_lookup will be used to find them in the original specs dataset
-        _group.specs.forEach(function (_spec) {
+        _group.specs.forEach(function(_spec) {
             var spec = {};
             spec.url = _spec.url;
             spec.key = group.key + _spec.url;
             spec.type = "spec";
-            if (that.displayData.spec_lookup[_spec.url]) {
+            if(that.displayData.spec_lookup[_spec.url]) {
                 var _fullSpec = that.displayData.spec_lookup[_spec.url];
-
                 //every spec will have two children, a group of issues for the HTML spec and a group of tests
-                spec.children = [{name: "HTML", type:"HTML", key: spec.key + "HTML", children: []},
-                        {name: "Tests", type:"Tests", key: spec.key + "Tests", children: []}];
-
+                spec.children = [{name:"HTML", key:spec.key + "HTML", children:[]},{name:"Tests", key:spec.key + "Tests", children:[]}];
                 spec.name = _fullSpec.name;
-                if (_fullSpec.issues) {
+                if(_fullSpec.issues) {
                     _fullSpec.issues.forEach(function (_issue) {
                         var issue = {};
                         issue.title = _issue.title;
@@ -181,14 +155,28 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
                         issue.url = _issue.html_url;
                         spec.children[0].children.push(issue);
                     });
+                     // sort issues
+                    spec.children[0].children.sort(function(a,b)
+                    {
+                    if((a.type + a.state) < (b.type + b.state))
+                    {
+                        return -1;
+                    }
+                    if((a.type + a.state) > (b.type + b.state))
+                    {
+                        return 1;
+                    }
+                    return 0;
+                });
+            } else {
                 }
             } else {
                 console.log("Spec Not Found Error: " + _spec.url);
             }
             //looks for tests in the test lookup table, creates copies if found
-            if (that.displayData.test_lookup[_spec.url]) {
+            if(that.displayData.test_lookup[_spec.url]) {
                 var _allTests = that.displayData.test_lookup[_spec.url];
-                _allTests.forEach(function (_test) {
+                _allTests.forEach(function(_test) {
                     var test = {};
                     test.title = _test.title;
                     test.key = spec.key + _test.html_url;
@@ -197,8 +185,21 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
                     test.created_at = _test.created_at;
                     spec.children[1].children.push(test);
                 });
+                // sort tests
+                spec.children[1].children.sort(function(a,b)
+                {
+                    if((a.type + a.state) < (b.type + b.state))
+                    {
+                        return -1;
+                    }
+                    if((a.type + a.state) > (b.type + b.state))
+                    {
+                        return 1;
+                    }
+                    return 0;
+                });
             } else {
-                //console.log("No Tests for: " + dd.url);
+               //console.log("No Tests for: " + dd.url);
             }
             group.children.push(spec);
         });
@@ -208,12 +209,12 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
     this.displayData.root = root;
 };
 
-SpecVis.prototype.updateVis = function () {
+SpecVis.prototype.updateVis = function() {
     var that = this;
 
     var root = this.displayData.root;
 
-    var click = function (d) {
+    var click = function(d) {
         console.log(d);
         path.transition()
             .duration(750)
@@ -221,56 +222,105 @@ SpecVis.prototype.updateVis = function () {
     };
 
     var path = this.svg.selectAll("path")
-        .data(this.partition.nodes(root), function (d) {
+        .data(this.partition.nodes(root), function(d) {
             return d.key;
         });
 
-    path.enter().append("path")
-        //.call(this.tip)
-        .attr("class", function (d) {
-            return d.type;
-        })
-         .style("opacity", function(d)
-         {
-             return that.caniuse(d);
-         })
-        .style("fill", function (d, i) {
-            if (d.type === "group") {
-                return that.colorGroups(i);
-            }
-            if (d.type === "spec") {
-                //console.log(d.parent.name)
-                //console.log(d)
-                if (d.parent.name == "Web Applications Working Group")
-                    return '#97A2B8';
-
-                if (d.parent.name == "HTML Working Group")
-                    return '#8F9299';
-
-                if (d.parent.name == "Device APIs Working Group")
-                    return '#6CAED7';
-
-                if (d.parent.name == "Web Performance Working Group")
-                    return '#C9B3A2';
-
-                if (d.parent.name == "Web Real-Time Communications Working Group")
-                    return '#888499';
-
-                if (d.parent.name == "Web Application Security Working Group")
-                    return '#6CAED7';
-                else {
-                    var colors = ['#97A2B8', '#B2BDC7'];
-                    var random_color = colors[Math.floor(Math.random() * colors.length)];
-                    return random_color;
+    path.enter().append("path").call(this.tip)
+        //if a leaf node, take the color of parent, otherwise take a new color
+        .attr("class", function(d) {
+            if(d.type)
+            { //console.log(d);
+                if(d.type == "group" || d.type == "spec") // inner layers
+                {
+                    return "sunburst " + d.type;
+                }
+                else
+                {
+                    return "sunburst " + d.type + " " + d.state;
                 }
             }
+            else if(d.name)  // "HTML" or "Tests", for second-outermost-layer
+            { //console.log(d);
+              return "sunburst " + d.name; }
+            else
+            { //console.log(d); // it's a mystery what this is
+              return "sunburst"; }
+          })
+//         .style("opacity", function(d)
+//         {
+//             if(d.type === "spec")
+//             {
+// // console.log(d);  TRYING TO INCORPORATE CANIUSE SCORE HERE
+//             }
+//         })
+.style("fill", function(d, i){
+
+            if(d.type === "group")
+            {
+                return that.colorGroups(i);
+
+            }
+
+            if(d.type == "test"){
+
+                return "#D71C39";
+            }
+
+            if(d.type == "pull"){
+
+                return "#560b16";
+            }
+
+            if(d.type === "spec")
+            {
+                    //console.log(d.parent.name)
+                    //console.log(d)
+                    if(d.parent.name == "Web Applications Working Group")
+                    return '#97A2B8'
+
+                    if(d.parent.name == "HTML Working Group")
+                    return '#8F9299'
+
+                    if(d.parent.name == "Device APIs Working Group")
+                    return '#6CAED7'
+
+                    if(d.parent.name == "Web Performance Working Group")
+                    return '#C9B3A2'
+
+                    if(d.parent.name == "Web Real-Time Communications Working Group")
+                    return '#888499'
+
+                    if(d.parent.name == "Web Application Security Working Group")
+                    return '#6CAED7'
+
+                else{
+
+                var colors = ['#97A2B8', '#B2BDC7'];
+                var random_color = colors[Math.floor(Math.random() * colors.length)];
+                return random_color;
+
+                }
+
+            }
+
+             if(d.type === "issue")
+            {
+                return "white"
+            }
+
+             if(d.type === "issue")
+            {
+                return "white"
+            }
+
         })
-        .on("click", click);
-    //      .on("mouseover", this.tip.show);
-    //       .each(this.stash);
+        .on("click", click)
+        .on("mouseover", this.tip.show);
+ //       .each(this.stash);
 
     path.attr("d", this.arc);
-    //       .attrTween("d", this.arcTweenData);
+ //       .attrTween("d", this.arcTweenData);
 
     path
         .exit()
@@ -300,54 +350,44 @@ SpecVis.prototype.updateVis = function () {
     //    .text(function(d) { return d.depth ? d.name.split(" ")[1] || "" : ""; });
 };
 
-SpecVis.prototype.onSelectionChange = function (selectionStart, selectionEnd) {
-    this.wrangleData(function (d) {
-        return new Date(d.created_at) >= selectionStart && new Date(d.created_at) <= selectionEnd
-    });
+SpecVis.prototype.onSelectionChange = function(selectionStart, selectionEnd) {
+    this.wrangleData(function(d) {return new Date(d.created_at) >= selectionStart && new Date(d.created_at) <=selectionEnd});
     this.updateVis();
 };
 
 // Interpolate the scales!
-SpecVis.prototype.arcTweenZoom = function (d) {
+SpecVis.prototype.arcTweenZoom = function(d) {
     var that = this;
     var xd = d3.interpolate(this.x.domain(), [d.x, d.x + d.dx]),
         yd = d3.interpolate(this.y.domain(), [d.y, 1]),
         yr = d3.interpolate(this.y.range(), [d.y ? 20 : 0, that.radius]);
-    return function (d, i) {
+    return function(d, i) {
         return i
-            ? function (t) {
-            return that.arc(d);
-        }
-            : function (t) {
-            that.x.domain(xd(t));
-            that.y.domain(yd(t)).range(yr(t));
-            return that.arc(d);
-        };
+            ? function(t) { return that.arc(d); }
+            : function(t) { that.x.domain(xd(t)); that.y.domain(yd(t)).range(yr(t)); return that.arc(d); };
     };
 };
 
 // Setup for switching data: stash the old values for transition.
-SpecVis.prototype.stash = function (d) {
+SpecVis.prototype.stash = function(d) {
     d.x0 = d.x;
     d.dx0 = d.dx;
 };
 
 // When switching data: interpolate the arcs in data space.
-SpecVis.prototype.arcTweenData = function (a, i) {
+SpecVis.prototype.arcTweenData = function(a, i) {
     var oi = d3.interpolate({x: a.x0, dx: a.dx0}, a);
-
     function tween(t) {
         var b = oi(t);
         a.x0 = b.x;
         a.dx0 = b.dx;
         return arc(b);
     }
-
     if (i == 0) {
         // If we are on the first arc, adjust the x domain to match the root node
         // at the current zoom level. (We only need to do this once.)
         var xd = d3.interpolate(x.domain(), [node.x, node.x + node.dx]);
-        return function (t) {
+        return function(t) {
             x.domain(xd(t));
             return tween(t);
         };
@@ -357,26 +397,16 @@ SpecVis.prototype.arcTweenData = function (a, i) {
 };
 
 //Utility method to count issues (all the leaves)
-SpecVis.prototype.countIssues = function () {
+SpecVis.prototype.countIssues = function() {
     var totalIssues = 0;
-    this.displayData.children.forEach(function (d) {
-        d.children.forEach(function (dd) {
-            dd.children.forEach(function (ddd) {
-                if (ddd.children) {
-                    totalIssues += ddd.children.length;
+    this.displayData.children.forEach(function(d) {
+        d.children.forEach(function(dd) {
+            dd.children.forEach(function(ddd) {
+                if(ddd.children) {
+                    totalIssues+=ddd.children.length;
                 }
             });
         });
     });
     return totalIssues();
-};
-
-//Can i use function
-//TODO: always returns 1 as a placeholder for future function
-SpecVis.prototype.caniuse = function (d) {
-    if(d.type=="spec") {
-        return 1;
-    } else {
-        return 1;
-    }
 };

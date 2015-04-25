@@ -27,28 +27,41 @@
     fill-rule: evenodd;
 }*/
 
-.d3-tip{
+.d3-tip {
     background-color: lightyellow;
 }
 
-.sunburst.W3C {
+/* sunburst styles */
+.sunburst .root {
     fill: white;
 }
 
-.sunburst.group {
+.sunburst .group {
     fill: #1E3248;
 }
 
-.sunburst.spec {
+.sunburst .spec {
     fill: crimson;
 }
 
-.sunburst.HTML {
+.sunburst .HTML {
     fill: #145184;
 }
 
-.sunburst.Tests {
+.sunburst .Tests {
     fill: #142335;
+}
+
+.sunburst .test {
+    fill: #D71C39
+}
+
+.sunburst .pull {
+    fill: #560b16
+}
+
+.sunburst .issue {
+    fill: white
 }
 
 /* spec published */
