@@ -7,7 +7,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="http://d3js.org/queue.v1.min.js"></script>
-  <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 
     <!-- Styles from http://testthewebforward.org/ -->
@@ -49,20 +49,26 @@
         };
 
         var initVis = function () {
+            //Handles timeline brushing
             var brushHandler = {};
+            //Handles sunburst selection changing
             var selectionHandler = {};
+            //Handles whovis author selection changing
+            var authorHandler = {};
+
             spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler);
-
-            who_vis = new WhoVis(d3.select("#whoVis"), allData, selectionHandler);
-
+            who_vis = new WhoVis(d3.select("#whoVis"), allData, authorHandler);
             timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler);
 
             $(brushHandler).bind("brushChanged", function (event, selectionStart, selectionEnd) {
-            spec_vis.onSelectionChange(selectionStart, selectionEnd);
+                spec_vis.onTimelineChange(selectionStart, selectionEnd);
+                who_vis.onTimelineChange(selectionStart, selectionEnd);
             });
 
             $(selectionHandler).bind("selectionChanged", function (event, specSelection) {
-
+                timeline_vis.onSelectionChange(specSelection);
+                who_vis.onSelectionChange(specSelection);
+                console.log(specSelection);
             });
         };
 
