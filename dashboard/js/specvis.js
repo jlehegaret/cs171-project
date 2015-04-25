@@ -66,6 +66,7 @@ SpecVis.prototype.initVis = function() {
                         { text = d.title; }
 // console.log(d);
                         return "<div class='d3-tip'>"
+                        // + d.type + ", " + d.state + "<br>"
                         + "<a href='" + d.url
                         + "'>" + text
                         + "</a></div>";
@@ -129,7 +130,8 @@ SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
         group.type = "group";
         group.url = _group.url;
         group.children = [];
-        //specs are only keyed by url in each group, spec_lookup will be used to find them in the original specs dataset
+        //specs are only keyed by url in each group,
+        // spec_lookup will be used to find them in the original specs dataset
         _group.specs.forEach(function(_spec) {
             var spec = {};
             spec.url = _spec.url;
@@ -138,9 +140,11 @@ SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
             if(that.displayData.spec_lookup[_spec.url]) {
                 var _fullSpec = that.displayData.spec_lookup[_spec.url];
                 //every spec will have two children, a group of issues for the HTML spec and a group of tests
-                spec.children = [{name:"HTML", key:spec.key + "HTML", children:[]},{name:"Tests", key:spec.key + "Tests", children:[]}];
+                spec.children = [{name:"HTML", key:spec.key + "HTML", children:[]},
+                                {name:"Tests", key:spec.key + "Tests", children:[]}];
                 spec.name = _fullSpec.name;
-                if(_fullSpec.issues) {
+                if(_fullSpec.issues)
+                {
                     _fullSpec.issues.forEach(function (_issue) {
                         var issue = {};
                         issue.title = _issue.title;
@@ -153,12 +157,26 @@ SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
                         issue.url = _issue.html_url;
                         spec.children[0].children.push(issue);
                     });
+                    // sort issues
+                    spec.children[0].children.sort(function(a,b)
+                    {
+                        if((a.type + a.state) < (b.type + b.state))
+                        {
+                            return -1;
+                        }
+                        if((a.type + a.state) > (b.type + b.state))
+                        {
+                            return 1;
+                        }
+                        return 0;
+                    });
                 }
             } else {
                 console.log("Spec Not Found Error: " + _spec.url);
             }
             //looks for tests in the test lookup table, creates copies if found
-            if(that.displayData.test_lookup[_spec.url]) {
+            if(that.displayData.test_lookup[_spec.url])
+            {
                 var _allTests = that.displayData.test_lookup[_spec.url];
                 _allTests.forEach(function(_test) {
                     var test = {};
@@ -168,6 +186,19 @@ SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
                     test.state = _test.state;
                     test.created_at = _test.created_at;
                     spec.children[1].children.push(test);
+                });
+                // sort tests
+                spec.children[1].children.sort(function(a,b)
+                {
+                    if((a.type + a.state) < (b.type + b.state))
+                    {
+                        return -1;
+                    }
+                    if((a.type + a.state) > (b.type + b.state))
+                    {
+                        return 1;
+                    }
+                    return 0;
                 });
             } else {
                //console.log("No Tests for: " + dd.url);
@@ -181,6 +212,8 @@ SpecVis.prototype.wrangleData = function(_dateFilterFunction) {
 };
 
 SpecVis.prototype.updateVis = function() {
+console.log("SpecVis:");
+console.log(this.displayData);
     var that = this;
 
     var root = this.displayData.root;
@@ -230,7 +263,7 @@ SpecVis.prototype.updateVis = function() {
             if(d.type === "group")
             {
                 return that.colorGroups(i);
-                
+
             }
 
             if(d.type == "test"){
@@ -255,7 +288,7 @@ SpecVis.prototype.updateVis = function() {
 
                     if(d.parent.name == "Device APIs Working Group")
                     return '#6CAED7'
-                    
+
                     if(d.parent.name == "Web Performance Working Group")
                     return '#C9B3A2'
 
@@ -270,9 +303,9 @@ SpecVis.prototype.updateVis = function() {
                 var colors = ['#97A2B8', '#B2BDC7'];
                 var random_color = colors[Math.floor(Math.random() * colors.length)];
                 return random_color;
-                
+
                 }
-               
+
             }
 
              if(d.type === "issue")
