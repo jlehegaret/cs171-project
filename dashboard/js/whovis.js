@@ -2,9 +2,8 @@ WhoVis = function(_parentElement, _data, _eventHandler, _options) {
     this.parentElement = _parentElement;
     this.data = _data;
     this.eventHandler = _eventHandler;
-    this.options = _options;
-    // TEMPORARY
-    this.options = {  "start_date"  : "2014-01-01",
+    this.options = _options ||
+                  {  "start_date"  : "2014-01-01",
                       "end_date"    : "2015-05-05",
                       "categories"  : ["spec", "test"],
                       "actions"     : ["ISS_O", "ISS_C",
@@ -73,16 +72,17 @@ WhoVis.prototype.initVis = function() {
 
 WhoVis.prototype.updateVis = function()
 {
+console.log("WhoVis:");
+console.log(this.displayData);
+
     var that = this;
 
     // CURRENTLY, WE ARE JUST SHOWING LINES OF CODE
     //   we would need to expand this to include issues someday
      this.max = d3.max(this.displayData, function(d)
                         { return d.total_code; } );
-     this.min = d3.min(this.displayData, function(d)
-                        { return d.total_code; } );
 
-    this.x.domain([this.min, this.max]);
+    this.x.domain([0, this.max]);
     this.y.domain(this.displayData.map(function(d)
                         { return d.who; }));
 
@@ -122,10 +122,12 @@ WhoVis.prototype.updateVis = function()
         .transition()
         .delay(function(d, i) { return i * 10; })
         .attr("width", function(d) {
-//console.log("d.total_code is");
-//console.log(d.total_code);
-//console.log("result is");
-//console.log(that.x(d.total_code));
+// console.log(d);
+// console.log("d.total_code is");
+// console.log(d.total_code);
+// console.log("result is");
+// console.log(that.x(d.total_code));
+
           return that.x(d.total_code); });
 
 
@@ -139,14 +141,11 @@ WhoVis.prototype.updateVis = function()
 
     };
 
-WhoVis.prototype.onTimelineChange = function(selectionStart, selectionEnd) {
+WhoVis.prototype.onSelectionChange = function(selectionStart, selectionEnd) {
     this.wrangleData();
     this.updateVis();
 };
 
-WhoVis.prototype.onSelectionChange = function(sunburstSelection) {
-
-};
 
 
 WhoVis.prototype.wrangleData = function()
@@ -235,16 +234,17 @@ WhoVis.prototype.wrangleData = function()
     ? plus = 0
     : plus = 5;
 
-    if(d.commits && that.options.actions.indexOf("COM") !== -1)
-    {
-      d.commits.forEach(function(c)
-      {
-          who = that.displayData[findWho(c.author)];
-          who.total_code += (c.line_added + c.line_deleted);
-          who.work[0 + plus].total += (c.line_added + c.line_deleted);
-          who.work[0 + plus].details.push(c);
-      });
-    }
+    // TAKING OUT COMMIT FUNCTIONALITY FOR NOW
+    // if(d.commits && that.options.actions.indexOf("COM") !== -1)
+    // {
+    //   d.commits.forEach(function(c)
+    //   {
+    //       who = that.displayData[findWho(c.author)];
+    //       who.total_code += (c.line_added + c.line_deleted);
+    //       who.work[0 + plus].total += (c.line_added + c.line_deleted);
+    //       who.work[0 + plus].details.push(c);
+    //   });
+    // }
 
     if( (category == "spec" && d.issues)
         || category == "test")
@@ -259,17 +259,36 @@ WhoVis.prototype.wrangleData = function()
         // is it a PR or an issue
         if(c.type === "pull" || c.type === "test")
         {
-          if(!c.line_added || !c.line_deleted)
+          // First, check data
+          if(c.line_added == undefined)
           {
-            if(c["line added"]) { c.line_added = c["line added"]; }
-            if(c["line deleted"]) { c.line_deleted = c["line deleted"]; }
+            if(c["line added"])
+            {
+              console.log("Have line added instead of line_added");
+              c.line_added = c["line added"];
+            }
+            else
+            {
+              c.line_added = 0;
+            }
+
           }
-          if(!c.line_added || !c.line_deleted)
+
+          if(c.line_deleted == undefined)
           {
-            // console.log("Problem with line_added or line_deleted:");
-            // console.log(c);
+            if(c["line deleted"])
+            {
+              console.log("Have line deleted instead of line_deleted");
+              c.line_deleted = c["line deleted"];
+            }
+            else
+            {
+              c.line_deleted = 0;
+            }
+
           }
-          else
+
+          // Now, see if we want to see the data
           if( that.options.actions.indexOf("PR_O") !== -1
               && c.created_at >= that.options.start_date)
           {
@@ -279,38 +298,35 @@ WhoVis.prototype.wrangleData = function()
             who.work[1 + plus].total += (c.line_added + c.line_deleted);
             who.work[1 + plus].details.push(c);
           }
-          if(!c.line_added || !c.line_deleted)
-          {
-            if(c["line added"]) { c.line_added = c["line added"]; }
-            if(c["line deleted"]) { c.line_deleted = c["line deleted"]; }
-          }
-          if(!c.line_added || !c.line_deleted)
-          {
-            // console.log("Problem with line_added or line_deleted:");
-            // console.log(c);
-          }
-          else
+
           if(c.closed_at)
           {
             //  OUR DATA IS NOT PERFECT.  IF A PR IS NOT MERGED
             //    WE ACTUALLY DON'T KNOW WHO CLOSED IT
-            if(c.merged_by)
+            if(c.merged_by || c.closed_by)
             {
               // who possibly closed it
               if( that.options.actions.indexOf("PR_C") !== -1
                 && c.closed_at <= that.options.end_date)
               {
-                who = that.displayData[findWho(c.merged_by.login)];
+                if(c.merged_by)
+                {
+                  who = that.displayData[findWho(c.merged_by.login)];
+                }
+                else
+                {
+                  who = that.displayData[findWho(c.closed_by.login)];
+                }
                 who.total_code += (c.line_added + c.line_deleted);
                 who.work[2 + plus].total += (c.line_added + c.line_deleted);
                 who.work[1 + plus].details.push(c);
               }
             }
-            // else
-            // {
-            //   console.log("Need closed by name");
-            //   console.log(c);
-            // }
+            else
+            {
+              console.log("Need closed_by name");
+              console.log(c);
+            }
           }
         }
         else if(c.type === "issue") // CURRENTLY, ONLY HAVE OPENING DATA
@@ -395,16 +411,24 @@ WhoVis.prototype.wrangleData = function()
     });
   }
 
-//console.log("Who data before sort");
-//console.log(this.displayData);
-
   this.displayData.sort(function(a, b)
                   { return b.total_code - a.total_code; });
-  // TAKING ROBIN BERJON OUT, AS HE IS A HUGE OUTLIER.  OR, WE SHOULD JUST
-  //   BY HAND TAKE OUT HIS HUGEST MOVE OF THE REPOS
-  this.displayData = this.displayData.slice(1, this.options.number_who);
 
-//console.log("Who data after sort");
-//console.log(this.displayData);
+  // we exclude some people from this display
+  var except = [ "Robin Berjon", "rberjon", "plehegar","darobin",
+                "unknown", undefined];
+
+  // take enough elements to cover exceptions list, just in case
+  this.displayData = this.displayData.slice(0,
+                      (this.options.number_who + except.length));
+
+  // filter out exceptions
+  this.displayData = this.displayData.filter(function(d)
+                      { return except.indexOf(d.who) === -1; });
+
+  // make sure it's the right length
+  this.displayData = this.displayData.slice(0,
+                      (this.options.number_who));
+
 }
 

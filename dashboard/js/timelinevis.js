@@ -147,6 +147,9 @@ TimelineVis.prototype.initVis = function() {
 };
 
 TimelineVis.prototype.updateVis = function() {
+console.log("TimeVis:");
+console.log(this.displayData);
+
     var that = this;
 
 // console.log("In updateVis #7");
@@ -395,15 +398,16 @@ TimelineVis.prototype.reorderData = function() {
       today.details.push(d);
     }
 
-    if(d.commits)
-    {
-      d.commits.forEach(function(c)
-      {
-          today = that.displayData[findDate(c.date)].actions[1 + plus];
-          today.total += (c.line_added + c.line_deleted);
-          today.details.push(c);
-      });
-    }
+    // REMOVING COMMITS FOR NOW
+    // if(d.commits)
+    // {
+    //   d.commits.forEach(function(c)
+    //   {
+    //       today = that.displayData[findDate(c.date)].actions[1 + plus];
+    //       today.total += (c.line_added + c.line_deleted);
+    //       today.details.push(c);
+    //   });
+    // }
 
     if( (category == "spec" && d.issues)
         || category == "test")

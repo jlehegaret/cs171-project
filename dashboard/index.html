@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="css/vis.css" type="text/css" media="screen">
 
     <!--Vis code-->
-    <script src="js/specvis.js"></script>
+    <script src="js/specvis_JLH.js"></script>
     <script src="js/whovis.js"></script>
     <script src="js/timelinevis.js"></script>
 </head>
@@ -85,13 +85,39 @@
                             }
                             if (d.issues) {
                                 d.issues = d.issues.map(function (dd) {
-                                    dd.created_at = stripTime(dd.created_at);
+                                    if(dd.created_at)
+                                    {
+                                        dd.created_at = stripTime(dd.created_at);
+                                    }
+                                    else if(dd["created at"])
+                                    {
+                                        dd.created_at = stripTime(dd["created at"]);
+                                    }
+                                    else
+                                    {
+                                        console.log("missing created_at");
+                                        console.log(dd);
+                                    }
+
                                     if ("closed_at" in dd) {
                                         dd.closed_at = stripTime(dd.closed_at);
                                     }
+                                    else if ("closed at" in dd) {
+                                        dd.closed_at = stripTime(dd["closed at"]);
+                                    }
+
                                     if ("merged_at" in dd) {
                                         dd.merged_at = stripTime(dd.merged_at);
                                     }
+                                    else if ("merged at" in dd) {
+                                        dd.merged_at = stripTime(dd["merged at"]);
+                                    }
+
+                                    if(dd.closed_at && !dd.closed_by)
+                                    {
+                                        dd.closed_by = "unknown";
+                                    }
+
                                     return dd;
                                 });
                             }
@@ -154,10 +180,30 @@
                         });
                 //coerce date strings into date objects
                 tests = _tests.map(function (d) {
-                    d.created_at = stripTime(d.created_at);
+                    if(d.created_at)
+                    {
+                        d.created_at = stripTime(d.created_at);
+                    }
+                    else if(dd["created at"])
+                    {
+                        d.created_at = stripTime(d["created at"]);
+                    }
+                    else
+                    {
+                        console.log("missing created_at");
+                        console.log(d);
+                    }
                     if ("closed_at" in d) {
                         d.closed_at = stripTime(d.closed_at);
                     }
+                    else if ("closed at" in d) {
+                        d.closed_at = stripTime(d["closed at"]);
+                    }
+                    if(d.closed_at && d.closed_by === undefined)
+                    {
+                        d.closed_by = "unknown";
+                    }
+
                     return d;
                 });
                 allData.caniuse = caniuse;
@@ -196,6 +242,7 @@
         };
 
         init();
+console.log("Index version 3.0");
     });
 
 </script>
