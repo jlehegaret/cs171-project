@@ -12,6 +12,6 @@ Section 4 cont. - Our Design Process, the Who Graph
 Even though the original vision had imagined a horizontal bar chart, our first iteration was vertical:
 
 <p align="center">
-    <img src="images/who1.jpg"/>
+    <img src="images/Who1.jpg"/>
 </p>
 

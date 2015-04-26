@@ -11,13 +11,13 @@ One thing to note, which has been helpful during our design decisions, is that w
 As we began work, we at first stuck closely to look of the [website](www.testthewebforward/dashboard) that we may eventually replace:
 
 <p align="center">
-    <img src="images/index1.png" width="600"/>
+    <img src="images/Index1.png" width="600"/>
 </p>
 
 However, by the time that we met with our TF (or "marker"), we had dared to go a bit more "infovis" style, towards Zona's vision:
 
 <p align="center">
-    <img src="images/index2.png" width="600"/>
+    <img src="images/Index2.png" width="600"/>
 </p>
 
 Once the fundamental graphs were in place, Zona was able to spend some time further improving the overall look:
