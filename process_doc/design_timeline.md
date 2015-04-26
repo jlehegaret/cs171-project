@@ -6,7 +6,7 @@ Section 4 cont. - Our Design Process, the Timeline
 ## The TimeLine
 
 <p align="center">
-    <img src="images/w3_proposal.jpg" width="600"/>
+    <img src="images/main1.jpg" width="600"/>
 </p>
 
 The timeline shows all of the work represented by the sunburst graph, but across time.
@@ -25,15 +25,16 @@ First, we needed something as a fast placeholder which could also interact with 
     <img src="images/Timeline1.png" width="600"/>
 </p>
 
-However, we wanted our color-coding by contribution type.  Also, given that every day presents a SUM of the work done by type on that day, it was hard to present the number of issues on the same scale as lines of code.  Our first attempt to create two x axes, one for each scale, showed us quite quickly that there was too much data to fit in 5 bars per day for the entire time frame:
+However, we wanted our color-coding by contribution type.  Also, given that every day presents a SUM of the work done by type on that day, it was hard to present the number of issues on the same scale as lines of code.  Our first attempt to create two x axes, one for each scale, showed us quite quickly that there was too much data to fit in 5 bars per day for the entire time frame.  As you can see, there is so much work done in recent times that the bars overlap, making purely saturated color.
+
 
 <p align="center">
     <img src="images/Timeline2.png" width="600"/>
 </p>
 
-Due to the crowdedness of the data, we broke up the types of work into yet more axes, so that every day could be just 1-2 pixels wide rather than 5.  The top two lines represent code and issues for the specs themselves, while the bottom two lines represent code and issues for the test suite.
+Due to the crowdedness of the data, we broke up the types of work into yet more axes, so that that every day could be just 1-2 pixels wide rather than 5.  The top two lines represent code and issues for the specs themselves, while the bottom two lines represent code and issues for the test suite.
 
-Even so, the complete history of data is too much for the graph.  We turned to pre-emptive filtering to show data for the most recent year and a half.  This seems reasonable, given that W3C seems most interested in trends over the last few months:
+Even so, the complete history of data seemed too much for the graph.  We turned to pre-emptive filtering to show data for the most recent year and a half.  This seemed reasonable, given that W3C seems most interested in trends over the last few months:
 
 <p align="center">
     <img src="images/Timeline3.png" width="600"/>

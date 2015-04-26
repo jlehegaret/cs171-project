@@ -6,7 +6,7 @@ Section 4 cont. - Our Design Process, the Sunburst
 ## The Sunburst
 
 <p align="center">
-    <img src="images/w3_proposal.jpg" width="600"/>
+    <img src="images/main1.jpg" width="600"/>
 </p>
 
 We refer to the large circle at the top left of our charts as the "sunburst".  It is a hierarchical tree structure.  Its root is W3C as a whole.  Its next layer is formed of the various working groups within W3C.  Then, there are a layer of all of the specs that each working group contributes to.  Lastly, there is the outer layer of the exact kinds of contributions to that spec which have occurred.
@@ -31,7 +31,7 @@ However, due to the number of individual contributions forming the outer ring, t
     <img src="images/Sunburst3.png" width="600"/>
 </p>
 
-However, these colors, being quite flat, appeared quite amateur, and so we chose a more sophisticated palate and added gradations to be more pleasing to the eye.  This version was ready for outside review:
+Also, these colors, being quite flat, appeared quite amateur, and so we chose a more sophisticated palate and added gradations to be more pleasing to the eye.  This version was ready for outside review:
 
 <p align="center">
     <img src="images/Sunburst4.png" width="600"/>
