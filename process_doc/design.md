@@ -1,17 +1,9 @@
 # Section 4 - Our Design Process
 
 * *return to [Section 3, What W3C Has So Far](existing.md)*
-* *proceed to [Section 5, Our Proposed Feature Set](proposal.md)*
+* *proceed to [Section 4 cont., The Design Process - Further Details](design_details.md)*
 
-* The History:  The Seed, and Zona's Take
-* [The Continued Overview](design_details.md)
-* Evolution
-  * [of the overall page](design_index.md)
-  * [of the sunburst](design_sunburst.md)
-  * [of the timeline](design_timeline.md)
-  * [of the who graph](design_who.md)
-
-## The Seed
+## The Beginnings
 
 As Jennifer spoke with W3 about what they wanted to see that was different than what they already had, the main question she heard W3C ask was "how are the working groups spending their time?"
 

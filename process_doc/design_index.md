@@ -1,7 +1,7 @@
 # Section 4 cont. - Our Design Process, the Dashboard
 
-* *return to [Continued Overview](design_details.md)*
-* *proceed to [Evolution - Sunburst](design_sunburst.md)*
+* *return to [The Design Process - Further Details](design_details.md)*
+* *proceed to [The Design Process - Sunburst](design_sunburst.md)*
 
 
 ## The Dashboard Itself
@@ -10,17 +10,19 @@ One thing to note, which has been helpful during our design decisions, is that w
 
 As we began work, we at first stuck closely to look of the [website](www.testthewebforward/dashboard) that we may eventually replace:
 
-[ screenshot here ]
+<p align="center">
+    <img src="images/index1.png" width="600"/>
+</p>
 
 However, by the time that we met with our TF (or "marker"), we had dared to go a bit more "infovis" style, towards Zona's vision:
 
-[ screenshot here ]
+<p align="center">
+    <img src="images/index2.png" width="600"/>
+</p>
 
 Once the fundamental graphs were in place, Zona was able to spend some time further improving the overall look:
 
 [ screenshot here ]
 
 [ AND THEN, WHAT LIES AHEAD EVEN AFTER THAT...]
-
-
 

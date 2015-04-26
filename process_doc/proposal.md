@@ -1,6 +1,6 @@
 # Section 5 - Our Proposed Feature Set
 
-* *return to [Section 4, Our Design Ideas](design.md)*
+* *return to [Section 4, The Design Process](design.md)*
 * *proceed to [Section 6, The End Result](evolution.md)*
 
 ## Proposal

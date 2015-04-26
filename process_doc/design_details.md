@@ -1,7 +1,7 @@
 # Section 4 cont. - Our Design Process - Continued Overview
 
-* *return to [The Seed and Zona's take](design.md)*
-* *proceed to [Evolution](design_index.md)*
+* *return to [The Design Process - Beginnings](design.md)*
+* *proceed to [The Design Process - Dashboard](design_index.md)*
 
 ## Understanding the Visualization, 3/31/15
 
@@ -23,7 +23,7 @@ Timeline needs to represent all easy issues, hard issues, pull requests and the 
 
 ## Design Meeting, 4/4/15
 
-At this meeting, the three of us delved into Zona's graphics to understand our implmentation goals.
+At this meeting, the three of us delved into Zona's graphics to understand our implementation goals.
 
 ### Sunburst
 

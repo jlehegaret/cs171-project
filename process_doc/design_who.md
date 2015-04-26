@@ -1,9 +1,9 @@
 Section 4 cont. - Our Design Process, the Who Graph
 
-* *return to [Evolution - Timeline](design_timeline.md)*
+* *return to [The Design Process - Timeline](design_timeline.md)*
 * *proceed to [Section 5, Our Proposed Feature Set](proposal.md)*
 
-## The Who
+## The Who Graph
 
 <p align="center">
     <img src="images/main1.jpg" width="600"/>
@@ -11,5 +11,7 @@ Section 4 cont. - Our Design Process, the Who Graph
 
 Even though the original vision had imagined a horizontal bar chart, our first iteration was vertical:
 
-[ screenshot here ]
+<p align="center">
+    <img src="images/who1.jpg"/>
+</p>
 
