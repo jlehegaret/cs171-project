@@ -13,7 +13,8 @@ WhoVis = function(_parentElement, _data, _eventHandler, _options) {
                       "who"         : [],
                       "number_who"  : 20,
                       "width"       : 300,
-                      "height"      : 900
+                      "height"      : 900,
+                      "who_sort"    : "issues"
                     };
     this.displayData = [];
 
@@ -39,25 +40,23 @@ WhoVis.prototype.initVis = function() {
               + ","
               + this.margin.top + ")");
 
-     this.x = d3.scale.linear().range([0, this.width/2]);
-     this.y = d3.scale.ordinal().rangeRoundBands([0, this.height], .2, 0);
+     this.x_code = d3.scale.linear()
+                      .range([0, this.width/2]);
+     this.x_issues = d3.scale.linear()
+                      .range([0, this.width/2]);
+     this.y = d3.scale.ordinal()
+                      .rangeRoundBands([0, this.height], .2, 0);
 
     this.color = d3.scale.ordinal()
     .range(["#062B59", "#09458F", "#073874", "#09458F", "#0B52AA", "#0C5FC5"]);
-
-    this.x = d3.scale.linear()
-        .range([0, this.width/2]);
-
-    this.y = d3.scale.ordinal()
-        .rangeRoundBands([0, this.height], .2, 0);
 
     // this.xAxis = d3.svg.axis()
     // .scale(this.x)
     // .ticks(5)
     // .orient("top");
 
-    this.group = this.svg.append("g")
-        .attr("class", "bars");
+    this.svg.append("g")
+            .attr("class", "bars");
 
     // this.svg.append("g")
     //     .attr("class", "x axis")
@@ -77,12 +76,16 @@ console.log(this.displayData);
 
     var that = this;
 
-    // CURRENTLY, WE ARE JUST SHOWING LINES OF CODE
-    //   we would need to expand this to include issues someday
-     this.max = d3.max(this.displayData, function(d)
+    // for lines of code
+    this.max = d3.max(this.displayData, function(d)
                         { return d.total_code; } );
+    this.x_code.domain([0, this.max]);
 
-    this.x.domain([0, this.max]);
+    // for number of issues
+    this.max = d3.max(this.displayData, function(d)
+                        { return d.total_issues; } );
+    this.x_issues.domain([0, this.max]);
+
     this.y.domain(this.displayData.map(function(d)
                         { return d.who; }));
 
@@ -90,45 +93,78 @@ console.log(this.displayData);
     //     .call(this.xAxis)
     //     .selectAll("text");
 
+console.log("this.displayData");
+console.log(this.displayData);
 
-    var bar = this.group.selectAll(".bar")
-        .data(this.displayData, function(d)
-                        { return d.who; });
+    var bar = this.svg.selectAll("g.bars")
+                      .selectAll("g.who")
+                      .data(this.displayData, function(d)
+                        { return d.who;
+                        });
 
-    var bar_enter = bar.enter().append("g");
+    var bar_enter = bar.enter()
+                       .append("g")
+                       .attr("class", "who");
 
-    bar_enter.append("rect");
     bar_enter.append("text");
 
-    bar
-        .attr("class", "bar");
+    bar_enter.append("rect")
+              .data(this.displayData.map(function(d)
+                    { return { "who" : d.who,
+                               "total" : d.total_code,
+                               "type" : "code" };
+                    }))
+              .attr("class", "bar code");
 
-    bar.exit()
-        .remove();
+    bar_enter.append("rect")
+              .data(this.displayData.map(function(d)
+                    { return { "who" : d.who,
+                               "total" : d.total_issues,
+                               "type" : "issues" };
+                    }))
+              .attr("class", "bar issues");
 
-    bar
-        .attr("class", "bar")
-        .attr("transform", function(d, i)
-            { return "translate(0," + that.y(d.who) + ")"; });
+    // update all bars showing data
+    bar.attr("transform", function(d)
+    {
+      return "translate(0," + that.y(d.who) + ")";
+    });
 
-
-    bar.selectAll("rect")
+    bar.selectAll("rect.bar")
         .attr("height", 10)
         .attr("x", 0)
-        .attr("y", 0)
-        .style("fill", function(d){
+        .attr("y", function(d)
+                    {
+                      if(d.type === "issues")
+                      {
+                        return 12; // move it down by bar_height
+                      }
+                      return 0;
+                    })
+        .style("fill", function(d)
+        {
+          if(d.type === "code")
+          {
             return that.color(d.who)
+          }
+          else
+          {
+            return "crimson";
+          }
         })
         .transition()
         .delay(function(d, i) { return i * 10; })
-        .attr("width", function(d) {
-// console.log(d);
-// console.log("d.total_code is");
-// console.log(d.total_code);
-// console.log("result is");
-// console.log(that.x(d.total_code));
-
-          return that.x(d.total_code); });
+        .attr("width", function(d)
+        {
+          if(d.type === "code")
+          {
+            return that.x_code(d.total);
+          }
+          else
+          {
+            return that.x_issues(d.total);
+          }
+        });
 
 
     bar.selectAll("text")
@@ -138,6 +174,9 @@ console.log(this.displayData);
             .attr("dx", "-.8em")
             .attr("dy", "0.8em")
             .style("font-family", "sans-serif");
+
+    bar.exit()
+        .remove();
 
     };
 
@@ -329,7 +368,8 @@ WhoVis.prototype.wrangleData = function()
             }
           }
         }
-        else if(c.type === "issue") // CURRENTLY, ONLY HAVE OPENING DATA
+        else if(c.type === "issue")
+        // CURRENTLY, ONLY HAVE OPENING DATA
         {
           // how hard is it
           var value;
@@ -411,9 +451,16 @@ WhoVis.prototype.wrangleData = function()
     });
   }
 
+if(this.options.who_sort === "code")
+{
   this.displayData.sort(function(a, b)
                   { return b.total_code - a.total_code; });
-
+}
+else // sort by issues
+{
+    this.displayData.sort(function(a, b)
+                  { return b.total_issues - a.total_issues; });
+}
   // we exclude some people from this display
   var except = [ "Robin Berjon", "rberjon", "plehegar","darobin",
                 "unknown", undefined];
