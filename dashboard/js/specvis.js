@@ -2,7 +2,9 @@ SpecVis = function (_parentElement, _data, _eventHandler, _options) {
     this.parentElement = _parentElement;
     this.data = _data;
     this.eventHandler = _eventHandler;
-    this.options = _options || {width: 750, height: 750};
+    this.options = _options || {width: 750, height: 750,
+        "start_date"  : "2014-01-01",
+        "end_date"    : "2015-05-05"};
     this.displayData = {};
     this.allIssues = [];
 
@@ -20,8 +22,8 @@ SpecVis.prototype.initVis = function () {
     this.dateFormatter = d3.time.format("%Y-%m-%d");
     this.radius = Math.min(this.width, this.height) / 2;
 
-    // sets up a default datefilter (returns from a given date till now)
-    this.currentDateFilter = this.dateFilter(new Date("2014-01-01"), new Date());
+    // sets up a default date filter (returns from a given date till now)
+    this.currentDateFilter = this.dateFilter(new Date(this.options.start_date), new Date(this.options.end_date));
     // sets up default author filter (returns all)
     this.currentAuthorFilter = function(d) {return true;};
 
@@ -57,7 +59,8 @@ SpecVis.prototype.initVis = function () {
         .attr("height", this.height + this.margin.top + this.margin.bottom)
         .append("g")
         .classed("sunburst", true)
-        .attr("transform", "translate(" + (this.margin.left + this.margin.right + this.width) / 2 + "," + (this.margin.top + this.margin.bottom + this.height) / 2 + ")")
+        .attr("transform", "translate(" + (this.margin.left + this.margin.right + this.width) / 2 + ","
+        + (this.margin.top + this.margin.bottom + this.height) / 2 + ")");
 
     //sets up the partition layout
     this.partition = d3.layout.partition()
@@ -93,20 +96,21 @@ SpecVis.prototype.initVis = function () {
 
 
 SpecVis.prototype.wrangleData = function (filters) {
-
     var that = this;
 
     //uses current filter unless new one is defined, then sets current filter to one in use
     var dateFilterFunction = this.currentDateFilter;
-    if (filters && filters._dateFilterFunction != null) {
+    if (filters && filters._dateFilterFunction) {
         dateFilterFunction = filters._dateFilterFunction;
     }
+    this.currentDateFilter = dateFilterFunction;
 
     // sets up default author filter (returns all)
     var authorFilterFunction = this.currentAuthorFilter;
-    if (filters && filters._authorFilterFunction != null) {
+    if (filters && filters._authorFilterFunction) {
         authorFilterFunction = filters._authorFilterFunction;
     }
+    this.currentAuthorFilter = authorFilterFunction;
 
     //create a lookup table of specs keyed by spec url
     this.displayData.spec_lookup = {};
