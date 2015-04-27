@@ -41,14 +41,15 @@ SpecVis.prototype.initVis = function () {
             {
                 return 1;
             }
-            return 0;
-        // if(a.type === "issue") {
-        //     return -1;
-        // } else if (a.type === "pull") {
-        //     return 1;
-        // } else {
-        //     return d3.descending(a, b);
-        // }
+            if(a.name < b.name)
+            {
+                return -1;
+            }
+            if(a.name > b.name)
+            {
+                return 1;
+            }
+            return d3.descending(a, b);
     };
 
     this.colorGroups = d3.scale.ordinal()
