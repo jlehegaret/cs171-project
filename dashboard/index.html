@@ -7,7 +7,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="js/lib/d3.js" charset="utf-8"></script>
     <script src="js/lib/queue.v1.js"></script>
-    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    <script src="js/lib/d3.tip.v0.6.6.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 
     <!-- Styles from http://testthewebforward.org/ -->
@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="css/vis.css" type="text/css" media="screen">
 
     <!--Vis code-->
+    <script src="js/processData.js"></script>
     <script src="js/specvis.js"></script>
     <script src="js/whovis.js"></script>
     <script src="js/timelinevis.js"></script>
@@ -61,7 +62,7 @@
             spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler);
             who_vis = new WhoVis(d3.select("#whoVis"), allData, authorHandler);
             timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler);
-            filter_ui = new FilterUI(d3.select("#filterUI"), allData, filterHandler);
+            //filter_ui = new FilterUI(d3.select("#filterUI"), allData, filterHandler);
 
             //Wire up event handlers
             $(brushHandler).bind("brushChanged", function (event, selectionStart, selectionEnd) {
@@ -76,9 +77,11 @@
             $(authorHandler).bind("authorChanged", function (event, author) {
                 spec_vis.onAuthorChange(author);
                 timeline_vis.onAuthorChange(author);
-                console.log(author);
             });
             $(filterHandler).bind("filterChanged", function(event, filters) {
+                //spec_vis.onFilterChange(filters);
+                //timeline_vis.onFilterChange(filters);
+                //who_vis.onFilterChange(filters);
                 console.log(filters);
             });
         };
@@ -96,18 +99,25 @@
                                     if(dd.created_at) {
                                         dd.created_at = stripTime(dd.created_at);
                                     } else if(dd["created at"]) {
+                                        console.log("Warning: JSON with irregular field \"created at\"");
+                                        console.log(dd);
                                         dd.created_at = stripTime(dd["created at"]);
                                     } else {
-                                        console.log("missing created_at");
+                                        console.log("Error: JSON missing created_at field");
                                         console.log(dd);
                                     }
-                                    if ("closed_at" in dd) {
+                                    if (dd.closed_at) {
                                         dd.closed_at = stripTime(dd.closed_at);
-                                    } else if ("closed at" in dd) {
+                                    } else if (dd["closed at"]) {
+                                        console.log("Warning: JSON with irregular field \"closed at\"");
+                                        console.log(dd);
                                         dd.closed_at = stripTime(dd["closed at"]);
-                                    }if ("merged_at" in dd) {
+                                    }
+                                    if (dd.merged_at) {
                                         dd.merged_at = stripTime(dd.merged_at);
-                                    } else if ("merged at" in dd) {
+                                    } else if (dd["merged at"]) {
+                                        console.log("Warning: JSON with irregular field \"merged at\"");
+                                        console.log(dd);
                                         dd.merged_at = stripTime(dd["merged at"]);
                                     }
                                     if(dd.closed_at && !dd.closed_by) {
@@ -116,10 +126,8 @@
                                     return dd;
                                 });
                             }
-                            if(d.commits)
-                            {
-                              d.commits = d.commits.map(function(dd)
-                                          {
+                            if(d.commits) {
+                              d.commits = d.commits.map(function(dd) {
                                             dd.date = stripTime(dd.date);
                                             return dd;
                                           });
@@ -139,27 +147,20 @@
                             //                      0 not
                             //                      1 partial
                             //                      2 yes
-                            var elements = caniuse.filter(function(e)
-                            {
+                            var elements = caniuse.filter(function(e) {
                                 return e.spec == d.url;
                             });
-                            if(elements.length == 0)
-                            {
+                            if(elements.length == 0) {
                                 d.score = 0;
                             }
-                            else
-                            {
-                                elements.forEach(function(e)
-                                {
+                            else {
+                                elements.forEach(function(e) {
                                     e.CIUresult = 0;
-                                    e.stats.forEach(function(browser)
-                                    {
-                                        if(browser.support === "yes")
-                                        {
+                                    e.stats.forEach(function(browser) {
+                                        if(browser.support === "yes") {
                                             e.CIUresult += 2;
                                         }
-                                        else if(browser.support === "partial")
-                                        {
+                                        else if(browser.support === "partial") {
                                             e.CIUresult += 1;
                                         } // else nothing
                                     });
@@ -197,6 +198,9 @@
                 allData.groups = groups;
                 allData.specs = specs;
                 allData.tests = tests;
+
+
+
                 //log the data structures, remove for production
                 // logData();
                 initVis();
