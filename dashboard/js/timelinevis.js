@@ -94,41 +94,7 @@ TimelineVis.prototype.initVis = function() {
       .attr("y2", function(d) { return d; });
 
     // define our tooltip function
-    this.tip = d3.tip()
-                  .offset([0,0])
-                  .html(function(d)
-                    {
-                      var fields = [];
-                      var text = "<ul class='d3-tip'>";
-                      d.details.forEach(function(dd)
-                      {
-                        text = text + "<li>";
-
-                        // define how to access this dd
-                        if(d.type == "PUB")
-                        {
-                          text = text + "<a href='" + dd.url + "'>"
-                                + dd.title + "</a><br>" +
-                                dd.status;
-                        }
-                        else if(d.cat === "spec" && d.type === "COM")
-                        {
-                          text = text + "<a href='" + dd.html_url + "'>"
-                                + dd.title + "</a>";
-                        }
-                        else
-                        {
-                          text = text + "<a href='" + dd.html_url + "'>"
-                                + dd.title + "</a><br>"
-                                + dd.state;
-                        }
-
-                        text = text + "</li>";
-                      });
-                      text = text + "</ul>";
-
-                      return text;
-                    });
+    this.tip = this.tooltip();
 
     // brushing
     this.brush = d3.svg.brush()
@@ -576,5 +542,43 @@ TimelineVis.prototype.wrangleData = function(filters)
   });
 // console.log("vizData: ");
 // console.log(this.vizData);
-}
+};
+
+TimelineVis.prototype.tooltip = function() {
+    return d3.tip()
+        .offset([0,0])
+        .html(function(d)
+        {
+            var fields = [];
+            var text = "<ul class='d3-tip'>";
+            d.details.forEach(function(dd)
+            {
+                text = text + "<li>";
+
+                // define how to access this dd
+                if(d.type == "PUB")
+                {
+                    text = text + "<a href='" + dd.url + "'>"
+                    + dd.title + "</a><br>" +
+                    dd.status;
+                }
+                else if(d.cat === "spec" && d.type === "COM")
+                {
+                    text = text + "<a href='" + dd.html_url + "'>"
+                    + dd.title + "</a>";
+                }
+                else
+                {
+                    text = text + "<a href='" + dd.html_url + "'>"
+                    + dd.title + "</a><br>"
+                    + dd.state;
+                }
+
+                text = text + "</li>";
+            });
+            text = text + "</ul>";
+
+            return text;
+        });
+};
 
