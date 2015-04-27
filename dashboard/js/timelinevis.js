@@ -31,6 +31,14 @@ TimelineVis.prototype.initVis = function() {
         .attr("transform", "translate(" + this.margin.left
               + "," + this.margin.top + ")");
 
+    // focus is the zoomed selection
+    this.focus = this.svg.append("g")
+        .attr("class", "context");
+
+    // context is the brushing window
+    this.context = this.svg.append("g")
+        .attr("class", "focus");
+
     // creates scales
     this.x0 = d3.time.scale.utc()
                     .range([0, this.width]);
@@ -71,17 +79,16 @@ TimelineVis.prototype.initVis = function() {
         .orient("bottom");
 
     // prepare for display bars
-    this.svg.append("g")
+    this.context.append("g")
             .attr("class", "bars");
 
     // Add axes visual elements
-    this.svg.append("g")
+    this.context.append("g")
         .attr("class", "x axis")  // put it in the middle
         .attr("transform", "translate(0," + this.height + ")");
 
     // draw the various x-axis lines
-    d3.select("g.timeline")
-      .append("g")
+    this.context.append("g")
       .attr("class", "categoryLines")
       .selectAll(".categoryLine")
       .data(this.y_axisType.range())
@@ -102,7 +109,7 @@ TimelineVis.prototype.initVis = function() {
             $(that.eventHandler).trigger("brushChanged",
             that.brush.extent());
         });
-    this.svg.append("g")
+    this.context.append("g")
         .attr("class", "brush");
 
 
@@ -128,11 +135,11 @@ TimelineVis.prototype.updateVis = function() {
     this.height_count.domain([0, this.vizData.max_numIssues]);
 
     // update axis
-   this.svg.select(".x.axis")
+   this.context.select(".x.axis")
       .call(this.xAxis);
 
     // update graph:
-    var dates = this.svg.select(".bars")
+    var dates = this.context.select(".bars")
                         .selectAll(".date")
                         .data(this.vizData.dates, function(d)
                           { return d.date; });
@@ -225,7 +232,7 @@ TimelineVis.prototype.updateVis = function() {
 
     // update brush
     this.brush.x(this.x0);
-    this.svg.select(".brush")
+    this.context.select(".brush")
         .call(this.brush)
         .selectAll("rect")
         .attr("height", this.height);
