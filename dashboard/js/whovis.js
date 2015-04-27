@@ -113,7 +113,13 @@ WhoVis.prototype.updateVis = function() {
             .append("g")
             .attr("class", "who")
             .on("click",function(d) {
-            $(that.eventHandler).trigger("authorChanged", d);
+            if(!d.selected) {
+                d.selected = true;
+                $(that.eventHandler).trigger("authorChanged", d.who);
+            } else { // If author has already been selected, reset selection
+                d.selected = false;
+                $(that.eventHandler).trigger("authorChanged", null);
+            }
         });
 
     bar_enter.append("text");
