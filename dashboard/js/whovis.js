@@ -181,10 +181,14 @@ console.log(this.displayData);
     };
 
 WhoVis.prototype.onTimelineChange = function(selectionStart, selectionEnd) {
-    this.wrangleData();
-    this.updateVis();
+//    this.wrangleData();
+//    this.updateVis();
 };
 
+WhoVis.prototype.onSelectionChange = function(sunburstSelection) {
+    //TODO: This function is triggered by a selection of an arc on a sunburst, wrangle data needs to be called on this selection
+    console.log("Filter by " + sunburstSelection.type + " " + sunburstSelection.name);
+};
 
 
 WhoVis.prototype.wrangleData = function()
