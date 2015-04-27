@@ -98,14 +98,14 @@ SpecVis.prototype.initVis = function () {
 SpecVis.prototype.wrangleData = function (filters) {
     var that = this;
 
-    //uses current filter unless new one is defined, then sets current filter to one in use
+    //uses current filter unless new one is defined, then saves current filter
     var dateFilterFunction = this.currentDateFilter;
     if (filters && filters._dateFilterFunction) {
         dateFilterFunction = filters._dateFilterFunction;
     }
     this.currentDateFilter = dateFilterFunction;
 
-    // sets up default author filter (returns all)
+    //uses current filter unless new one is defined, then saves current filter
     var authorFilterFunction = this.currentAuthorFilter;
     if (filters && filters._authorFilterFunction) {
         authorFilterFunction = filters._authorFilterFunction;
@@ -150,7 +150,7 @@ SpecVis.prototype.wrangleData = function (filters) {
 
     // Create a group object for every group in the original dataset
     // It is VERY important that every item has a unique key, or the layout will have undesirable behavior
-    // This is especially true because certain specs belong to more than one group
+    // This is especially true because certain specs belong to more than one group, requiring deep copies
     this.data.groups.forEach(function (_group) {
         var group = {};
         group.name = _group.name;
@@ -211,7 +211,7 @@ SpecVis.prototype.wrangleData = function (filters) {
                 }
             }
             else {
-                console.log("Spec Not Found Error: " + _spec.url);
+                console.log("Error: Spec Not Found: " + _spec.url);
             }
             //looks for tests in the test lookup table, creates copies if found
             if (that.displayData.test_lookup[_spec.url]) {
@@ -232,7 +232,7 @@ SpecVis.prototype.wrangleData = function (filters) {
                     spec.children[1].children.push(test);
                 });
             } else {
-                //console.log("No Tests for: " + dd.url);
+                //console.log("Debug: No Tests for: " + dd.url);
             }
             group.children.push(spec);
         });
@@ -246,8 +246,6 @@ SpecVis.prototype.updateVis = function () {
 
     var that = this;
 
-    var root = this.displayData.root;
-
     // click handler for each arc
     var click = function (d) {
         $(that.eventHandler).trigger("selectionChanged", d);
@@ -257,7 +255,7 @@ SpecVis.prototype.updateVis = function () {
     };
 
     var path = this.svg.selectAll("path")
-        .data(this.partition.nodes(root), function (d) {
+        .data(this.partition.nodes(this.displayData.root), function (d) {
             return d.key;
         });
 
