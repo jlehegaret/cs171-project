@@ -20,36 +20,25 @@ SpecVis.prototype.initVis = function () {
     this.dateFormatter = d3.time.format("%Y-%m-%d");
     this.radius = Math.min(this.width, this.height) / 2;
 
-    //this.color = d3.scale.category20c();
 
     //use standard descending ordering for all elements
     //except group issues and pulls separately
     var sortTypes = function(a,b) {
-            if(a.type < b.type)
-            {
+            if(a.type < b.type) {
                 return -1;
-            }
-            if(a.type > b.type)
-            {
+            } else if(a.type > b.type) {
                 return 1;
-            }
-            if(a.state < b.state)
-            {
+            } else if(a.state < b.state) {
                 return -1;
-            }
-            if(a.state > b.state)
-            {
+            } else if(a.state > b.state) {
                 return 1;
-            }
-            if(a.name < b.name)
-            {
+            } else if(a.name < b.name) {
                 return -1;
-            }
-            if(a.name > b.name)
-            {
+            } else if(a.name > b.name) {
                 return 1;
+            } else {
+                return d3.descending(a, b);
             }
-            return d3.descending(a, b);
     };
 
     this.x = d3.scale.linear()
@@ -89,49 +78,7 @@ SpecVis.prototype.initVis = function () {
         });
 
     // set up tooltips
-    this.tip = d3.tip()
-        .offset([0, 0])
-        .html(function (d) {
-            var text;
-            var link;
-
-            if (d.name) {
-                if (d.name == "HTML") {
-                    text = "Spec";
-                }
-                else {
-                    text = d.name;
-                }
-            }
-            else {
-                text = d.title;
-            }
-            if(d.type === "pull"
-                || d.type === "commit"
-                || d.type === "issue")
-            {
-                text = d.state + " " + d.type + ": " + text;
-            }
-
-            if(d.url !== undefined)
-            {
-                link = d.url;
-            }
-            else if(d.html_url !== undefined)
-            {
-                link = d.html_url;
-            }
-            else if(d.name !== "W3C")
-            {
-                console.log("missing URL for");
-                console.log(d);
-            }
-
-            return "<div class='d3-tip'>"
-                + "<a href='" + link
-                + "'>" + text
-                + "</a></div>";
-        });
+    this.tip = this.tooltip();
 
     // filter, aggregate, modify data
     this.wrangleData();
@@ -140,34 +87,20 @@ SpecVis.prototype.initVis = function () {
 };
 
 
-SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
-
-// console.log("source data");
-// console.log(this.data.specs);
+SpecVis.prototype.wrangleData = function (_dateFilterFunction, _authorFilterFunction) {
 
     var that = this;
 
-    //setup the default date filter function (right now filtering from march 1, 2015 to now)
-    var dateFilterFunction = function (d) {
-        if(d.created_at !== undefined) // tests
-        {
-            return new Date(d.created_at) >= new Date("2014-01-01") && new Date(d.created_at) <= new Date()
-        }
-        else if(d.created !== undefined) // spec?
-        {
-            return new Date(d.date) >= new Date("2014-01-01")
-        }
-        else if(d.date !== undefined) // commits
-        {
-            return new Date(d.date) >= new Date("2014-01-01")
-        }
-        else
-        {
-            return false;
-        }
-    };
+    // sets up a default datefilter (returns from a given date till now)
+    var dateFilterFunction = this.dateFilter(new Date("2014-01-01"), new Date());
     if (_dateFilterFunction != null) {
         dateFilterFunction = _dateFilterFunction;
+    }
+
+    // sets up default author filter (returns all)
+    var authorFilterFunction = function(d) {return true};
+    if (_authorFilterFunction != null) {
+        authorFilterFunction = _authorFilterFunction;
     }
 
     //create a lookup table of specs keyed by spec url
@@ -190,7 +123,6 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
     //creates a lookup table of tests keyed by spec url
     this.displayData.test_lookup = {};
     this.data.tests.forEach(function (test) {
-// console.log(test);
         if (dateFilterFunction(test)) {
             test.specs.forEach(function (spec) {
                 //check if an entry already exists, if not create one
@@ -219,14 +151,12 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
         group.url = _group.url;
         group.children = [];
         //specs are only keyed by url in each group, spec_lookup will be used to find them in the original specs dataset
-        _group.specs.forEach(function (_spec)
-        {
+        _group.specs.forEach(function (_spec) {
             var spec = {};
             spec.url = _spec.url;
             spec.key = group.key + _spec.url;
             spec.type = "spec";
-            if (that.displayData.spec_lookup[_spec.url])
-            {
+            if (that.displayData.spec_lookup[_spec.url]) {
                 var _fullSpec = that.displayData.spec_lookup[_spec.url];
 
                 //every spec will have two children, a group of issues for the HTML spec and a group of tests
@@ -234,8 +164,7 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
                                     type:"HTML",
                                     key: spec.key + "HTML",
                                     url: spec.url,
-                                    children: []
-                                 },
+                                    children: []},
                                 {   name: "Tests",
                                     type:"Tests",
                                     url: "", // WOULD BE NICE TO FILL THIS IN
@@ -243,8 +172,7 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
                                     children: []}];
 
                 spec.name = _fullSpec.name;
-                if (_fullSpec.issues)
-                {
+                if (_fullSpec.issues) {
                     _fullSpec.issues.forEach(function (_issue) {
                         var issue = {};
                         issue.title = _issue.title;
@@ -258,8 +186,7 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
                         spec.children[0].children.push(issue);
                     });
                 }
-                if (_fullSpec.commits)
-                {
+                if (_fullSpec.commits) {
                     _fullSpec.commits.forEach(function (_issue) {
                         var commit = {};
                         commit.title = _issue.title;
@@ -274,24 +201,21 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
                     });
                 }
             }
-            else
-            {
+            else {
                 console.log("Spec Not Found Error: " + _spec.url);
             }
             //looks for tests in the test lookup table, creates copies if found
             if (that.displayData.test_lookup[_spec.url]) {
                 var _allTests = that.displayData.test_lookup[_spec.url];
-console.log(_allTests);
+                //console.log(_allTests);
                 _allTests.forEach(function (_test) {
                     var test = {};
                     test.title = _test.title;
                     test.key = spec.key + _test.html_url;
-                    if(_test.type === "test")
-                    {
+                    if(_test.type === "test") {
                         test.type = "pull";
                     }
-                    else
-                    {
+                    else {
                         test.type = _test.type;
                     }
                     test.html_url = _test.html_url;
@@ -317,32 +241,12 @@ SpecVis.prototype.updateVis = function () {
 
     var that = this;
 
-    // sort our displayData
-console.log(this.displayData.root)
-
-    // if(a.type < b.type)
-    // {
-    //     return -1;
-    // }
-    // if(a.type > b.type)
-    // {
-    //     return 1;
-    // }
-    // // else, those were equal, check state
-    // if(a.state < b.state)
-    // {
-    //     return -1;
-    // }
-    // if(a.state > b.state)
-    // {
-    //     return 1;
-    // }
-
     var root = this.displayData.root;
 
+    // click handler for each arc
     var click = function (d) {
         $(that.eventHandler).trigger("selectionChanged", d);
-        path.transition()
+        path_update.transition()
             .duration(750)
             .attrTween("d", that.arcTweenZoom(d));
     };
@@ -352,7 +256,7 @@ console.log(this.displayData.root)
             return d.key;
         });
 
-    path.enter().append("path")
+    var path_enter = path.enter().append("path")
         .attr("class", function (d) {
             return d.type;
         })
@@ -370,44 +274,55 @@ console.log(this.displayData.root)
         .on("mouseover", this.tip.show);
     //       .each(this.stash);
 
-    path.attr("d", this.arc)
+    var path_update = path.attr("d", this.arc)
         .call(this.tip);
     //       .attrTween("d", this.arcTweenData);
 
     path
         .exit()
         .remove();
-
-    //var text = this.svg.selectAll("text").data(this.partition.nodes);
-    //var textEnter = text.enter().append("text")
-    //    .style("fill-opacity", 1)
-    //    .style("fill", "black")
-    //    .attr("text-anchor", function(d) {
-    //        return x(d.x + d.dx / 2) > Math.PI ? "end" : "start";
-    //    })
-    //    .attr("dy", ".2em")
-    //    .attr("transform", function(d) {
-    //        var multiline = (d.name || "").split(" ").length > 1,
-    //            angle = x(d.x + d.dx / 2) * 180 / Math.PI - 90,
-    //            rotate = angle + (multiline ? -.5 : 0);
-    //        return "rotate(" + rotate + ")translate(" + (y(d.y) + padding) + ")rotate(" + (angle > 90 ? -180 : 0) + ")";
-    //    });
-    //
-    //textEnter.append("tspan")
-    //    .attr("x", 0)
-    //    .text(function(d) { return d.depth ? d.name.split(" ")[0] : ""; });
-    //textEnter.append("tspan")
-    //    .attr("x", 0)
-    //    .attr("dy", "1em")
-    //    .text(function(d) { return d.depth ? d.name.split(" ")[1] || "" : ""; });
 };
 
+// Filters data by timeline selections
 SpecVis.prototype.onTimelineChange = function (selectionStart, selectionEnd) {
     this.wrangleData(function (d) {
         return new Date(d.created_at) >= selectionStart && new Date(d.created_at) <= selectionEnd
     });
     this.updateVis();
 };
+
+// Filters data by author selections
+SpecVis.prototype.authorChange = function(authorSelection) {
+
+};
+
+
+// returns closure with filter for start to end date
+SpecVis.prototype.dateFilter = function(startDate, endDate) {
+
+    return function(d) {
+        //tests
+        if (d.created_at !== undefined) {
+            return new Date(d.created_at) >= new Date(startDate) && new Date(d.created_at) <= new Date(endDate);
+        }
+        //spec?
+        else if (d.created !== undefined) {
+            return new Date(d.created) >= new Date(startDate) && new Date(d.created) <= new Date(endDate);
+        }
+        //commits
+        else if (d.date !== undefined) {
+            return new Date(d.date) >= new Date(startDate) && new Date(d.date) <= new Date(endDate);
+        }
+        //if there is no associated date, filter it out
+        else {
+            console.log("Object missing date information:");
+            console.log(d);
+            return false;
+        }
+    }
+};
+
+/// Utility methods
 
 // Interpolate the scales!
 SpecVis.prototype.arcTweenZoom = function (d) {
@@ -483,6 +398,55 @@ SpecVis.prototype.caniuse = function (d) {
     }
 };
 
+//Sets up the tooltip function
+SpecVis.prototype.tooltip = function() {
+    return d3.tip()
+        .offset([0, 0])
+        .html(function (d) {
+            var text;
+            var link;
+
+            if (d.name) {
+                if (d.name == "HTML") {
+                    text = "Spec";
+                }
+                else {
+                    text = d.name;
+                }
+            }
+            else {
+                text = d.title;
+            }
+            if(d.type === "pull"
+                || d.type === "commit"
+                || d.type === "issue")
+            {
+                text = d.state + " " + d.type + ": " + text;
+            }
+
+            if(d.url !== undefined)
+            {
+                link = d.url;
+            }
+            else if(d.html_url !== undefined)
+            {
+                link = d.html_url;
+            }
+            else if(d.name !== "W3C")
+            {
+                console.log("missing URL for");
+                console.log(d);
+            }
+
+            return "<div class='d3-tip'>"
+                + "<a href='" + link
+                + "'>" + text
+                + "</a></div>";
+        });
+};
+
+// Color filling method for sunburst
+// Note most colors are in vis.css
 SpecVis.prototype.sunburstFill = function(d,i) {
     var that = this;
 

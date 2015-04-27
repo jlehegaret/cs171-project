@@ -53,9 +53,12 @@
             //Handles whovis author selection changing
             var authorHandler = {};
 
+            //Create visualizations
             spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler);
             who_vis = new WhoVis(d3.select("#whoVis"), allData, authorHandler);
             timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler);
+
+            //Wire up event handlers
             $(brushHandler).bind("brushChanged", function (event, selectionStart, selectionEnd) {
                 spec_vis.onTimelineChange(selectionStart, selectionEnd);
                 who_vis.onTimelineChange(selectionStart, selectionEnd);
@@ -65,6 +68,11 @@
                 who_vis.onSelectionChange(specSelection);
                 console.log(specSelection);
             });
+            $(authorHandler).bind("authorChanged", function (event, author) {
+                spec_vis.onAuthorChange(author);
+                timeline_vis.onAuthorChange(author);
+                console.log(authorSelection);
+            })
         };
         var dataLoaded = function (error, _caniuse, _groups, _specs, _tests) {
             if (!error) {
@@ -72,39 +80,29 @@
                 groups = _groups;
                 specs = _specs
                         .map(function (d) {
-                            if(d["last_pub"])
-                            {
+                            if(d["last_pub"]) {
                               d.last_pub = stripTime(d["last_pub"]);
                             }
                             if (d.issues) {
                                 d.issues = d.issues.map(function (dd) {
-                                    if(dd.created_at)
-                                    {
+                                    if(dd.created_at) {
                                         dd.created_at = stripTime(dd.created_at);
-                                    }
-                                    else if(dd["created at"])
-                                    {
+                                    } else if(dd["created at"]) {
                                         dd.created_at = stripTime(dd["created at"]);
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         console.log("missing created_at");
                                         console.log(dd);
                                     }
                                     if ("closed_at" in dd) {
                                         dd.closed_at = stripTime(dd.closed_at);
-                                    }
-                                    else if ("closed at" in dd) {
+                                    } else if ("closed at" in dd) {
                                         dd.closed_at = stripTime(dd["closed at"]);
-                                    }
-                                    if ("merged_at" in dd) {
+                                    }if ("merged_at" in dd) {
                                         dd.merged_at = stripTime(dd.merged_at);
-                                    }
-                                    else if ("merged at" in dd) {
+                                    } else if ("merged at" in dd) {
                                         dd.merged_at = stripTime(dd["merged at"]);
                                     }
-                                    if(dd.closed_at && !dd.closed_by)
-                                    {
+                                    if(dd.closed_at && !dd.closed_by) {
                                         dd.closed_by = "unknown";
                                     }
                                     return dd;
@@ -169,27 +167,20 @@
                         });
                 //coerce date strings into date objects
                 tests = _tests.map(function (d) {
-                    if(d.created_at)
-                    {
+                    if(d.created_at) {
                         d.created_at = stripTime(d.created_at);
-                    }
-                    else if(dd["created at"])
-                    {
+                    } else if(dd["created at"]) {
                         d.created_at = stripTime(d["created at"]);
-                    }
-                    else
-                    {
+                    } else {
                         console.log("missing created_at");
                         console.log(d);
                     }
                     if ("closed_at" in d) {
                         d.closed_at = stripTime(d.closed_at);
-                    }
-                    else if ("closed at" in d) {
+                    } else if ("closed at" in d) {
                         d.closed_at = stripTime(d["closed at"]);
                     }
-                    if(d.closed_at && d.closed_by === undefined)
-                    {
+                    if(d.closed_at && d.closed_by === undefined) {
                         d.closed_by = "unknown";
                     }
                     return d;
