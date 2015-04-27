@@ -20,6 +20,11 @@ SpecVis.prototype.initVis = function () {
     this.dateFormatter = d3.time.format("%Y-%m-%d");
     this.radius = Math.min(this.width, this.height) / 2;
 
+    // sets up a default datefilter (returns from a given date till now)
+    this.currentDateFilter = this.dateFilter(new Date("2014-01-01"), new Date());
+    // sets up default author filter (returns all)
+    this.currentAuthorFilter = function(d) {return true};
+
 
     //use standard descending ordering for all elements
     //except group issues and pulls separately
@@ -87,20 +92,20 @@ SpecVis.prototype.initVis = function () {
 };
 
 
-SpecVis.prototype.wrangleData = function (_dateFilterFunction, _authorFilterFunction) {
+SpecVis.prototype.wrangleData = function (filters) {
 
     var that = this;
 
-    // sets up a default datefilter (returns from a given date till now)
-    var dateFilterFunction = this.dateFilter(new Date("2014-01-01"), new Date());
-    if (_dateFilterFunction != null) {
-        dateFilterFunction = _dateFilterFunction;
+    //uses current filter unless new one is defined, then sets current filter to one in use
+    var dateFilterFunction = this.currentDateFilter;
+    if (filters && filters._dateFilterFunction != null) {
+        dateFilterFunction = filters._dateFilterFunction;
     }
 
     // sets up default author filter (returns all)
-    var authorFilterFunction = function(d) {return true};
-    if (_authorFilterFunction != null) {
-        authorFilterFunction = _authorFilterFunction;
+    var authorFilterFunction = this.currentAuthorFilter;
+    if (filters && filters._authorFilterFunction != null) {
+        authorFilterFunction = filters._authorFilterFunction;
     }
 
     //create a lookup table of specs keyed by spec url
@@ -282,7 +287,7 @@ SpecVis.prototype.updateVis = function () {
 
 // Filters data by timeline selections
 SpecVis.prototype.onTimelineChange = function (selectionStart, selectionEnd) {
-    this.wrangleData(this.dateFilter(selectionStart, selectionEnd));
+    this.wrangleData(filters = {_dateFilterFunction: this.dateFilter(selectionStart, selectionEnd)});
     this.updateVis();
 };
 
