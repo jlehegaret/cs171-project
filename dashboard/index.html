@@ -5,8 +5,8 @@
     <title>Web Platform Test Dashboard | Test the Web Forward</title>
     <!--Library code -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script src="js/lib/d3.min.js" charset="utf-8"></script>
-    <script src="js/lib/queue.v1.min.js"></script>
+    <script src="js/lib/d3.js" charset="utf-8"></script>
+    <script src="js/lib/queue.v1.js"></script>
     <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 
@@ -19,6 +19,7 @@
     <script src="js/specvis.js"></script>
     <script src="js/whovis.js"></script>
     <script src="js/timelinevis.js"></script>
+    <script src="js/filterui.js"></script>
 </head>
 <body>
 
@@ -26,6 +27,7 @@
     <h1>Web Platform Tests Dashboard</h1>
 
         <div style="float:left" id="specVis"></div>
+        <div id="filterUI"></div>
         <div id="whoVis"></div>
         <div id="timelineVis"></div>
 
@@ -52,11 +54,14 @@
             var selectionHandler = {};
             //Handles whovis author selection changing
             var authorHandler = {};
+            //Handles filter options from UI
+            var filterHandler = {};
 
             //Create visualizations
             spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler);
             who_vis = new WhoVis(d3.select("#whoVis"), allData, authorHandler);
             timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler);
+            filter_ui = new FilterUI(d3.select("#filterUI"), allData, filterHandler);
 
             //Wire up event handlers
             $(brushHandler).bind("brushChanged", function (event, selectionStart, selectionEnd) {
@@ -72,7 +77,10 @@
                 spec_vis.onAuthorChange(author);
                 timeline_vis.onAuthorChange(author);
                 console.log(author);
-            })
+            });
+            $(filterHandler).bind("filterChanged", function(event, filters) {
+                console.log(filters);
+            });
         };
         var dataLoaded = function (error, _caniuse, _groups, _specs, _tests) {
             if (!error) {
