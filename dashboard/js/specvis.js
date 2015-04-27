@@ -2,7 +2,7 @@ SpecVis = function (_parentElement, _data, _eventHandler, _options) {
     this.parentElement = _parentElement;
     this.data = _data;
     this.eventHandler = _eventHandler;
-    this.options = _options || {width: 800, height: 800};
+    this.options = _options || {width: 750, height: 750};
     this.displayData = {};
     this.allIssues = [];
 
@@ -23,7 +23,7 @@ SpecVis.prototype.initVis = function () {
     // sets up a default datefilter (returns from a given date till now)
     this.currentDateFilter = this.dateFilter(new Date("2014-01-01"), new Date());
     // sets up default author filter (returns all)
-    this.currentAuthorFilter = function(d) {return true};
+    this.currentAuthorFilter = function(d) {return true;};
 
 
     //use standard descending ordering for all elements
@@ -117,10 +117,11 @@ SpecVis.prototype.wrangleData = function (filters) {
         spec.name = d.title;
         spec.score = d.score;  // this is here now, but I don't see it showing up elsewhere
         if (d.issues) {
-            spec.issues = d.issues.filter(dateFilterFunction);
+            spec.issues = d.issues.filter(dateFilterFunction).filter(authorFilterFunction);
         }
         if (d.commits) {
-            spec.commits = d.commits.filter(dateFilterFunction);
+
+            spec.commits = d.commits.filter(dateFilterFunction).filter(authorFilterFunction);
         }
         that.displayData.spec_lookup[d.url] = spec;
     });
@@ -128,7 +129,7 @@ SpecVis.prototype.wrangleData = function (filters) {
     //creates a lookup table of tests keyed by spec url
     this.displayData.test_lookup = {};
     this.data.tests.forEach(function (test) {
-        if (dateFilterFunction(test)) {
+        if (dateFilterFunction(test) && authorFilterFunction(test)) {
             test.specs.forEach(function (spec) {
                 //check if an entry already exists, if not create one
                 if (!that.displayData.test_lookup[spec]) {
@@ -146,8 +147,7 @@ SpecVis.prototype.wrangleData = function (filters) {
     // Create a group object for every group in the original dataset
     // It is VERY important that every item has a unique key, or the layout will have undesirable behavior
     // This is especially true because certain specs belong to more than one group
-    this.data.groups.forEach(function (_group)
-    {
+    this.data.groups.forEach(function (_group) {
         var group = {};
         group.name = _group.name;
         group.shortname = _group.shortname;
@@ -212,7 +212,6 @@ SpecVis.prototype.wrangleData = function (filters) {
             //looks for tests in the test lookup table, creates copies if found
             if (that.displayData.test_lookup[_spec.url]) {
                 var _allTests = that.displayData.test_lookup[_spec.url];
-                //console.log(_allTests);
                 _allTests.forEach(function (_test) {
                     var test = {};
                     test.title = _test.title;
@@ -293,13 +292,14 @@ SpecVis.prototype.onTimelineChange = function (selectionStart, selectionEnd) {
 
 // Filters data by author selections
 SpecVis.prototype.onAuthorChange = function(authorSelection) {
-
+    this.wrangleData(filters = {_authorFilterFunction: this.authorFilter(authorSelection.who)});
+    this.updateVis();
 };
 
 
 // returns closure with filter for start to end date
+// function checks date members for test, issue and commit objects
 SpecVis.prototype.dateFilter = function(startDate, endDate) {
-
     return function(d) {
         //tests
         if (d.created_at !== undefined) {
@@ -316,6 +316,34 @@ SpecVis.prototype.dateFilter = function(startDate, endDate) {
         //if there is no associated date, log and filter it out
         else {
             console.log("Error: Object missing date information:");
+            console.log(d);
+            return false;
+        }
+    }
+};
+
+// returns closure with filter for author
+SpecVis.prototype.authorFilter = function(who) {
+    return function(d) {
+        // issues or commits
+        if(d.author) {
+            //issues and tests (has author object with members)
+            if(d.author.login) {
+                //check merging author, otherwise just check overall author
+                if (d.merged_by) {
+                    return d.merged_by.login || d.author.login === who;
+                } else {
+                    return d.author.login === who;
+                }
+            }
+            //commits (has author field with name)
+            else {
+                return d.login === who;
+            }
+        }
+        // no author found
+        else {
+            console.log("Error: Object missing author information:");
             console.log(d);
             return false;
         }
@@ -434,7 +462,7 @@ SpecVis.prototype.tooltip = function() {
             }
             else if(d.name !== "W3C")
             {
-                console.log("missing URL for");
+                console.log("Error: Object missing URL");
                 console.log(d);
             }
 
