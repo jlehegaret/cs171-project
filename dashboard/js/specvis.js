@@ -232,9 +232,6 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction, _authorFilterFunc
     });
 
     this.displayData.root = root;
-
-// console.log("displayData");
-// console.log(this.displayData);
 };
 
 SpecVis.prototype.updateVis = function () {
@@ -285,9 +282,7 @@ SpecVis.prototype.updateVis = function () {
 
 // Filters data by timeline selections
 SpecVis.prototype.onTimelineChange = function (selectionStart, selectionEnd) {
-    this.wrangleData(function (d) {
-        return new Date(d.created_at) >= selectionStart && new Date(d.created_at) <= selectionEnd
-    });
+    this.wrangleData(this.dateFilter(selectionStart, selectionEnd));
     this.updateVis();
 };
 
@@ -313,9 +308,9 @@ SpecVis.prototype.dateFilter = function(startDate, endDate) {
         else if (d.date !== undefined) {
             return new Date(d.date) >= new Date(startDate) && new Date(d.date) <= new Date(endDate);
         }
-        //if there is no associated date, filter it out
+        //if there is no associated date, log and filter it out
         else {
-            console.log("Object missing date information:");
+            console.log("Error: Object missing date information:");
             console.log(d);
             return false;
         }
