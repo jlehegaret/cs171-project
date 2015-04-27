@@ -25,13 +25,31 @@ SpecVis.prototype.initVis = function () {
     //use standard descending ordering for all elements
     //except group issues and pulls separately
     var sortTypes = function(a,b) {
-        if(a.type === "issue") {
-            return -1;
-        } else if (a.type === "pull") {
-            return 1;
-        } else {
+            if(a.type < b.type)
+            {
+                return -1;
+            }
+            if(a.type > b.type)
+            {
+                return 1;
+            }
+            if(a.state < b.state)
+            {
+                return -1;
+            }
+            if(a.state > b.state)
+            {
+                return 1;
+            }
+            if(a.name < b.name)
+            {
+                return -1;
+            }
+            if(a.name > b.name)
+            {
+                return 1;
+            }
             return d3.descending(a, b);
-        }
     };
 
     this.x = d3.scale.linear()
@@ -75,6 +93,7 @@ SpecVis.prototype.initVis = function () {
         .offset([0, 0])
         .html(function (d) {
             var text;
+            var link;
 
             if (d.name) {
                 if (d.name == "HTML") {
@@ -87,8 +106,29 @@ SpecVis.prototype.initVis = function () {
             else {
                 text = d.title;
             }
+            if(d.type === "pull"
+                || d.type === "commit"
+                || d.type === "issue")
+            {
+                text = d.state + " " + d.type + ": " + text;
+            }
+
+            if(d.url !== undefined)
+            {
+                link = d.url;
+            }
+            else if(d.html_url !== undefined)
+            {
+                link = d.html_url;
+            }
+            else if(d.name !== "W3C")
+            {
+                console.log("missing URL for");
+                console.log(d);
+            }
+
             return "<div class='d3-tip'>"
-                + "<a href='" + d.url
+                + "<a href='" + link
                 + "'>" + text
                 + "</a></div>";
         });
@@ -101,11 +141,30 @@ SpecVis.prototype.initVis = function () {
 
 
 SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
+
+// console.log("source data");
+// console.log(this.data.specs);
+
     var that = this;
 
     //setup the default date filter function (right now filtering from march 1, 2015 to now)
     var dateFilterFunction = function (d) {
-        return new Date(d.created_at) >= new Date("2014-01-01") && new Date(d.created_at) <= new Date()
+        if(d.created_at !== undefined) // tests
+        {
+            return new Date(d.created_at) >= new Date("2014-01-01") && new Date(d.created_at) <= new Date()
+        }
+        else if(d.created !== undefined) // spec?
+        {
+            return new Date(d.date) >= new Date("2014-01-01")
+        }
+        else if(d.date !== undefined) // commits
+        {
+            return new Date(d.date) >= new Date("2014-01-01")
+        }
+        else
+        {
+            return false;
+        }
     };
     if (_dateFilterFunction != null) {
         dateFilterFunction = _dateFilterFunction;
@@ -122,12 +181,16 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
         if (d.issues) {
             spec.issues = d.issues.filter(dateFilterFunction);
         }
+        if (d.commits) {
+            spec.commits = d.commits.filter(dateFilterFunction);
+        }
         that.displayData.spec_lookup[d.url] = spec;
     });
 
     //creates a lookup table of tests keyed by spec url
     this.displayData.test_lookup = {};
     this.data.tests.forEach(function (test) {
+// console.log(test);
         if (dateFilterFunction(test)) {
             test.specs.forEach(function (spec) {
                 //check if an entry already exists, if not create one
@@ -146,7 +209,8 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
     // Create a group object for every group in the original dataset
     // It is VERY important that every item has a unique key, or the layout will have undesirable behavior
     // This is especially true because certain specs belong to more than one group
-    this.data.groups.forEach(function (_group) {
+    this.data.groups.forEach(function (_group)
+    {
         var group = {};
         group.name = _group.name;
         group.shortname = _group.shortname;
@@ -155,20 +219,32 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
         group.url = _group.url;
         group.children = [];
         //specs are only keyed by url in each group, spec_lookup will be used to find them in the original specs dataset
-        _group.specs.forEach(function (_spec) {
+        _group.specs.forEach(function (_spec)
+        {
             var spec = {};
             spec.url = _spec.url;
             spec.key = group.key + _spec.url;
             spec.type = "spec";
-            if (that.displayData.spec_lookup[_spec.url]) {
+            if (that.displayData.spec_lookup[_spec.url])
+            {
                 var _fullSpec = that.displayData.spec_lookup[_spec.url];
 
                 //every spec will have two children, a group of issues for the HTML spec and a group of tests
-                spec.children = [{name: "HTML", type:"HTML", key: spec.key + "HTML", children: []},
-                        {name: "Tests", type:"Tests", key: spec.key + "Tests", children: []}];
+                spec.children = [{  name: "HTML",
+                                    type:"HTML",
+                                    key: spec.key + "HTML",
+                                    url: spec.url,
+                                    children: []
+                                 },
+                                {   name: "Tests",
+                                    type:"Tests",
+                                    url: "", // WOULD BE NICE TO FILL THIS IN
+                                    key: spec.key + "Tests",
+                                    children: []}];
 
                 spec.name = _fullSpec.name;
-                if (_fullSpec.issues) {
+                if (_fullSpec.issues)
+                {
                     _fullSpec.issues.forEach(function (_issue) {
                         var issue = {};
                         issue.title = _issue.title;
@@ -182,17 +258,43 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
                         spec.children[0].children.push(issue);
                     });
                 }
-            } else {
+                if (_fullSpec.commits)
+                {
+                    _fullSpec.commits.forEach(function (_issue) {
+                        var commit = {};
+                        commit.title = _issue.title;
+                        commit.key = spec.key + _issue.html_url;
+                        commit.type = "commit";
+                        commit.state = "closed";
+                        commit.created_at = _issue.date;
+                        commit.closed_at = _issue.date;
+                        commit.merged_at = _issue.date;
+                        commit.url = _issue.html_url;
+                        spec.children[0].children.push(commit);
+                    });
+                }
+            }
+            else
+            {
                 console.log("Spec Not Found Error: " + _spec.url);
             }
             //looks for tests in the test lookup table, creates copies if found
             if (that.displayData.test_lookup[_spec.url]) {
                 var _allTests = that.displayData.test_lookup[_spec.url];
+console.log(_allTests);
                 _allTests.forEach(function (_test) {
                     var test = {};
                     test.title = _test.title;
                     test.key = spec.key + _test.html_url;
-                    test.type = _test.type;
+                    if(_test.type === "test")
+                    {
+                        test.type = "pull";
+                    }
+                    else
+                    {
+                        test.type = _test.type;
+                    }
+                    test.html_url = _test.html_url;
                     test.state = _test.state;
                     test.created_at = _test.created_at;
                     spec.children[1].children.push(test);
@@ -206,10 +308,35 @@ SpecVis.prototype.wrangleData = function (_dateFilterFunction) {
     });
 
     this.displayData.root = root;
+
+// console.log("displayData");
+// console.log(this.displayData);
 };
 
 SpecVis.prototype.updateVis = function () {
+
     var that = this;
+
+    // sort our displayData
+console.log(this.displayData.root)
+
+    // if(a.type < b.type)
+    // {
+    //     return -1;
+    // }
+    // if(a.type > b.type)
+    // {
+    //     return 1;
+    // }
+    // // else, those were equal, check state
+    // if(a.state < b.state)
+    // {
+    //     return -1;
+    // }
+    // if(a.state > b.state)
+    // {
+    //     return 1;
+    // }
 
     var root = this.displayData.root;
 

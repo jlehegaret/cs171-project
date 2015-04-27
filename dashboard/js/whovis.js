@@ -13,7 +13,7 @@ WhoVis = function(_parentElement, _data, _eventHandler, _options) {
                       "who"         : [],
                       "number_who"  : 20,
                       "width"       : 300,
-                      "height"      : 900,
+                      "height"      : 800,
                       "who_sort"    : "issues"
                     };
     this.displayData = [];
@@ -21,7 +21,11 @@ WhoVis = function(_parentElement, _data, _eventHandler, _options) {
     // defines constants
     this.margin = {top: 20, right: 10, bottom: 20, left: 50};
     this.width = this.options.width - this.margin.left - this.margin.right;
+    // height is going to be as high as it needs to be for all bars
+    //  but here is a default
     this.height = this.options.height - this.margin.top - this.margin.bottom;
+    this.barHeight = 10;
+    this.barPadding = 5;
 
     this.initVis();
 };
@@ -33,7 +37,7 @@ WhoVis.prototype.initVis = function() {
 
     this.svg = this.parentElement.append("svg")
         .attr("width", this.width + this.margin.left + this.margin.right)
-        .attr("height", this.height + this.margin.top + this.margin.bottom)
+        // .attr("height", this.height + this.margin.top + this.margin.bottom)
         .append("g")
         .attr("transform", "translate("
               + (this.margin.left + this.margin.right + this.width)/2
@@ -44,8 +48,7 @@ WhoVis.prototype.initVis = function() {
                       .range([0, this.width/2]);
      this.x_issues = d3.scale.linear()
                       .range([0, this.width/2]);
-     this.y = d3.scale.ordinal()
-                      .rangeRoundBands([0, this.height], .2, 0);
+     this.y = d3.scale.ordinal();
 
     this.color = d3.scale.ordinal()
     .range(["#062B59", "#09458F", "#073874", "#09458F", "#0B52AA", "#0C5FC5"]);
@@ -71,10 +74,16 @@ WhoVis.prototype.initVis = function() {
 
 WhoVis.prototype.updateVis = function()
 {
-console.log("WhoVis:");
-console.log(this.displayData);
+// console.log("WhoVis:");
+// console.log(this.displayData);
 
     var that = this;
+
+    // figure out height
+    this.height = this.displayData.length * 2*(this.barHeight + this.barPadding);
+
+    this.parentElement.select("svg")
+        .attr("height", this.height + this.margin.top + this.margin.bottom)
 
     // for lines of code
     this.max = d3.max(this.displayData, function(d)
@@ -87,14 +96,15 @@ console.log(this.displayData);
     this.x_issues.domain([0, this.max]);
 
     this.y.domain(this.displayData.map(function(d)
-                        { return d.who; }));
+                        { return d.who; }))
+          .rangeRoundBands([0, this.height], .2, 0);;
 
     // this.svg.select(".x.axis")
     //     .call(this.xAxis)
     //     .selectAll("text");
 
-console.log("this.displayData");
-console.log(this.displayData);
+// console.log("this.displayData");
+// console.log(this.displayData);
 
     var bar = this.svg.selectAll("g.bars")
                       .selectAll("g.who")
@@ -131,13 +141,14 @@ console.log(this.displayData);
     });
 
     bar.selectAll("rect.bar")
-        .attr("height", 10)
+        .attr("height", that.barHeight)
         .attr("x", 0)
         .attr("y", function(d)
                     {
                       if(d.type === "issues")
                       {
-                        return 12; // move it down by bar_height
+                        // move it down by bar_height
+                        return that.barHeight + that.barPadding;
                       }
                       return 0;
                     })
@@ -277,17 +288,17 @@ WhoVis.prototype.wrangleData = function()
     ? plus = 0
     : plus = 5;
 
-    // TAKING OUT COMMIT FUNCTIONALITY FOR NOW
-    // if(d.commits && that.options.actions.indexOf("COM") !== -1)
-    // {
-    //   d.commits.forEach(function(c)
-    //   {
-    //       who = that.displayData[findWho(c.author)];
-    //       who.total_code += (c.line_added + c.line_deleted);
-    //       who.work[0 + plus].total += (c.line_added + c.line_deleted);
-    //       who.work[0 + plus].details.push(c);
-    //   });
-    // }
+    // COMMIT FUNCTIONALITY
+    if(d.commits && that.options.actions.indexOf("COM") !== -1)
+    {
+      d.commits.forEach(function(c)
+      {
+          who = that.displayData[findWho(c.author)];
+          who.total_code += (c.line_added + c.line_deleted);
+          who.work[0 + plus].total += (c.line_added + c.line_deleted);
+          who.work[0 + plus].details.push(c);
+      });
+    }
 
     if( (category == "spec" && d.issues)
         || category == "test")
@@ -458,28 +469,55 @@ WhoVis.prototype.wrangleData = function()
 if(this.options.who_sort === "code")
 {
   this.displayData.sort(function(a, b)
-                  { return b.total_code - a.total_code; });
+                  {
+                    if(b.total_code < a.total_code)
+                    {
+                      return -1;
+                    }
+                    else if(b.total_code > a.total_code)
+                    {
+                      return 1;
+                    }
+                    else
+                    {
+                      return b.total_issues - a.total_issues;
+                    }
+                  });
 }
 else // sort by issues
 {
     this.displayData.sort(function(a, b)
-                  { return b.total_issues - a.total_issues; });
+                  {
+                    if(b.total_issues < a.total_issues)
+                    {
+                      return -1;
+                    }
+                    else if(b.total_issues > a.total_issues)
+                    {
+                      return 1;
+                    }
+                    else
+                    {
+                      return b.total_code - a.total_code;
+                    }
+                  });
 }
   // we exclude some people from this display
   var except = [ "Robin Berjon", "rberjon", "plehegar","darobin",
                 "unknown", undefined];
 
-  // take enough elements to cover exceptions list, just in case
-  this.displayData = this.displayData.slice(0,
-                      (this.options.number_who + except.length));
+  // // take enough elements to cover exceptions list, just in case
+  // this.displayData = this.displayData.slice(0,
+  //                     (this.options.number_who + except.length));
 
   // filter out exceptions
   this.displayData = this.displayData.filter(function(d)
                       { return except.indexOf(d.who) === -1; });
 
-  // make sure it's the right length
-  this.displayData = this.displayData.slice(0,
-                      (this.options.number_who));
+  // // make sure it's the right length
+  // this.displayData = this.displayData.slice(0,
+  //                     (this.options.number_who));
 
 }
 
+WhoVis.prototype.onSelectionChange = function() {}

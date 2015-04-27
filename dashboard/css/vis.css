@@ -1,3 +1,9 @@
+#whoVis {
+    height: 800px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
 .axis text {
     font: 10px sans-serif;
 }
@@ -26,46 +32,35 @@
     background-color: lightyellow;
 }
 
-/* sunburst styles */
+/* sunburst-specific styles */
 /*.sunburst path {*/
     /*stroke: #fff;*/
     /*fill-rule: evenodd;*/
 /*}*/
 
-.sunburst .root {
+.root {
     fill: white;
 }
 
-.sunburst .group {
+.group {
     fill: #1E3248;
 }
 
-.sunburst .spec {
-    fill: crimson;
+.sunburst.spec {
+    /* currently within D3 */
 }
 
-.sunburst .HTML {
+.HTML {
     fill: #145184;
 }
 
-.sunburst .Tests {
-    fill: #142335;
-}
-
-.sunburst .test, .sunburst .test.open, .sunburst .test.closed {
-    fill: #D71C39
-}
-
-.sunburst .pull, .sunburst .pull.open, .sunburst .pull.closed {
-    fill: #560b16
-}
-
-.sunburst .issue, .sunburst .issue.open, .sunburst .issue.closed {
-    fill: lightgrey
+.Tests {
+/*    fill: #142335;*/
+fill: yellow;
 }
 
 
-/* timeline styles */
+/* timeline-specific styles */
 
 /* spec published */
 .PUB {
@@ -77,33 +72,36 @@
 
 }
 
-/* commit made */
-.commit, .COM {
-    fill: #D58800;
-}
-
-/* Pull Request opened */
-.timeline .pull.open, .test.open, .PR_O {
-    fill: #145085;
-}
-
-/* Pull Request closed */
-.timeline .pull.closed, .test.closed, .PR_C {
-    fill: darkblue;
-}
-
-/* issue opened */
-.timeline .issue.open, .ISS_O {
-    fill: #D81839;
-}
-
-/* issue closed */
-.timeline .issue.closed, .ISS_C {
-    fill: #4c0814;
-}
-
 /*.categoryLine{
     stroke: darkgrey;
     stroke-width: 1;
 }
 */
+
+/* GENERAL CATEGORY STYLES
+
+/* commit made */
+.commit, .COM {
+    fill: #1A5691;
+}
+
+/* Pull Request opened - Is that what an open test is?? */
+.pull.open, .test.open, .PR_O {
+    fill: #DC8C0C;
+}
+
+/* Pull Request closed */
+.pull.closed, .test.closed, .PR_C, .bar.code {
+    fill: #237DBC;
+}
+
+/* issue opened */
+.issue.open, .ISS_O {
+    fill: #E4211C;
+}
+
+/* issue closed */
+.issue.closed, .ISS_C, .bar.issues {
+    fill: #9A153F;
+}
+
