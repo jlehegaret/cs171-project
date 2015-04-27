@@ -249,7 +249,7 @@ SpecVis.prototype.updateVis = function () {
     // click handler for each arc
     var click = function (d) {
         $(that.eventHandler).trigger("selectionChanged", d);
-        path_update.transition()
+        path.transition()
             .duration(750)
             .attrTween("d", that.arcTweenZoom(d));
     };
@@ -277,7 +277,10 @@ SpecVis.prototype.updateVis = function () {
         .on("mouseover", this.tip.show);
     //       .each(this.stash);
 
-    var path_update = path.attr("d", this.arc)
+    var path_update = path
+        .transition()
+        .duration(750)
+        .attr("d", this.arc)
         .call(this.tip);
     //       .attrTween("d", this.arcTweenData);
 
@@ -294,7 +297,7 @@ SpecVis.prototype.onTimelineChange = function (selectionStart, selectionEnd) {
 
 // Filters data by author selections
 SpecVis.prototype.onAuthorChange = function(authorSelection) {
-    this.wrangleData(filters = {_authorFilterFunction: this.authorFilter(authorSelection.who)});
+    this.wrangleData(filters = {_authorFilterFunction: this.authorFilter(authorSelection)});
     this.updateVis();
 };
 
@@ -326,28 +329,34 @@ SpecVis.prototype.dateFilter = function(startDate, endDate) {
 
 // returns closure with filter for author
 SpecVis.prototype.authorFilter = function(who) {
-    return function(d) {
-        // issues or commits
-        if(d.author) {
-            //issues and tests (has author object with members)
-            if(d.author.login) {
-                //check merging author, otherwise just check overall author
-                if (d.merged_by) {
-                    return d.merged_by.login || d.author.login === who;
-                } else {
-                    return d.author.login === who;
+    if(who === null) {
+        return function(d) {
+            return true;
+        }
+    } else {
+        return function (d) {
+            // issues or commits
+            if (d.author) {
+                //issues and tests (has author object with members)
+                if (d.author.login) {
+                    //check merging author, otherwise just check overall author
+                    if (d.merged_by) {
+                        return d.merged_by.login || d.author.login === who;
+                    } else {
+                        return d.author.login === who;
+                    }
+                }
+                //commits (has author field with name)
+                else {
+                    return d.login === who;
                 }
             }
-            //commits (has author field with name)
+            // no author found
             else {
-                return d.login === who;
+                console.log("Error: Object missing author information:");
+                console.log(d);
+                return false;
             }
-        }
-        // no author found
-        else {
-            console.log("Error: Object missing author information:");
-            console.log(d);
-            return false;
         }
     }
 };
@@ -443,8 +452,7 @@ SpecVis.prototype.tooltip = function() {
                 else {
                     text = d.name;
                 }
-            }
-            else {
+            } else {
                 text = d.title;
             }
             if(d.type === "pull"
@@ -454,16 +462,11 @@ SpecVis.prototype.tooltip = function() {
                 text = d.state + " " + d.type + ": " + text;
             }
 
-            if(d.url !== undefined)
-            {
+            if(d.url !== undefined) {
                 link = d.url;
-            }
-            else if(d.html_url !== undefined)
-            {
+            } else if(d.html_url !== undefined) {
                 link = d.html_url;
-            }
-            else if(d.name !== "W3C")
-            {
+            } else if(d.name !== "W3C") {
                 console.log("Error: Object missing URL");
                 console.log(d);
             }
