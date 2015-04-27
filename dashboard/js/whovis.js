@@ -72,10 +72,7 @@ WhoVis.prototype.initVis = function() {
 };
 
 
-WhoVis.prototype.updateVis = function()
-{
-// console.log("WhoVis:");
-// console.log(this.displayData);
+WhoVis.prototype.updateVis = function() {
 
     var that = this;
 
@@ -202,226 +199,9 @@ WhoVis.prototype.onSelectionChange = function(sunburstSelection) {
 };
 
 
-WhoVis.prototype.wrangleData = function()
-{
+WhoVis.prototype.wrangleData = function(filters) {
   var that = this;
 
-  function findWho(name, type)
-  {
-    var found = false;
-    for(var i = 0; i < that.displayData.length; i++)
-    {
-      if(that.displayData[i].who == name)
-      {
-        return i;
-      }
-    }
-
-    // if we're here, we need to create a new element
-    //  PERHAPS WE WOULD GET RID OF DETAILS FOR PRODUCTION
-    that.displayData.push(
-      { "who"          : name,
-        "total_code"   : 0,
-        "total_issues" : 0,
-        "work"         : [ { "cat"   : "spec",
-                              "type"  : "COM",
-                              "scale" : "code",
-                              "details" : [],
-                              "total" : 0 },
-                            { "cat"  : "spec",
-                              "type" : "PR_O",
-                              "scale": "code",
-                              "details" : [],
-                              "total" : 0 },
-                            { "cat"  : "spec",
-                              "type" : "PR_C",
-                              "scale": "code",
-                              "details" : [],
-                              "total" : 0 },
-                            { "cat"  : "spec",
-                              "type" : "ISS_O",
-                              "scale": "count",
-                              "details" : [],
-                              "total" : 0 },
-                            { "cat"  : "spec",
-                              "type" : "ISS_C",
-                              "scale": "count",
-                              "details" : [],
-                              "total" : 0 },
-                            { "cat"   : "test",
-                              "type"  : "COM",
-                              "scale" : "code",
-                              "details" : [],
-                              "total" : 0 },
-                            { "cat"  : "test",
-                              "type" : "PR_O",
-                              "scale": "code",
-                              "details" : [],
-                              "total" : 0 },
-                            { "cat"  : "test",
-                              "type" : "PR_C",
-                              "scale": "code",
-                              "details" : [],
-                              "total" : 0 },
-                            { "cat"  : "test",
-                              "type" : "ISS_O",
-                              "scale": "count",
-                              "details" : [],
-                              "total" : 0 },
-                            { "cat"  : "test",
-                              "type" : "ISS_C",
-                              "scale": "count",
-                              "details" : [],
-                              "total" : 0 } ]
-      });
-
-    return (that.displayData.length - 1);
-  }
-
-  function processData(d, category)
-  {
-    var who;
-    var index;
-    var plus;  // need to change element number depending
-              // on category being processed
-    (category === "spec")
-    ? plus = 0
-    : plus = 5;
-
-    // COMMIT FUNCTIONALITY
-    if(d.commits && that.options.actions.indexOf("COM") !== -1)
-    {
-      d.commits.forEach(function(c)
-      {
-          who = that.displayData[findWho(c.author)];
-          who.total_code += (c.line_added + c.line_deleted);
-          who.work[0 + plus].total += (c.line_added + c.line_deleted);
-          who.work[0 + plus].details.push(c);
-      });
-    }
-
-    if( (category == "spec" && d.issues)
-        || category == "test")
-    {
-      var process;
-
-      (d.issues)
-      ? process = d.issues
-      : process = [d];
-      process.forEach(function(c)
-      {
-        // is it a PR or an issue
-        if(c.type === "pull" || c.type === "test")
-        {
-          // First, check data
-          if(c.line_added == undefined)
-          {
-            if(c["line added"])
-            {
-              console.log("Have line added instead of line_added");
-              c.line_added = c["line added"];
-            }
-            else
-            {
-              c.line_added = 0;
-            }
-
-          }
-
-          if(c.line_deleted == undefined)
-          {
-            if(c["line deleted"])
-            {
-              console.log("Have line deleted instead of line_deleted");
-              c.line_deleted = c["line deleted"];
-            }
-            else
-            {
-              c.line_deleted = 0;
-            }
-
-          }
-
-          // Now, see if we want to see the data
-          if( that.options.actions.indexOf("PR_O") !== -1
-              && c.created_at >= that.options.start_date)
-          {
-            // who created it
-            who = that.displayData[findWho(c.author.login)];
-            who.total_code += (c.line_added + c.line_deleted);
-            who.work[1 + plus].total += (c.line_added + c.line_deleted);
-            who.work[1 + plus].details.push(c);
-          }
-
-          if(c.closed_at)
-          {
-            //  OUR DATA IS NOT PERFECT.  IF A PR IS NOT MERGED
-            //    WE ACTUALLY DON'T KNOW WHO CLOSED IT
-            if(c.merged_by || c.closed_by)
-            {
-              // who possibly closed it
-              if( that.options.actions.indexOf("PR_C") !== -1
-                && c.closed_at <= that.options.end_date)
-              {
-                if(c.merged_by)
-                {
-                  who = that.displayData[findWho(c.merged_by.login)];
-                }
-                else
-                {
-                  who = that.displayData[findWho(c.closed_by.login)];
-                }
-                who.total_code += (c.line_added + c.line_deleted);
-                who.work[2 + plus].total += (c.line_added + c.line_deleted);
-                who.work[1 + plus].details.push(c);
-              }
-            }
-            else
-            {
-              console.log("Need closed_by name");
-              console.log(c);
-            }
-          }
-        }
-        else if(c.type === "issue")
-        // CURRENTLY, ONLY HAVE OPENING DATA
-        {
-          // how hard is it
-          var value;
-          if(c.difficulty)
-          {
-            (c.difficulty === "easy")
-            ? value = 1
-            : value = 2
-          }
-          else // not flagged, flag it this way
-          {
-            value = 3;
-          }
-
-          if(that.options.actions.indexOf("ISS_O") !== -1
-              && c.created_at >= that.options.start_date)
-          {
-            // when was it created
-            who = that.displayData[findWho(c.author.login)];
-            who.total_issues += value;
-            who.work[3 + plus].total += value;
-            who.work[3 + plus].details.push(c);
-          }
-          // if(c.closed_at
-          //    && c.??? <= that.options.end_date)
-          // {
-          // when was it possibly closed
-          // if(that.options.actions.indexOf("ISS_C") !== -1)
-          // {
-             // NEED DATA FOR THIS TO CODE FOR IT
-          // }
-          // }
-        }
-        else { console.log("What is this?"); console.log(c); }
-      });
-    } // end of d.issues work
-  }
 
   // CALL HELPER FUNCTIONS
   that.displayData = [];
@@ -432,7 +212,7 @@ WhoVis.prototype.wrangleData = function()
       if(that.options.specs.length == 0
          || that.options.specs.indexOf(d.url) != -1)
       {
-        processData(d, "spec");
+        that.processData(d, "spec");
       }
     });
   }
@@ -444,7 +224,7 @@ WhoVis.prototype.wrangleData = function()
       {
 // console.log("processing test data for ");
 // console.log(d);
-         processData(d, "test");
+         that.processData(d, "test");
       }
       else // we need to check that a spec we care about is concerned
       {
@@ -461,7 +241,7 @@ WhoVis.prototype.wrangleData = function()
             i++; // keep looking
           }
         }
-        if(found) { processData(d, "test"); }
+        if(found) { that.processData(d, "test"); }
       }
     });
   }
@@ -518,6 +298,225 @@ else // sort by issues
   // this.displayData = this.displayData.slice(0,
   //                     (this.options.number_who));
 
-}
+};
 
-WhoVis.prototype.onSelectionChange = function() {}
+WhoVis.prototype.processData = function processData(d, category) {
+    var that = this;
+    var who;
+    var index;
+    var plus;  // need to change element number depending
+    // on category being processed
+    (category === "spec")
+        ? plus = 0
+        : plus = 5;
+
+    // COMMIT FUNCTIONALITY
+    if (d.commits && that.options.actions.indexOf("COM") !== -1) {
+        d.commits.forEach(function (c) {
+            who = that.displayData[that.findWho(c.author)];
+            who.total_code += (c.line_added + c.line_deleted);
+            who.work[0 + plus].total += (c.line_added + c.line_deleted);
+            who.work[0 + plus].details.push(c);
+        });
+    }
+
+    if ((category == "spec" && d.issues)
+        || category == "test") {
+        var process;
+
+        (d.issues)
+            ? process = d.issues
+            : process = [d];
+        process.forEach(function (c) {
+            // is it a PR or an issue
+            if (c.type === "pull" || c.type === "test") {
+                // First, check data
+                if (c.line_added == undefined) {
+                    if (c["line added"]) {
+                        console.log("Have line added instead of line_added");
+                        c.line_added = c["line added"];
+                    }
+                    else {
+                        c.line_added = 0;
+                    }
+
+                }
+
+                if (c.line_deleted == undefined) {
+                    if (c["line deleted"]) {
+                        console.log("Have line deleted instead of line_deleted");
+                        c.line_deleted = c["line deleted"];
+                    }
+                    else {
+                        c.line_deleted = 0;
+                    }
+
+                }
+
+                // Now, see if we want to see the data
+                if (that.options.actions.indexOf("PR_O") !== -1
+                    && c.created_at >= that.options.start_date) {
+                    // who created it
+                    who = that.displayData[that.findWho(c.author.login)];
+                    who.total_code += (c.line_added + c.line_deleted);
+                    who.work[1 + plus].total += (c.line_added + c.line_deleted);
+                    who.work[1 + plus].details.push(c);
+                }
+
+                if (c.closed_at) {
+                    //  OUR DATA IS NOT PERFECT.  IF A PR IS NOT MERGED
+                    //    WE ACTUALLY DON'T KNOW WHO CLOSED IT
+                    if (c.merged_by || c.closed_by) {
+                        // who possibly closed it
+                        if (that.options.actions.indexOf("PR_C") !== -1
+                            && c.closed_at <= that.options.end_date) {
+                            if (c.merged_by) {
+                                who = that.displayData[that.findWho(c.merged_by.login)];
+                            }
+                            else {
+                                who = that.displayData[that.findWho(c.closed_by.login)];
+                            }
+                            who.total_code += (c.line_added + c.line_deleted);
+                            who.work[2 + plus].total += (c.line_added + c.line_deleted);
+                            who.work[1 + plus].details.push(c);
+                        }
+                    }
+                    else {
+                        console.log("Need closed_by name");
+                        console.log(c);
+                    }
+                }
+            }
+            else if (c.type === "issue")
+            // CURRENTLY, ONLY HAVE OPENING DATA
+            {
+                // how hard is it
+                var value;
+                if (c.difficulty) {
+                    (c.difficulty === "easy")
+                        ? value = 1
+                        : value = 2
+                }
+                else // not flagged, flag it this way
+                {
+                    value = 3;
+                }
+
+                if (that.options.actions.indexOf("ISS_O") !== -1
+                    && c.created_at >= that.options.start_date) {
+                    // when was it created
+                    who = that.displayData[that.findWho(c.author.login)];
+                    who.total_issues += value;
+                    who.work[3 + plus].total += value;
+                    who.work[3 + plus].details.push(c);
+                }
+                // if(c.closed_at
+                //    && c.??? <= that.options.end_date)
+                // {
+                // when was it possibly closed
+                // if(that.options.actions.indexOf("ISS_C") !== -1)
+                // {
+                // NEED DATA FOR THIS TO CODE FOR IT
+                // }
+                // }
+            }
+            else {
+                console.log("What is this?");
+                console.log(c);
+            }
+        });
+    } // end of d.issues work
+};
+
+//TODO:method comments
+WhoVis.prototype.findWho = function findWho(name, type) {
+    var that = this;
+    var found = false;
+    for (var i = 0; i < that.displayData.length; i++) {
+        if (that.displayData[i].who == name) {
+            return i;
+        }
+    }
+
+    // if we're here, we need to create a new element
+    //  PERHAPS WE WOULD GET RID OF DETAILS FOR PRODUCTION
+    that.displayData.push(
+        {
+            "who": name,
+            "total_code": 0,
+            "total_issues": 0,
+            "work": [{
+                "cat": "spec",
+                "type": "COM",
+                "scale": "code",
+                "details": [],
+                "total": 0
+            },
+                {
+                    "cat": "spec",
+                    "type": "PR_O",
+                    "scale": "code",
+                    "details": [],
+                    "total": 0
+                },
+                {
+                    "cat": "spec",
+                    "type": "PR_C",
+                    "scale": "code",
+                    "details": [],
+                    "total": 0
+                },
+                {
+                    "cat": "spec",
+                    "type": "ISS_O",
+                    "scale": "count",
+                    "details": [],
+                    "total": 0
+                },
+                {
+                    "cat": "spec",
+                    "type": "ISS_C",
+                    "scale": "count",
+                    "details": [],
+                    "total": 0
+                },
+                {
+                    "cat": "test",
+                    "type": "COM",
+                    "scale": "code",
+                    "details": [],
+                    "total": 0
+                },
+                {
+                    "cat": "test",
+                    "type": "PR_O",
+                    "scale": "code",
+                    "details": [],
+                    "total": 0
+                },
+                {
+                    "cat": "test",
+                    "type": "PR_C",
+                    "scale": "code",
+                    "details": [],
+                    "total": 0
+                },
+                {
+                    "cat": "test",
+                    "type": "ISS_O",
+                    "scale": "count",
+                    "details": [],
+                    "total": 0
+                },
+                {
+                    "cat": "test",
+                    "type": "ISS_C",
+                    "scale": "count",
+                    "details": [],
+                    "total": 0
+                }]
+        });
+
+    return (that.displayData.length - 1);
+
+};
