@@ -18,7 +18,9 @@ FilterUI.prototype.initVis = function () {
     var that = this;
 
 
-    // constructs SVG layout
+    // constructs filter ui
     this.ui = this.parentElement.append("form");
+
+    //TODO: Show all issues, open issues, closed issues
 };
 
