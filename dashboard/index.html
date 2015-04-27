@@ -39,10 +39,6 @@
 <script>
     $(document).ready(function() {
         //Global data variables
-        var caniuse = [];
-        var groups = [];
-        var specs = [];
-        var tests = [];
         var allData = {caniuse: [], groups: [], specs: [], tests: []};
 
         var initVis = function () {
@@ -88,7 +84,7 @@
                 allData = processData(_caniuse, _groups, _specs, _tests);
 
                 //log the data structures, remove for production
-                // logData();
+                //logData();
                 initVis();
             } else {
                 console.log("Error loading data!:" + error);
