@@ -5,8 +5,8 @@
     <title>Web Platform Test Dashboard | Test the Web Forward</title>
     <!--Library code -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <script src="http://d3js.org/queue.v1.min.js"></script>
+    <script src="js/lib/d3.min.js" charset="utf-8"></script>
+    <script src="js/lib/queue.v1.min.js"></script>
     <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 
@@ -71,7 +71,7 @@
             $(authorHandler).bind("authorChanged", function (event, author) {
                 spec_vis.onAuthorChange(author);
                 timeline_vis.onAuthorChange(author);
-                console.log(authorSelection);
+                console.log(author);
             })
         };
         var dataLoaded = function (error, _caniuse, _groups, _specs, _tests) {

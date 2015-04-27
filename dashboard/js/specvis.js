@@ -292,7 +292,7 @@ SpecVis.prototype.onTimelineChange = function (selectionStart, selectionEnd) {
 };
 
 // Filters data by author selections
-SpecVis.prototype.authorChange = function(authorSelection) {
+SpecVis.prototype.onAuthorChange = function(authorSelection) {
 
 };
 

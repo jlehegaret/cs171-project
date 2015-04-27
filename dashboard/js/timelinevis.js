@@ -274,6 +274,10 @@ TimelineVis.prototype.onSelectionChange = function(sunburstSelection) {
     console.log("Filter by " + sunburstSelection.type + " " + sunburstSelection.name);
 };
 
+TimelineVis.prototype.onAuthorChange = function(author) {
+
+};
+
 TimelineVis.prototype.reorderData = function() {
 
   var that = this;

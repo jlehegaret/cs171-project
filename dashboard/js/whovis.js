@@ -80,7 +80,7 @@ WhoVis.prototype.updateVis = function() {
     this.height = this.displayData.length * 2*(this.barHeight + this.barPadding);
 
     this.parentElement.select("svg")
-        .attr("height", this.height + this.margin.top + this.margin.bottom)
+        .attr("height", this.height + this.margin.top + this.margin.bottom);
 
     // for lines of code
     this.max = d3.max(this.displayData, function(d)
@@ -110,8 +110,11 @@ WhoVis.prototype.updateVis = function() {
                         });
 
     var bar_enter = bar.enter()
-                       .append("g")
-                       .attr("class", "who");
+            .append("g")
+            .attr("class", "who")
+            .on("click",function(d) {
+            $(that.eventHandler).trigger("authorChanged", d);
+        });
 
     bar_enter.append("text");
 
