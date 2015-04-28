@@ -1,21 +1,25 @@
-WhoVis = function(_parentElement, _data, _eventHandler, _options) {
+WhoVis = function(_parentElement, _data, _eventHandler, _filters, _options) {
     this.parentElement = _parentElement;
     this.data = _data;
     this.eventHandler = _eventHandler;
-    this.options = _options ||
-                  {  "start_date"  : "2014-01-01",
-                      "end_date"    : "2015-05-05",
-                      "categories"  : ["spec", "test"],
-                      "actions"     : ["ISS_O", "ISS_C",
-                                       "PR_O", "PR_C",
-                                       "COM", "PUB"],
-                      "specs"       : [],
-                      "who"         : [],
-                      "number_who"  : 20,
-                      "width"       : 300,
-                      "height"      : 800,
-                      "who_sort"    : "issues"
-                    };
+    this.options = _options || {
+        "width"       : 300,
+        "height"      : 700
+    };
+
+    this.filters = _filters || {
+        "start_date"  : "2014-01-01",
+        "end_date"    : "2015-05-05",
+        "categories"  : ["spec", "test"],
+        "actions"     : ["ISS_O", "ISS_C",
+            "PR_O", "PR_C",
+            "COM", "PUB"],
+        "specs"       : [],
+        "who"         : [],
+        "number_who"  : 20,
+        "who_sort"    : "issues"
+    };
+
     this.displayData = [];
 
     // defines constants
@@ -34,6 +38,10 @@ WhoVis.prototype.initVis = function() {
     var that = this;
 
     this.dateFormatter = d3.time.format("%Y-%m-%d");
+
+    // we exclude some people from this display
+    this.exclusions = [ "Robin Berjon", "rberjon", "plehegar","darobin",
+        "unknown", undefined];
 
     this.svg = this.parentElement.append("svg")
         .attr("width", this.width + this.margin.left + this.margin.right)
@@ -149,40 +157,29 @@ WhoVis.prototype.updateVis = function() {
     bar.selectAll("rect.bar")
         .attr("height", that.barHeight)
         .attr("x", 0)
-        .attr("y", function(d)
-                    {
-                      if(d.type === "issues")
-                      {
-                        // move it down by bar_height
-                        return that.barHeight + that.barPadding;
-                      }
-                      return 0;
-                    })
-        .style("fill", function(d)
-        {
-          if(d.type === "code")
-          {
+        .attr("y", function(d) {
+            if(d.type === "issues") {
+              // move it down by bar_height
+              return that.barHeight + that.barPadding;
+            }
+            return 0;
+        })
+        .style("fill", function(d) {
+          if(d.type === "code") {
             return that.color(d.who)
-          }
-          else
-          {
+          } else {
             return "crimson";
           }
         })
         .transition()
         .delay(function(d, i) { return i * 10; })
-        .attr("width", function(d)
-        {
-          if(d.type === "code")
-          {
-            return that.x_code(d.total);
-          }
-          else
-          {
-            return that.x_issues(d.total);
+        .attr("width", function(d) {
+          if(d.type === "code") {
+              return that.x_code(d.total);
+          } else {
+              return that.x_issues(d.total);
           }
         });
-
 
     bar.selectAll("text")
             .text(function(d){return d.who})
@@ -213,95 +210,68 @@ WhoVis.prototype.wrangleData = function(filters) {
 
 
   // CALL HELPER FUNCTIONS
-  that.displayData = [];
-  if(that.options.categories.indexOf("spec") !== -1)
-  {
-    that.data.specs.forEach(function(d)
-    {
-      if(that.options.specs.length == 0
-         || that.options.specs.indexOf(d.url) != -1)
-      {
-        that.processData(d, "spec");
-      }
-    });
-  }
-  if(that.options.categories.indexOf("test") !== -1)
-  {
-    that.data.tests.forEach(function(d)
-    {
-      if(that.options.specs.length == 0)
-      {
-// console.log("processing test data for ");
-// console.log(d);
-         that.processData(d, "test");
-      }
-      else // we need to check that a spec we care about is concerned
-      {
-        var found = false;
-        var i = 0;
-        while(!found && i < this.options.specs.length)
-        {
-          if(that.options.specs.indexOf(d.specs[i]) !== -1)
-          {
-            found = true;
-          }
-          else
-          {
-            i++; // keep looking
-          }
-        }
-        if(found) { that.processData(d, "test"); }
-      }
-    });
-  }
+  // that.displayData = [];
+    if(that.filters.categories.indexOf("spec") !== -1) {
+        that.data.specs.forEach(function(d) {
+            if(that.filters.specs.length == 0 || that.filters.specs.indexOf(d.url) != -1) {
+                that.processData(d, "spec");
+            }
+        });
+    }
+    if(that.filters.categories.indexOf("test") !== -1) {
+        that.data.tests.forEach(function(d) {
+            if(that.filters.specs.length == 0) {
+                that.processData(d, "test");
+            }
+            // we need to check that a spec we care about is concerned
+            else {
+                var found = false;
+                var i = 0;
+                while(!found && i < this.filters.specs.length) {
+                    if(that.filters.specs.indexOf(d.specs[i]) !== -1) {
+                        found = true;
+                    } else {
+                        i++; // keep looking
+                    }
+                } if(found) { that.processData(d, "test"); }
+            }
+        });
+    }
 
-if(this.options.who_sort === "code")
-{
-  this.displayData.sort(function(a, b)
-                  {
-                    if(b.total_code < a.total_code)
-                    {
-                      return -1;
-                    }
-                    else if(b.total_code > a.total_code)
-                    {
-                      return 1;
-                    }
-                    else
-                    {
-                      return b.total_issues - a.total_issues;
-                    }
-                  });
-}
-else // sort by issues
-{
-    this.displayData.sort(function(a, b)
-                  {
-                    if(b.total_issues < a.total_issues)
-                    {
-                      return -1;
-                    }
-                    else if(b.total_issues > a.total_issues)
-                    {
-                      return 1;
-                    }
-                    else
-                    {
-                      return b.total_code - a.total_code;
-                    }
-                  });
-}
-  // we exclude some people from this display
-  var except = [ "Robin Berjon", "rberjon", "plehegar","darobin",
-                "unknown", undefined];
+    //sort by code size
+    if(this.filters.who_sort === "code") {
+        this.displayData.sort(function(a, b) {
+            if(b.total_code < a.total_code) {
+                return -1;
+            } else if(b.total_code > a.total_code) {
+                return 1;
+            } else {
+                return b.total_issues - a.total_issues;
+            }
+        });
+    }
+    // sort by issues
+    else {
+        this.displayData.sort(function(a, b) {
+            if(b.total_issues < a.total_issues) {
+                return -1;
+            }
+            else if(b.total_issues > a.total_issues) {
+                return 1;
+            } else {
+                return b.total_code - a.total_code;
+            }
+        });
+    }
 
   // // take enough elements to cover exceptions list, just in case
   // this.displayData = this.displayData.slice(0,
   //                     (this.options.number_who + except.length));
 
   // filter out exceptions
-  this.displayData = this.displayData.filter(function(d)
-                      { return except.indexOf(d.who) === -1; });
+  this.displayData = this.displayData.filter(function(d) {
+      return that.exclusions.indexOf(d.who) === -1;
+  });
 
   // // make sure it's the right length
   // this.displayData = this.displayData.slice(0,
@@ -313,19 +283,16 @@ WhoVis.prototype.processData = function processData(d, category) {
     var that = this;
     var who;
     var index;
-    var plus;  // need to change element number depending
+    var plus = category === "spec" ? 0 : 5;  // need to change element number depending
     // on category being processed
-    (category === "spec")
-        ? plus = 0
-        : plus = 5;
 
     // COMMIT FUNCTIONALITY
-    if (d.commits && that.options.actions.indexOf("COM") !== -1) {
+    if (d.commits && that.filters.actions.indexOf("COM") !== -1) {
         d.commits.forEach(function (c) {
             who = that.displayData[that.findWho(c.author)];
             who.total_code += (c.line_added + c.line_deleted);
-            who.work[0 + plus].total += (c.line_added + c.line_deleted);
-            who.work[0 + plus].details.push(c);
+            who.work[plus].total += (c.line_added + c.line_deleted);
+            who.work[plus].details.push(c);
         });
     }
 
@@ -363,8 +330,8 @@ WhoVis.prototype.processData = function processData(d, category) {
                 }
 
                 // Now, see if we want to see the data
-                if (that.options.actions.indexOf("PR_O") !== -1
-                    && c.created_at >= that.options.start_date) {
+                if (that.filters.actions.indexOf("PR_O") !== -1
+                    && c.created_at >= that.filters.start_date) {
                     // who created it
                     who = that.displayData[that.findWho(c.author.login)];
                     who.total_code += (c.line_added + c.line_deleted);
@@ -377,8 +344,8 @@ WhoVis.prototype.processData = function processData(d, category) {
                     //    WE ACTUALLY DON'T KNOW WHO CLOSED IT
                     if (c.merged_by || c.closed_by) {
                         // who possibly closed it
-                        if (that.options.actions.indexOf("PR_C") !== -1
-                            && c.closed_at <= that.options.end_date) {
+                        if (that.filters.actions.indexOf("PR_C") !== -1
+                            && c.closed_at <= that.filters.end_date) {
                             if (c.merged_by) {
                                 who = that.displayData[that.findWho(c.merged_by.login)];
                             }
@@ -411,8 +378,8 @@ WhoVis.prototype.processData = function processData(d, category) {
                     value = 3;
                 }
 
-                if (that.options.actions.indexOf("ISS_O") !== -1
-                    && c.created_at >= that.options.start_date) {
+                if (that.filters.actions.indexOf("ISS_O") !== -1
+                    && c.created_at >= that.filters.start_date) {
                     // when was it created
                     who = that.displayData[that.findWho(c.author.login)];
                     who.total_issues += value;

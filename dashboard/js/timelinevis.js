@@ -1,10 +1,17 @@
-TimelineVis = function(_parentElement, _data, _eventHandler, _options) {
+TimelineVis = function(_parentElement, _data, _eventHandler, _filters, _options) {
     this.parentElement = _parentElement;
     this.data = _data;
     this.displayData = [];
     this.vizData = [];
     this.eventHandler = _eventHandler;
-    this.options = _options || {width:1200, height:300};
+    this.options = _options || {
+        width:1200, height:300
+    };
+    this.filters = _filters || {
+        start_date: "2014-01-01",
+        end_date: new Date(),    //new Date() for now
+        state: open             //open, closed, or all
+    };
 
     // defines constants
     this.margin = {top: 20, right: 20, bottom: 20, left: 50};

@@ -1,12 +1,17 @@
-SpecVis = function (_parentElement, _data, _eventHandler, _options) {
+SpecVis = function (_parentElement, _data, _eventHandler, _filters, _options) {
     this.parentElement = _parentElement;
     this.data = _data;
     this.eventHandler = _eventHandler;
-    this.options = _options || {width: 750, height: 750,
-        "start_date"  : "2014-01-01",
-        "end_date"    : "2015-05-05"};
+    this.options = _options || {
+        width: 750, height: 750
+    };
+    this.filters = _filters || {
+        start_date: "2014-01-01",
+        end_date: "2015-05-05",
+        state: open
+    };
+
     this.displayData = {};
-    this.allIssues = [];
 
     // defines constants
     this.margin = {top: 20, right: 20, bottom: 20, left: 50};
@@ -25,7 +30,7 @@ SpecVis.prototype.initVis = function () {
     // sets up a default date filter (returns from a given date till now)
     this.currentDateFilter = this.dateFilter(new Date(this.options.start_date), new Date(this.options.end_date));
     // sets up default author filter (returns all)
-    this.currentAuthorFilter = function(d) {return true;};
+    this.currentAuthorFilter = this.authorFilter(null);
 
 
     //use standard descending ordering for all elements
@@ -124,7 +129,6 @@ SpecVis.prototype.wrangleData = function (filters) {
             spec.issues = d.issues.filter(dateFilterFunction).filter(authorFilterFunction);
         }
         if (d.commits) {
-
             spec.commits = d.commits.filter(dateFilterFunction).filter(authorFilterFunction);
         }
         that.displayData.spec_lookup[d.url] = spec;
@@ -305,18 +309,22 @@ SpecVis.prototype.onAuthorChange = function(authorSelection) {
 // returns closure with filter for start to end date
 // function checks date members for test, issue and commit objects
 SpecVis.prototype.dateFilter = function(startDate, endDate) {
+
+    startDate = new Date(startDate);
+    endDate = new Date(endDate);
+
     return function(d) {
         //tests
         if (d.created_at !== undefined) {
-            return new Date(d.created_at) >= new Date(startDate) && new Date(d.created_at) <= new Date(endDate);
+            return new Date(d.created_at) >= startDate && new Date(d.created_at) <= endDate;
         }
         //spec?
         else if (d.created !== undefined) {
-            return new Date(d.created) >= new Date(startDate) && new Date(d.created) <= new Date(endDate);
+            return new Date(d.created) >= startDate && new Date(d.created) <= endDate;
         }
         //commits
         else if (d.date !== undefined) {
-            return new Date(d.date) >= new Date(startDate) && new Date(d.date) <= new Date(endDate);
+            return new Date(d.date) >= startDate && new Date(d.date) <= endDate;
         }
         //if there is no associated date, log and filter it out
         else {
@@ -329,11 +337,13 @@ SpecVis.prototype.dateFilter = function(startDate, endDate) {
 
 // returns closure with filter for author
 SpecVis.prototype.authorFilter = function(who) {
+    // always returns true if no author is selected
     if(who === null) {
         return function(d) {
             return true;
         }
     } else {
+        // function has to check various fields to cover all objects that have author information
         return function (d) {
             // issues or commits
             if (d.author) {
@@ -358,6 +368,44 @@ SpecVis.prototype.authorFilter = function(who) {
                 return false;
             }
         }
+    }
+};
+
+SpecVis.prototype.stateFilter = function (state) {
+    var open = function(d) {
+        if(d.state) {
+            return d.state === "open"
+        } else {
+            console.log("Error: Object missing state information");
+            console.log(d);
+            return false;
+        }
+    };
+    var closed = function(d) {
+        if(d.state) {
+            return d.state === "closed"
+        } else {
+            console.log("Error:Object missing state information");
+            console.log(d);
+            return false;
+        }
+    };
+    var all = function(d) {
+        if(d.state) {
+            return true;
+        } else {
+            console.log("Error: Object missing state information");
+            console.log(d);
+            return false;
+        }
+    };
+    switch(state) {
+        case "open":
+            return open;
+        case "closed":
+            return closed;
+        default:
+            return all;
     }
 };
 

@@ -42,6 +42,13 @@
         //Global data variables
         var allData = {caniuse: [], groups: [], specs: [], tests: []};
 
+        //If this object is passed to visualization, it will override the default filters
+        var initialFilters = {
+            start_date: "2014-01-01",
+            end_date: new Date(),    //new Date() for now
+            state: open             //open, closed, or all
+        };
+
         var initVis = function () {
             //Handles timeline brushing
             var brushHandler = {};
@@ -52,10 +59,11 @@
             //Handles filter options from UI
             var filterHandler = {};
 
+
             //Create visualizations
-            spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler);
+            spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler, initialFilters);
             who_vis = new WhoVis(d3.select("#whoVis"), allData, authorHandler);
-            timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler);
+            timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler, initialFilters);
             //filter_ui = new FilterUI(d3.select("#filterUI"), allData, filterHandler);
 
             //Wire up event handlers
