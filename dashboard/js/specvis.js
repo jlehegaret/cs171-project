@@ -25,6 +25,7 @@ SpecVis = function (_parentElement, _data, _eventHandler, _filters, _options) {
     this.initVis();
 };
 
+// initializes all visual functionality that doesn't depend on the actual data
 SpecVis.prototype.initVis = function () {
     var that = this;
 
@@ -105,13 +106,14 @@ SpecVis.prototype.initVis = function () {
     this.updateVis();
 };
 
-
-SpecVis.prototype.wrangleData = function (filters) {
+//filters and processes the date based on given _filters parameters
+SpecVis.prototype.wrangleData = function (_filters) {
     var that = this;
 
-    var filterChain = this.createFilterChain(filters);
+    //Create a new filter chain from currentFilters and new _filters
+    var filterChain = this.createFilterChain(_filters);
 
-    //create a lookup table of specs keyed by spec url
+    //create a lookup table of specs keyed by spec url, apply filters to data
     this.displayData.spec_lookup = {};
     this.data.specs.forEach(function (d) {
         //new spec objects need to be created to not filter out items from allData
@@ -128,7 +130,7 @@ SpecVis.prototype.wrangleData = function (filters) {
         that.displayData.spec_lookup[d.url] = spec;
     });
 
-    //creates a lookup table of tests keyed by spec url
+    //creates a lookup table of tests keyed by spec url, apply filters to data
     this.displayData.test_lookup = {};
     this.data.tests.forEach(function (test) {
         if (filterChain(test)) {
@@ -142,102 +144,11 @@ SpecVis.prototype.wrangleData = function (filters) {
         }
     });
 
-
-    // Create the root object for the vis data hierarchy
-    var root = {name: "W3C", key: "root", type:"root", children: []};
-
-    // Create a group object for every group in the original dataset
-    // It is VERY important that every item has a unique key, or the layout will have undesirable behavior
-    // This is especially true because certain specs belong to more than one group, requiring deep copies
-    this.data.groups.forEach(function (_group) {
-        var group = {};
-        group.name = _group.name;
-        group.shortname = _group.shortname;
-        group.key = _group.shortname;
-        group.type = "group";
-        group.url = _group.url;
-        group.children = [];
-        //specs are only keyed by url in each group, spec_lookup will be used to find them in the original specs dataset
-        _group.specs.forEach(function (_spec) {
-            var spec = {};
-            spec.url = _spec.url;
-            spec.key = group.key + _spec.url;
-            spec.type = "spec";
-            if (that.displayData.spec_lookup[_spec.url]) {
-                var _fullSpec = that.displayData.spec_lookup[_spec.url];
-
-                //every spec will have two children, a group of issues for the HTML spec and a group of tests
-                spec.children = [{  name: "HTML",
-                                    type:"HTML",
-                                    key: spec.key + "HTML",
-                                    url: spec.url,
-                                    children: []},
-                                {   name: "Tests",
-                                    type:"Tests",
-                                    url: "", // WOULD BE NICE TO FILL THIS IN
-                                    key: spec.key + "Tests",
-                                    children: []}];
-
-                spec.name = _fullSpec.name;
-                if (_fullSpec.issues) {
-                    _fullSpec.issues.forEach(function (_issue) {
-                        var issue = {};
-                        issue.title = _issue.title;
-                        issue.key = spec.key + _issue.html_url;
-                        issue.type = _issue.type;
-                        issue.state = _issue.state;
-                        issue.created_at = _issue.created_at;
-                        issue.closed_at = _issue.closed_at;
-                        issue.merged_at = _issue.merged_at;
-                        issue.url = _issue.html_url;
-                        spec.children[0].children.push(issue);
-                    });
-                }
-                if (_fullSpec.commits) {
-                    _fullSpec.commits.forEach(function (_issue) {
-                        var commit = {};
-                        commit.title = _issue.title;
-                        commit.key = spec.key + _issue.html_url;
-                        commit.type = "commit";
-                        commit.state = "closed";
-                        commit.created_at = _issue.date;
-                        commit.closed_at = _issue.date;
-                        commit.merged_at = _issue.date;
-                        commit.url = _issue.html_url;
-                        spec.children[0].children.push(commit);
-                    });
-                }
-            }
-            else {
-                console.log("Error: Spec Not Found: " + _spec.url);
-            }
-            //looks for tests in the test lookup table, creates copies if found
-            if (that.displayData.test_lookup[_spec.url]) {
-                var _allTests = that.displayData.test_lookup[_spec.url];
-                _allTests.forEach(function (_test) {
-                    var test = {};
-                    test.title = _test.title;
-                    test.key = spec.key + _test.html_url;
-                    if(_test.type === "test") {
-                        test.type = "pull";
-                    }
-                    else {
-                        test.type = _test.type;
-                    }
-                    test.html_url = _test.html_url;
-                    test.state = _test.state;
-                    test.created_at = _test.created_at;
-                    spec.children[1].children.push(test);
-                });
-            } else {
-                //console.log("Debug: No Tests for: " + dd.url);
-            }
-            group.children.push(spec);
-        });
-        root.children.push(group);
-    });
-
-    this.displayData.root = root;
+    //create the tree hierarchy needed by the partition layout from the filtered data
+    this.displayData.root = this.createHierarchy(
+        this.data.groups,
+        this.displayData.spec_lookup,
+        this.displayData.test_lookup);
 };
 
 //Updates visual elements with new data
@@ -288,6 +199,106 @@ SpecVis.prototype.updateVis = function () {
     path
         .exit()
         .remove();
+};
+
+//creates the tree hierarchy needed by the partition layout
+//function has no side effects, only uses passed parameters to create data structure
+SpecVis.prototype.createHierarchy = function(group_lookup, spec_lookup, test_lookup) {
+    // Create the root object for the vis data hierarchy
+    var root = {name: "W3C", key: "root", type:"root", children: []};
+
+    // Create a group object for every group in the original dataset
+    // It is VERY important that every item has a unique key, or the layout will have undesirable behavior
+    // This is especially true because certain specs belong to more than one group, requiring deep copies
+    group_lookup.forEach(function (_group) {
+        var group = {};
+        group.name = _group.name;
+        group.shortname = _group.shortname;
+        group.key = _group.shortname;
+        group.type = "group";
+        group.url = _group.url;
+        group.children = [];
+        //specs are only keyed by url in each group, spec_lookup will be used to find them in the original specs dataset
+        _group.specs.forEach(function (_spec) {
+            var spec = {};
+            spec.url = _spec.url;
+            spec.key = group.key + _spec.url;
+            spec.type = "spec";
+            if (spec_lookup[_spec.url]) {
+                var _fullSpec = spec_lookup[_spec.url];
+
+                //every spec will have two children, a group of issues for the HTML spec and a group of tests
+                spec.children = [{  name: "HTML",
+                    type:"HTML",
+                    key: spec.key + "HTML",
+                    url: spec.url,
+                    children: []},
+                    {   name: "Tests",
+                        type:"Tests",
+                        url: "", // WOULD BE NICE TO FILL THIS IN
+                        key: spec.key + "Tests",
+                        children: []}];
+
+                spec.name = _fullSpec.name;
+                if (_fullSpec.issues) {
+                    _fullSpec.issues.forEach(function (_issue) {
+                        var issue = {};
+                        issue.title = _issue.title;
+                        issue.key = spec.key + _issue.html_url;
+                        issue.type = _issue.type;
+                        issue.state = _issue.state;
+                        issue.created_at = _issue.created_at;
+                        issue.closed_at = _issue.closed_at;
+                        issue.merged_at = _issue.merged_at;
+                        issue.url = _issue.html_url;
+                        spec.children[0].children.push(issue);
+                    });
+                }
+                if (_fullSpec.commits) {
+                    _fullSpec.commits.forEach(function (_issue) {
+                        var commit = {};
+                        commit.title = _issue.title;
+                        commit.key = spec.key + _issue.html_url;
+                        commit.type = "commit";
+                        commit.state = "closed";
+                        commit.created_at = _issue.date;
+                        commit.closed_at = _issue.date;
+                        commit.merged_at = _issue.date;
+                        commit.url = _issue.html_url;
+                        spec.children[0].children.push(commit);
+                    });
+                }
+            }
+            else {
+                console.log("Error: Spec Not Found: " + _spec.url);
+            }
+            //looks for tests in the test lookup table, creates copies if found
+            if (test_lookup[_spec.url]) {
+                var _allTests = test_lookup[_spec.url];
+                _allTests.forEach(function (_test) {
+                    var test = {};
+                    test.title = _test.title;
+                    test.key = spec.key + _test.html_url;
+                    if(_test.type === "test") {
+                        test.type = "pull";
+                    }
+                    else {
+                        test.type = _test.type;
+                    }
+                    test.html_url = _test.html_url;
+                    test.state = _test.state;
+                    test.created_at = _test.created_at;
+                    spec.children[1].children.push(test);
+                });
+            } else {
+                //console.log("Debug: No Tests for: " + dd.url);
+            }
+            group.children.push(spec);
+        });
+        root.children.push(group);
+    });
+
+    return root;
 };
 
 // Event handler to filter data by timeline selections
@@ -407,7 +418,6 @@ SpecVis.prototype.authorFilter = function(who) {
 //Takes a string of "all" "closed" and "open" and returns a closure
 // to filter tests, issues and commits (commits are always closed)
 SpecVis.prototype.stateFilter = function (state) {
-    console.log(state);
     var open = function(d) {
         if(d.state) {
             return d.state === "open"
@@ -429,13 +439,10 @@ SpecVis.prototype.stateFilter = function (state) {
     };
     switch(state) {
         case "open":
-            console.log("creating open state filter");
             return open;
         case "closed":
-            console.log("creating closed state filter");
             return closed;
         default:
-            console.log("created all state filter");
             return all;
     }
 };
