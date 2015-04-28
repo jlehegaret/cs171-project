@@ -28,7 +28,7 @@ SpecVis.prototype.initVis = function () {
     this.radius = Math.min(this.width, this.height) / 2;
 
     // sets up a default date filter (returns from a given date till now)
-    this.currentDateFilter = this.dateFilter(new Date(this.options.start_date), new Date(this.options.end_date));
+    this.currentDateFilter = this.dateFilter(new Date(this.filters.start_date), new Date(this.filters.end_date));
     // sets up default author filter (returns all)
     this.currentAuthorFilter = this.authorFilter(null);
 
