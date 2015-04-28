@@ -296,9 +296,19 @@ SpecVis.prototype.onTimelineChange = function (selectionStart, selectionEnd) {
     this.updateVis();
 };
 
-// Event handler to filters data by author selections
+// Event handler to filter data by author selections
 SpecVis.prototype.onAuthorChange = function(authorSelection) {
     this.wrangleData(filters = {_authorFilterFunction: this.authorFilter(authorSelection)});
+    this.updateVis();
+};
+
+// Event handler to filter date by additional options.
+// Expects _filters to be and object with at least a "state" field
+SpecVis.prototype.onFilterChange = function(_filters) {
+    filters = {
+        _stateFilterFunction: this.stateFilter(_filters.state)
+    };
+    this.wrangleDate(filters);
     this.updateVis();
 };
 
@@ -394,6 +404,8 @@ SpecVis.prototype.authorFilter = function(who) {
     }
 };
 
+//Takes a string of "all" "closed" and "open" and returns a closure
+// to filter tests, issues and commits (commits are always closed)
 SpecVis.prototype.stateFilter = function (state) {
     console.log(state);
     var open = function(d) {
