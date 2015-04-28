@@ -18,6 +18,8 @@ SpecVis = function (_parentElement, _data, _eventHandler, _filters, _options) {
     this.width = this.options.width - this.margin.left - this.margin.right;
     this.height = this.options.height - this.margin.top - this.margin.bottom;
 
+    this.transitionDuration = 500;
+
     this.initVis();
 };
 
@@ -113,9 +115,14 @@ SpecVis.prototype.wrangleData = function (filters) {
     //uses current filter unless new one is defined, then saves current filter
     var authorFilterFunction = this.currentAuthorFilter;
     if (filters && filters._authorFilterFunction) {
+        console.log("setting new author filter");
         authorFilterFunction = filters._authorFilterFunction;
     }
     this.currentAuthorFilter = authorFilterFunction;
+
+    var filterChain = function(d) {
+        return dateFilterFunction(d) && authorFilterFunction(d);
+    };
 
     //create a lookup table of specs keyed by spec url
     this.displayData.spec_lookup = {};
@@ -254,7 +261,7 @@ SpecVis.prototype.updateVis = function () {
     var click = function (d) {
         $(that.eventHandler).trigger("selectionChanged", d);
         path.transition()
-            .duration(750)
+            .duration(that.transitionDuration)
             .attrTween("d", that.arcTweenZoom(d));
     };
 
@@ -263,7 +270,9 @@ SpecVis.prototype.updateVis = function () {
             return d.key;
         });
 
-    var path_enter = path.enter().append("path")
+    var path_enter = path
+        .enter()
+        .append("path")
         .attr("class", function (d) {
             return d.type;
         })
@@ -281,9 +290,9 @@ SpecVis.prototype.updateVis = function () {
         .on("mouseover", this.tip.show);
     //       .each(this.stash);
 
-    var path_update = path
+    path
         .transition()
-        .duration(750)
+        .duration(that.transitionDuration)
         .attr("d", this.arc)
         .call(this.tip);
     //       .attrTween("d", this.arcTweenData);
@@ -305,6 +314,10 @@ SpecVis.prototype.onAuthorChange = function(authorSelection) {
     this.updateVis();
 };
 
+
+SpecVis.prototype.createFilterChain = function (filters) {
+
+}
 
 // returns closure with filter for start to end date
 // function checks date members for test, issue and commit objects
@@ -338,7 +351,7 @@ SpecVis.prototype.dateFilter = function(startDate, endDate) {
 // returns closure with filter for author
 SpecVis.prototype.authorFilter = function(who) {
     // always returns true if no author is selected
-    if(who === null) {
+    if(!who) {
         return function(d) {
             return true;
         }
