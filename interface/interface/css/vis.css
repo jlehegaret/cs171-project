@@ -1,8 +1,9 @@
 #whoVis {
-    height: 500px;
+    height: 510px;
+    width: 380px;
 	margin-top:10px;
-    overflow-y: scroll;
-    overflow-x: hidden;
+    overflow-y: hidden;
+    overflow-x: scroll;
 }
 
 .axis text {
