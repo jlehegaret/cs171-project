@@ -44,9 +44,9 @@
 
         //If this object is passed to visualization, it will override the default filters
         var initialFilters = {
-            start_date: "2014-01-01",
+            start_date: "2015-03-01",
             end_date: new Date(),    //new Date() for now
-            state: open             //open, closed, or all
+            state: "open"             //open, closed, or all
         };
 
         var initVis = function () {
@@ -62,7 +62,7 @@
 
             //Create visualizations
             spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler, initialFilters);
-            who_vis = new WhoVis(d3.select("#whoVis"), allData, authorHandler);
+            who_vis = new WhoVis(d3.select("#whoVis"), allData, authorHandler, null);
             timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler, initialFilters);
             //filter_ui = new FilterUI(d3.select("#filterUI"), allData, filterHandler);
 

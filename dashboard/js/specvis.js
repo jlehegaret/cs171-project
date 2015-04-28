@@ -2,13 +2,15 @@ SpecVis = function (_parentElement, _data, _eventHandler, _filters, _options) {
     this.parentElement = _parentElement;
     this.data = _data;
     this.eventHandler = _eventHandler;
+    //NOTE: these options are overridden if _options is not null
     this.options = _options || {
         width: 750, height: 750
     };
+    //NOTE: these filters are overridden if _filters is not null
     this.filters = _filters || {
         start_date: "2014-01-01",
         end_date: "2015-05-05",
-        state: open
+        state: "open"
     };
 
     this.displayData = {};
@@ -33,6 +35,8 @@ SpecVis.prototype.initVis = function () {
     this.currentDateFilter = this.dateFilter(new Date(this.filters.start_date), new Date(this.filters.end_date));
     // sets up default author filter (returns all)
     this.currentAuthorFilter = this.authorFilter(null);
+    // sets up default state filter
+    this.currentStateFilter = this.stateFilter(this.filters.state);
 
 
     //use standard descending ordering for all elements
@@ -105,24 +109,7 @@ SpecVis.prototype.initVis = function () {
 SpecVis.prototype.wrangleData = function (filters) {
     var that = this;
 
-    //uses current filter unless new one is defined, then saves current filter
-    var dateFilterFunction = this.currentDateFilter;
-    if (filters && filters._dateFilterFunction) {
-        dateFilterFunction = filters._dateFilterFunction;
-    }
-    this.currentDateFilter = dateFilterFunction;
-
-    //uses current filter unless new one is defined, then saves current filter
-    var authorFilterFunction = this.currentAuthorFilter;
-    if (filters && filters._authorFilterFunction) {
-        console.log("setting new author filter");
-        authorFilterFunction = filters._authorFilterFunction;
-    }
-    this.currentAuthorFilter = authorFilterFunction;
-
-    var filterChain = function(d) {
-        return dateFilterFunction(d) && authorFilterFunction(d);
-    };
+    var filterChain = this.createFilterChain(filters);
 
     //create a lookup table of specs keyed by spec url
     this.displayData.spec_lookup = {};
@@ -133,10 +120,10 @@ SpecVis.prototype.wrangleData = function (filters) {
         spec.name = d.title;
         spec.score = d.score;  // this is here now, but I don't see it showing up elsewhere
         if (d.issues) {
-            spec.issues = d.issues.filter(dateFilterFunction).filter(authorFilterFunction);
+            spec.issues = d.issues.filter(filterChain);
         }
         if (d.commits) {
-            spec.commits = d.commits.filter(dateFilterFunction).filter(authorFilterFunction);
+            spec.commits = d.commits.filter(filterChain);
         }
         that.displayData.spec_lookup[d.url] = spec;
     });
@@ -144,7 +131,7 @@ SpecVis.prototype.wrangleData = function (filters) {
     //creates a lookup table of tests keyed by spec url
     this.displayData.test_lookup = {};
     this.data.tests.forEach(function (test) {
-        if (dateFilterFunction(test) && authorFilterFunction(test)) {
+        if (filterChain(test)) {
             test.specs.forEach(function (spec) {
                 //check if an entry already exists, if not create one
                 if (!that.displayData.test_lookup[spec]) {
@@ -253,6 +240,7 @@ SpecVis.prototype.wrangleData = function (filters) {
     this.displayData.root = root;
 };
 
+//Updates visual elements with new data
 SpecVis.prototype.updateVis = function () {
 
     var that = this;
@@ -302,22 +290,44 @@ SpecVis.prototype.updateVis = function () {
         .remove();
 };
 
-// Filters data by timeline selections
+// Event handler to filter data by timeline selections
 SpecVis.prototype.onTimelineChange = function (selectionStart, selectionEnd) {
     this.wrangleData(filters = {_dateFilterFunction: this.dateFilter(selectionStart, selectionEnd)});
     this.updateVis();
 };
 
-// Filters data by author selections
+// Event handler to filters data by author selections
 SpecVis.prototype.onAuthorChange = function(authorSelection) {
     this.wrangleData(filters = {_authorFilterFunction: this.authorFilter(authorSelection)});
     this.updateVis();
 };
 
 
+//Creates a filter chain closure function from an object containing filter functions
+//Also keeps track of the current filter state for the visualization by updating this.currentFilter functions
 SpecVis.prototype.createFilterChain = function (filters) {
+    var dateFilterFunction = this.currentDateFilter;
+    if (filters && filters._dateFilterFunction) {
+        dateFilterFunction = filters._dateFilterFunction;
+    }
+    this.currentDateFilter = dateFilterFunction;
 
-}
+    var authorFilterFunction = this.currentAuthorFilter;
+    if (filters && filters._authorFilterFunction) {
+        authorFilterFunction = filters._authorFilterFunction;
+    }
+    this.currentAuthorFilter = authorFilterFunction;
+
+    var stateFilterFunction = this.currentStateFilter;
+    if (filters && filters._stateFilterFunction) {
+        stateFilterFunction = filters._stateFilterFunction;
+    }
+
+    //returns closure that tests all the filter functions
+    return filterChain = function(d) {
+        return dateFilterFunction(d) && authorFilterFunction(d) && stateFilterFunction(d);
+    };
+};
 
 // returns closure with filter for start to end date
 // function checks date members for test, issue and commit objects
@@ -385,12 +395,12 @@ SpecVis.prototype.authorFilter = function(who) {
 };
 
 SpecVis.prototype.stateFilter = function (state) {
+    console.log(state);
     var open = function(d) {
         if(d.state) {
             return d.state === "open"
         } else {
-            console.log("Error: Object missing state information");
-            console.log(d);
+            // commits have no state field and are always closed
             return false;
         }
     };
@@ -398,26 +408,22 @@ SpecVis.prototype.stateFilter = function (state) {
         if(d.state) {
             return d.state === "closed"
         } else {
-            console.log("Error:Object missing state information");
-            console.log(d);
-            return false;
+            //commits have no state field and are always closed
+            return true;
         }
     };
     var all = function(d) {
-        if(d.state) {
-            return true;
-        } else {
-            console.log("Error: Object missing state information");
-            console.log(d);
-            return false;
-        }
+        return true;
     };
     switch(state) {
         case "open":
+            console.log("creating open state filter");
             return open;
         case "closed":
+            console.log("creating closed state filter");
             return closed;
         default:
+            console.log("created all state filter");
             return all;
     }
 };
