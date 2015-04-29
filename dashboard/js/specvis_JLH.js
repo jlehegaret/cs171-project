@@ -300,6 +300,7 @@ SpecVis.prototype.updateVis = function() {
                 var random_color = colors[Math.floor(Math.random() * colors.length)];
                 return random_color;
 
+
                 }
 
             }

@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="css/custom.css" type="text/css" media="screen">
     <!-- Visualization Styles -->
     <link rel="stylesheet" href="css/vis.css" type="text/css" media="screen">
+    <link href="css/style.css" rel="stylesheet" />
 
     <!--Vis code-->
     <script src="js/util.js"></script>
@@ -25,17 +26,83 @@
 </head>
 <body>
 
-<div class="container">
-    <h1>Web Platform Tests Dashboard</h1>
+<div id="wrapper">
 
+    <!-- header -->
+
+    <header>
+
+        <div class="navbar navbar-default navbar-static-top">
+            <div class="container">
+                <div class="navbar-header"></div>
+                <h1><span class="navbar-header"><img src="images/w3c.jpg" width="218" height="48"></span></h1>
+
+                <div class="navbar-collapse collapse ">
+
+                    <ul class="nav navbar-nav">
+                        <h1>W3C - Test the Web Forward</h1>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- main D3 stuff -->
+
+    <div class="container">
+
+        <div id='cssmenu'>
+            <ul>
+                <li class='active has-sub'><a href='#'><span>Sort by</span></a>
+                    <ul>
+                        <li class='has-sub'><a href='#'><span>Working Group</span></a>
+
+                        </li>
+                        <li class='has-sub'><a href='#'><span>Spec</span></a>
+                        </li>
+                    </ul>
+                </li>
+                <li class='active has-sub'><a href='#'><span>Filer by</span></a>
+                    <ul>
+                        <li class='has-sub'><a href='#'><span>Issue</span></a>
+
+                        </li>
+                        <li class='has-sub'><a href='#'><span>Pull Request</span></a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li><a href='#'><span>Choose Year</span></a></li>
+
+                <li class='last'><a href='#'><span>About</span></a></li>
+            </ul>
+        </div>
         <div style="float:left" id="specVis"></div>
+
         <div id="filterUI"></div>
         <div id="whoVis"></div>
         <div id="timelineVis"></div>
+     
+    </div>
+    
+    <div class="footer">
+        <!--
+        <div id="socnet">
+            <ul class="social-network">
+              <li><a href="#" data-placement="top" title="Facebook"><i class="fa fa-facebook"></i></a></li>
+              <li><a href="#" data-placement="top" title="Twitter"><i class="fa fa-twitter"></i></a></li>
+              <li><a href="#" data-placement="top" title="Linkedin"><i class="fa fa-linkedin"></i></a></li>
+              <li><a href="#" data-placement="top" title="Pinterest"><i class="fa fa-pinterest"></i></a></li>
+              <li><a href="#" data-placement="top" title="Google plus"><i class="fa fa-google-plus"></i></a></li>
+            </ul>
+            </div>-->
+
+        <!-- <div class="copyright">
+           <p> <span>&copy; </span>W3C 2015</p>
+         </div>-->
+  </div>
 
 </div>
-
-
 
 <script>
     $(document).ready(function() {

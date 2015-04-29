@@ -30,7 +30,6 @@
 
 body {
   background-color: white;
-  color: #333;
   font-family: "Open Sans","DejaVu Sans","Verdana",sans;
   font-size: 16px;
   line-height: 1.6;
@@ -49,7 +48,7 @@ h1, h2, h3 {
 }
 
 .navbar-default .navbar-brand {
-  color: #333;
+
   font-size: 16px;
   font-family: "Adelle", georgia, serif;
 }
@@ -97,19 +96,19 @@ table td {
 
 .collapsed.accordion-toggle:focus .caret,
 .collapsed.accordion-toggle:hover .caret {
-  border-left-color: #333;
+
   border-top-color: transparent;
 }
 
 accordion-toggle:focus .caret,
 accordion-toggle:hover .caret {
   border-left-color: transparent;
-  border-top-color: #333;
+
 }
 
 .accordion-toggle:focus,
 .accordion-toggle:hover {
-  color: #333;
+
   text-decoration: none;
 }
 
@@ -123,15 +122,6 @@ accordion-toggle:hover .caret {
   font-family: "Adelle", georgia, serif;
 }
 
-.panel-group, footer {
-  font-size: 78%;
-}
-
-/* affix plugin */
-
-.affix {
-  position: static;
-}
 
 /* Tablets/desktops and up */
 @media screen and (min-width: 992px) {
@@ -161,7 +151,6 @@ accordion-toggle:hover .caret {
   }
 }
 
-/* Large desktops and up */
 @media screen and (min-width: 1200px) {
   .affix-bottom,
   .affix {
@@ -185,50 +174,6 @@ h2 a.permalink span.glyphicon,
 h2 a.anchor span.glyphicon {
   display: inline;
   position: static;
-}
-
-.permalink,
-.anchor {
-  visibility: hidden;
-}
-
-footer {
-  background-color: #f8f8f8;
-  border-top: 1px solid #e7e7e7;
-  padding: 0;
-  margin-top: 60px;
-}
-
-footer p {
-  line-height: 50px;
-  padding: 0;
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.glyphicon {
-  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);
-}
-
-.glyphicon-xs { font-size: 12px }
-.glyphicon-s { font-size: 16px }
-.glyphicon-m { font-size: 32px }
-.glyphicon-l { font-size: 48px }
-.glyphicon-xl { font-size: 64px }
-.glyphicon-xxl { font-size: 128px }
-
-.glyphicon-xs small { font-size: 10px }
-.glyphicon-s small{ font-size: 12px }
-.glyphicon-m small { font-size: 16px }
-.glyphicon-l small { font-size: 32px }
-.glyphicon-xl small { font-size: 48px }
-.glyphicon-xxl small { font-size: 64px }
-
-.block-center {
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .done {
@@ -331,3 +276,4 @@ div[role=complementary] {
 :visited {
   color: #878787
 }
+

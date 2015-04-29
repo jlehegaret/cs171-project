@@ -4,7 +4,7 @@ SpecVis = function (_parentElement, _data, _eventHandler, _filters, _options) {
     this.eventHandler = _eventHandler;
     //NOTE: these options are overridden if _options is not null
     this.options = _options || {
-        width: 750, height: 750
+        width: 600, height: 530
     };
     //NOTE: these filters are overridden if _filters is not null
     this.filters = _filters || {
@@ -16,7 +16,7 @@ SpecVis = function (_parentElement, _data, _eventHandler, _filters, _options) {
     this.displayData = {};
 
     // defines constants
-    this.margin = {top: 20, right: 20, bottom: 20, left: 50};
+    this.margin = {top: 0, right: 20, bottom: 0, left: 50};
     this.width = this.options.width - this.margin.left - this.margin.right;
     this.height = this.options.height - this.margin.top - this.margin.bottom;
 
@@ -71,7 +71,7 @@ SpecVis.prototype.initVis = function () {
         .attr("height", this.height + this.margin.top + this.margin.bottom)
         .append("g")
         .classed("sunburst", true)
-        .attr("transform", "translate(" + (this.margin.left + this.margin.right + this.width) / 2 + ","
+        .attr("transform", "translate(" + (this.margin.left + this.margin.right + this.width) / 2.15 + ","
         + (this.margin.top + this.margin.bottom + this.height) / 2 + ")");
 
     //sets up the partition layout

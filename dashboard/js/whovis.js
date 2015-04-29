@@ -3,8 +3,8 @@ WhoVis = function(_parentElement, _data, _eventHandler, _filters, _options) {
     this.data = _data;
     this.eventHandler = _eventHandler;
     this.options = _options || {
-        "width"       : 300,
-        "height"      : 700
+        "width"       : 7670,
+        "height"      : 500
     };
 
     this.filters = _filters || {
@@ -28,8 +28,8 @@ WhoVis = function(_parentElement, _data, _eventHandler, _filters, _options) {
     // height is going to be as high as it needs to be for all bars
     //  but here is a default
     this.height = this.options.height - this.margin.top - this.margin.bottom;
-    this.barHeight = 10;
-    this.barPadding = 5;
+    this.barHeight = 3;
+    this.barPadding = 2;
 
     this.initVis();
 };
@@ -45,18 +45,18 @@ WhoVis.prototype.initVis = function() {
 
     this.svg = this.parentElement.append("svg")
         .attr("width", this.width + this.margin.left + this.margin.right)
-        // .attr("height", this.height + this.margin.top + this.margin.bottom)
-        .append("g")
-        .attr("transform", "translate("
-              + (this.margin.left + this.margin.right + this.width)/2
-              + ","
-              + this.margin.top + ")");
+        .attr("height", this.height + this.margin.top + this.margin.bottom)
+        .append("g");
 
-     this.x_code = d3.scale.linear()
-                      .range([0, this.width/2]);
-     this.x_issues = d3.scale.linear()
-                      .range([0, this.width/2]);
-     this.y = d3.scale.ordinal();
+    this.y_code = d3.scale.linear()
+        .range([this.height/2, 0]);
+
+
+    this.y_issues = d3.scale.linear()
+        .range([this.height/2, 0]);
+
+
+    this.x = d3.scale.ordinal();
 
     this.color = d3.scale.ordinal()
     .range(["#062B59", "#09458F", "#073874", "#09458F", "#0B52AA", "#0C5FC5"]);
@@ -87,22 +87,22 @@ WhoVis.prototype.updateVis = function() {
     // figure out height
     this.height = this.displayData.length * 2*(this.barHeight + this.barPadding);
 
-    this.parentElement.select("svg")
-        .attr("height", this.height + this.margin.top + this.margin.bottom);
+    this.parentElement.select("svg");
 
     // for lines of code
     this.max = d3.max(this.displayData, function(d)
-                        { return d.total_code; } );
-    this.x_code.domain([0, this.max]);
+    { return d.total_code; } );
+    this.y_code.domain([0, this.max]);
 
     // for number of issues
     this.max = d3.max(this.displayData, function(d)
-                        { return d.total_issues; } );
-    this.x_issues.domain([0, this.max]);
+    { return d.total_issues; } );
 
-    this.y.domain(this.displayData.map(function(d)
-                        { return d.who; }))
-          .rangeRoundBands([0, this.height], .2, 0);;
+    this.y_issues.domain([0, this.max]);
+
+    this.x.domain(this.displayData.map(function(d)
+    { return d.who; }))
+        .rangeRoundBands([0, this.height], .2, 0);
 
     // this.svg.select(".x.axis")
     //     .call(this.xAxis)
@@ -151,48 +151,71 @@ WhoVis.prototype.updateVis = function() {
     // update all bars showing data
     bar.attr("transform", function(d)
     {
-      return "translate(0," + that.y(d.who) + ")";
+        return "translate("+that.x(d.who)+","+ 140 +")";
     });
 
     bar.selectAll("rect.bar")
-        .attr("height", that.barHeight)
-        .attr("x", 0)
+        .attr("width", that.barHeight)
         .attr("y", function(d) {
-            if(d.type === "issues") {
-              // move it down by bar_height
-              return that.barHeight + that.barPadding;
+            if (d.type === "code"){
+
+                return that.y_code(d.total);
+            }
+            else{
+
+                return that.y_issues(d.total);
+            }
+        })
+        .attr("x", function(d)
+        {
+            if(d.type === "issues")
+            {
+                // move it down by bar_height
+                return that.barHeight + that.barPadding;
             }
             return 0;
         })
-        .style("fill", function(d) {
-          if(d.type === "code") {
-            return that.color(d.who)
-          } else {
-            return "crimson";
-          }
+        .style("fill", function(d)
+        {
+            if(d.type === "code")
+            {
+                return that.color(d.who)
+            }
+            else
+            {
+                return "crimson";
+            }
         })
         .transition()
         .delay(function(d, i) { return i * 10; })
-        .attr("width", function(d) {
-          if(d.type === "code") {
-              return that.x_code(d.total);
-          } else {
-              return that.x_issues(d.total);
-          }
+        .attr("height", function(d)
+        {
+            if(d.type === "code")
+            {
+                return that.height/33 - that.y_code(d.total);
+            }
+            else
+            {
+                return that.height/33 - that.y_issues(d.total);
+            }
         });
 
+
     bar.selectAll("text")
-            .text(function(d){return d.who})
-            .style("font-size", "9px")
-            .style("text-anchor", "end")
-            .attr("dx", "-.8em")
-            .attr("dy", "0.8em")
-            .style("font-family", "sans-serif");
+        .text(function(d){return d.who})
+        .style("font-size", "8px")
+        .style("text-anchor", "end")
+        .attr("dx", "-30em")
+        .attr("dy", "0.7em")
+        .style("font-family", "sans-serif")
+        .attr("transform", function(d) {
+            return "rotate(-90)"
+        });
 
     bar.exit()
         .remove();
 
-    };
+};
 
 WhoVis.prototype.onTimelineChange = function(selectionStart, selectionEnd) {
 //    this.wrangleData();

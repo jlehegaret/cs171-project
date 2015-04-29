@@ -1,7 +1,9 @@
 #whoVis {
-    height: 800px;
-    overflow-y: scroll;
-    overflow-x: hidden;
+    height: 510px;
+    width: 380px;
+	margin-top:10px;
+    overflow-y: hidden;
+    overflow-x: scroll;
 }
 
 .axis text {
@@ -28,26 +30,25 @@
     pointer-events: none;
 }
 
+/*path {
+    stroke: #fff;
+    fill-rule: evenodd;
+}*/
+
 .d3-tip{
     background-color: lightyellow;
 }
-
-/* sunburst-specific styles */
-/*.sunburst path {*/
-    /*stroke: #fff;*/
-    /*fill-rule: evenodd;*/
-/*}*/
 
 .root {
     fill: white;
 }
 
-.group {
+.sunburst.group {
     fill: #1E3248;
 }
 
 .sunburst.spec {
-    /* currently within D3 */
+    fill: crimson;
 }
 
 .HTML {
@@ -55,12 +56,8 @@
 }
 
 .Tests {
-/*    fill: #142335;*/
-fill: yellow;
+    fill: #142335;
 }
-
-
-/* timeline-specific styles */
 
 /* spec published */
 .PUB {
@@ -72,36 +69,33 @@ fill: yellow;
 
 }
 
+/* commit made */
+.commit, .COM {
+    fill: #DC7A2E;
+}
+
+/* Pull Request opened */
+.pull.open, .test.open, .PR_O {
+    fill: #B2BDC7;
+}
+
+/* Pull Request closed */
+.pull.closed, .test.closed, .PR_C {
+    fill: rgb(91, 87, 106);
+}
+
+/* issue opened */
+.issue.open, .ISS_O {
+    fill: #C2384E;
+}
+
+/* issue closed */
+.issue.closed, .ISS_C {
+    fill: #43161D;
+}
+
 /*.categoryLine{
     stroke: darkgrey;
     stroke-width: 1;
 }
 */
-
-/* GENERAL CATEGORY STYLES
-
-/* commit made */
-.commit, .COM {
-    fill: #1A5691;
-}
-
-/* Pull Request opened - Is that what an open test is?? */
-.pull.open, .test.open, .PR_O {
-    fill: #DC8C0C;
-}
-
-/* Pull Request closed */
-.pull.closed, .test.closed, .PR_C, .bar.code {
-    fill: #237DBC;
-}
-
-/* issue opened */
-.issue.open, .ISS_O {
-    fill: #E4211C;
-}
-
-/* issue closed */
-.issue.closed, .ISS_C, .bar.issues {
-    fill: #9A153F;
-}
-

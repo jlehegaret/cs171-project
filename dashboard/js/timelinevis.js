@@ -187,23 +187,33 @@ TimelineVis.prototype.updateVis = function() {
           // .on("mouseout", this.tip.hide);
 
     // for all bars, new and changing
-    bars.attr("width", 1)
+    bars.attr("width", function(d)
+    {
+        if(d.type == "PUB")
+        {
+            return 1;
+        }
+        else{
+
+            return 1.5
+        }
+    })
         .attr("height", function(d)
-                  {
-                    if(d.type == "PUB")
-                    {
-                      d.height = that.height;
-                    }
-                    else if(d.scale == "code")
-                    {
-                      d.height = that.height_lines(d.total);
-                    }
-                    else
-                    {
-                      d.height =  that.height_count(d.total);
-                    }
-                    return d.height;
-                  })
+        {
+            if(d.type == "PUB")
+            {
+                d.height = that.height;
+            }
+            else if(d.scale == "code")
+            {
+                d.height = that.height_lines(d.total)*2.5;
+            }
+            else
+            {
+                d.height =  that.height_count(d.total)*2.5;
+            }
+            return d.height;
+        })
         .attr("x", function(d) {
                                   // return 0; // for stacked charts
                                   // for grouped bar
