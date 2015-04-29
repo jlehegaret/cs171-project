@@ -187,29 +187,18 @@ TimelineVis.prototype.updateVis = function() {
           // .on("mouseout", this.tip.hide);
 
     // for all bars, new and changing
-    bars.attr("width", function(d)
-    {
-        if(d.type == "PUB")
-        {
+    bars.attr("width", function(d) {
+        if(d.type == "PUB") {
             return 1;
-        }
-        else{
-
+        } else {
             return 1.5
-        }
-    })
-        .attr("height", function(d)
-        {
-            if(d.type == "PUB")
-            {
+        }})
+        .attr("height", function(d) {
+            if(d.type == "PUB") {
                 d.height = that.height;
-            }
-            else if(d.scale == "code")
-            {
+            } else if(d.scale == "code") {
                 d.height = that.height_lines(d.total)*2.5;
-            }
-            else
-            {
+            } else {
                 d.height =  that.height_count(d.total)*2.5;
             }
             return d.height;
@@ -278,92 +267,6 @@ TimelineVis.prototype.reorderData = function() {
       return dateFormatter(new Date(dateTime))
   };
 
-  function findDate(day)
-  {
-    var found = false;
-    for(var i = 0; i < that.displayData.length; i++)
-    {
-      if(that.displayData[i].date == day)
-      {
-        return i;
-      }
-    }
-
-    // if we're here, we need to create a new element
-    that.displayData.push(
-      { "date"          : day,
-        "actions"       : [ { "cat"   : "spec",
-                              "type"  : "PUB",
-                              "total" : 0,
-                              "details" : [] },
-                            { "cat"   : "spec",
-                              "type"  : "COM",
-                              "scale" : "code",
-                              "dir"   : "up",
-                              "total" : 0,
-                              "details" : [] },
-                            { "cat"  : "spec",
-                              "type" : "PR_O",
-                              "scale": "code",
-                              "dir"   : "down",
-                              "total" : 0,
-                              "details" : [] },
-                            { "cat"  : "spec",
-                              "type" : "PR_C",
-                              "scale": "code",
-                              "dir"   : "up",
-                              "total" : 0,
-                              "details" : [] },
-                            { "cat"  : "spec",
-                              "type" : "ISS_O",
-                              "scale": "count",
-                              "dir"   : "down",
-                              "total" : 0,
-                              "details" : [] },
-                            { "cat"  : "spec",
-                              "type" : "ISS_C",
-                              "scale": "count",
-                              "dir"   : "up",
-                              "total" : 0,
-                              "details" : [] },
-                            { "cat"   : "test",
-                              "type"  : "PUB",
-                              "total" : 0,
-                              "details" : [] },
-                            { "cat"   : "test",
-                              "type"  : "COM",
-                              "scale" : "code",
-                              "dir"   : "up",
-                              "total" : 0,
-                              "details" : [] },
-                            { "cat"  : "test",
-                              "type" : "PR_O",
-                              "scale": "code",
-                              "dir"   : "down",
-                              "total" : 0,
-                              "details" : [] },
-                            { "cat"  : "test",
-                              "type" : "PR_C",
-                              "scale": "code",
-                              "dir"   : "up",
-                              "total" : 0,
-                              "details" : [] },
-                            { "cat"  : "test",
-                              "type" : "ISS_O",
-                              "scale": "count",
-                              "dir"   : "down",
-                              "total" : 0,
-                              "details" : [] },
-                            { "cat"  : "test",
-                              "type" : "ISS_C",
-                              "scale": "count",
-                              "dir"   : "up",
-                              "total" : 0,
-                              "details" : [] } ]
-      });
-
-    return (that.displayData.length - 1);
-  }
 
   // MAIN DATA WRANGLING FUNCTION
 
@@ -374,8 +277,7 @@ TimelineVis.prototype.reorderData = function() {
   // based on type,
   //  add/subtract the number of lines to display_lines
   //  add details to the details_array
-  function processData(d, category)
-  {
+  function processData(d, category) {
     var today;
     var index;
     var plus;  // need to change element number depending
@@ -384,74 +286,57 @@ TimelineVis.prototype.reorderData = function() {
     ? plus = 0
     : plus = 6;
 
-    if(d.last_pub)
-    {
-
-      today = that.displayData[findDate(d.last_pub)].actions[0 + plus];
+    if(d.last_pub) {
+      today = that.displayData[that.findDate(d.last_pub)].actions[0 + plus];
       today.total++;
       today.details.push(d);
     }
 
     // COMMITS
-    if(d.commits)
-    {
-      d.commits.forEach(function(c)
-      {
-          today = that.displayData[findDate(c.date)].actions[1 + plus];
+    if(d.commits) {
+      d.commits.forEach(function(c) {
+          today = that.displayData[that.findDate(c.date)].actions[1 + plus];
           today.total += (c.line_added + c.line_deleted);
           today.details.push(c);
       });
     }
 
-    if( (category == "spec" && d.issues)
-        || category == "test")
-    {
-      var process;
+      if( (category == "spec" && d.issues) || category == "test") {
+        var process = d.issues ? d.issues : [d];
 
-      (d.issues)
-      ? process = d.issues
-      : process = [d];
-      process.forEach(function(c)
-      {
+        process.forEach(function(c) {
         // is it a PR or an issue
-        if(c.type === "pull" || c.type === "test")
-        {
+            if(c.type === "pull" || c.type === "test") {
           // when was it created
-          today = that.displayData[findDate(c.created_at)].actions[2 + plus];
+          today = that.displayData[that.findDate(c.created_at)].actions[2 + plus];
           today.total += (c.line_added + c.line_deleted);
           today.details.push(c);
           // when was it possibly closed
-          if(c.closed_at)
-          {
-            today = that.displayData[findDate(c.closed_at)].actions[3 + plus];
+          if(c.closed_at) {
+            today = that.displayData[that.findDate(c.closed_at)].actions[3 + plus];
             today.total += (c.line_added + c.line_deleted);
             today.details.push(c);
           }
         }
-        else if(c.type === "issue")
-        {
+        else if(c.type === "issue") {
           // when was it created
-          today = that.displayData[findDate(c.created_at)].actions[4 + plus];
+          today = that.displayData[that.findDate(c.created_at)].actions[4 + plus];
 
           // how hard is it
           var value;
-          if(c.difficulty)
-          {
-            (c.difficulty === "easy")
-            ? value = 1
-            : value = 2
+          if(c.difficulty) {
+            (c.difficulty === "easy") ? value = 1 : value = 2
           }
-          else // not flagged, flag it this way
-          {
+          // not flagged, flag it this way
+          else {
             value = 3;
           }
           today.total += value;
           c.difficulty_value = value;
           today.details.push(c);
           // when was it possibly closed
-          if(c.closed_at)
-          {
-            today = that.displayData[findDate(c.closed_at)].actions[5 + plus];
+          if(c.closed_at) {
+            today = that.displayData[that.findDate(c.closed_at)].actions[5 + plus];
             today.total += value;
             today.details.push(c);
           }
@@ -481,11 +366,8 @@ TimelineVis.prototype.reorderData = function() {
         // {return Date.parse(a.date) - Date.parse(b.date); });
 // console.log("displayData");
 // console.log(displayData);
-}
-
-TimelineVis.prototype.onTimelineChange = function() {
-
 };
+
 
 TimelineVis.prototype.wrangleData = function(filters)
 {
@@ -566,6 +448,109 @@ TimelineVis.prototype.wrangleData = function(filters)
   });
 // console.log("vizData: ");
 // console.log(this.vizData);
+};
+
+
+//Looks for the array index of a date in the displayData array
+//If it's not found create a new day object at the end of the array
+TimelineVis.prototype.findDate = function (day) {
+    var that = this;
+    var found = false;
+
+    for (var i = 0; i < that.displayData.length; i++) {
+        if (that.displayData[i].date == day) {
+            return i;
+        }
+    }
+
+    // if we're here, we need to create a new element
+    that.displayData.push({
+        "date": day,
+        "actions": [{
+            "cat": "spec",
+            "type": "PUB",
+            "total": 0,
+            "details": []
+        }, {
+            "cat": "spec",
+            "type": "COM",
+            "scale": "code",
+            "dir": "up",
+            "total": 0,
+            "details": []
+        }, {
+            "cat": "spec",
+            "type": "PR_O",
+            "scale": "code",
+            "dir": "down",
+            "total": 0,
+            "details": []
+        }, {
+            "cat": "spec",
+            "type": "PR_C",
+            "scale": "code",
+            "dir": "up",
+            "total": 0,
+            "details": []
+        }, {
+            "cat": "spec",
+            "type": "ISS_O",
+            "scale": "count",
+            "dir": "down",
+            "total": 0,
+            "details": []
+        }, {
+            "cat": "spec",
+            "type": "ISS_C",
+            "scale": "count",
+            "dir": "up",
+            "total": 0,
+            "details": []
+        }, {
+            "cat": "test",
+            "type": "PUB",
+            "total": 0,
+            "details": []
+        }, {
+            "cat": "test",
+            "type": "COM",
+            "scale": "code",
+            "dir": "up",
+            "total": 0,
+            "details": []
+        }, {
+            "cat": "test",
+            "type": "PR_O",
+            "scale": "code",
+            "dir": "down",
+            "total": 0,
+            "details": []
+        }, {
+            "cat": "test",
+            "type": "PR_C",
+            "scale": "code",
+            "dir": "up",
+            "total": 0,
+            "details": []
+        }, {
+            "cat": "test",
+            "type": "ISS_O",
+            "scale": "count",
+            "dir": "down",
+            "total": 0,
+            "details": []
+        }, {
+            "cat": "test",
+            "type": "ISS_C",
+            "scale": "count",
+            "dir": "up",
+            "total": 0,
+            "details": []
+        }]
+    });
+
+    // returns the location of the newly created last element at the end of the array
+    return (that.displayData.length - 1);
 };
 
 TimelineVis.prototype.tooltip = function() {
