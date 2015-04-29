@@ -10,7 +10,7 @@ TimelineVis = function(_parentElement, _data, _eventHandler, _filters, _options)
     this.filters = _filters || {
         start_date: "2014-01-01",
         end_date: new Date(),    //new Date() for now
-        state: open             //open, closed, or all
+        state: "open"             //open, closed, or all
     };
 
     // defines constants
