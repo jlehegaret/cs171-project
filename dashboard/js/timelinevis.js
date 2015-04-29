@@ -257,199 +257,170 @@ TimelineVis.prototype.onAuthorChange = function(author) {
 
 };
 
+
+TimelineVis.prototype.wrangleData = function(_filters) {
+  // this is where we will apply filters and recalculate totals
+  // and remove all bits that don't have any data in them anyway
+
+
+    var that = this;
+    that.vizData = {
+        max_linesCode : 0,
+        // max_codedate : "",
+        // max_issdate : "",
+        max_numIssues : 0,
+        dates         : []
+    };
+
+  // TEMPORARY, UNTIL WE COORDINATE
+
+    filters = _filters || {
+        "start_date"  : "2014-01-01",
+        "end_date"    : "2015-05-05",
+        "categories"  : ["spec", "test"],
+        "actions"     : ["ISS_O", "ISS_C", "PR_O", "PR_C", "COM", "PUB"],
+        "specs"       : [],
+        "who"         : [],
+        "number_who"  : 20
+    };
+
+    this.displayData.forEach(function(d) {
+        var day = {};
+
+        // if we're in the timeframe
+        if( (!filters.start_date || (d.date >= filters.start_date)) &&
+            (!filters.end_date || (d.date <= filters.end_date)) ) {
+            day = {
+                "date"    : d.date,
+                "actions" : []
+            };
+
+            // evaluate data for this date
+            d.actions.forEach(function(dd) {
+                if (dd.total > 0)  { // we have some data we might want to see
+                    if(filters.categories.indexOf(dd.cat) !== -1 && filters.actions.indexOf(dd.type) !== -1) {
+                        // ADD WHO LATER, AND SPECS!!
+                        // if added who, need to recalculate TOTAL
+                        day.actions.push(dd);
+                        // check if either maximum needs to be updated
+                        if(dd.scale == "code") {
+                            if (dd.total > that.vizData.max_linesCode) {
+                                that.vizData.max_linesCode = dd.total;
+                                // that.vizData.max_codedate = d.date;
+                                }
+                        } else {
+                            if (dd.total > that.vizData.max_numIssues) {
+                                that.vizData.max_numIssues = dd.total;
+                                // that.vizData.max_issdate = d.date;
+                                }
+                        }
+                    }
+                }
+            });
+        }
+
+    // IF we found data meeting the criteria, add it to vizData
+
+        if(day.actions && day.actions.length > 0) {
+            that.vizData.dates.push(day);
+        }
+    });
+    // console.log("vizData: ");
+    // console.log(this.vizData);
+};
+
 TimelineVis.prototype.reorderData = function() {
+    var that = this;
 
-  var that = this;
+    // CREATE DISPLAYDATA by CALLING
+    // the main data-wrangling function on each
+    //   set of data we have
+    this.displayData = [];
+    this.data.specs.forEach(function(d) {
+        that.processData(d, "spec");
+    });
+    // console.log(this.data.tests);
+    this.data.tests.forEach(function(d) {
+        that.processData(d, "test");
+    });
+};
 
-  // helper functions
 
-  var stripTime = function(dateTime) {
-      return dateFormatter(new Date(dateTime))
-  };
-
-
-  // MAIN DATA WRANGLING FUNCTION
-
-  // for each "thing" in the data
-  // check the array for an element with that date
-  // create the element if necessary,
-  //  initializing it with blanks for each data type
-  // based on type,
-  //  add/subtract the number of lines to display_lines
-  //  add details to the details_array
-  function processData(d, category) {
+// MAIN DATA WRANGLING FUNCTION
+// for each "thing" in the data
+// check the array for an element with that date
+// create the element if necessary,
+//  initializing it with blanks for each data type
+// based on type,
+//  add/subtract the number of lines to display_lines
+//  add details to the details_array
+TimelineVis.prototype.processData = function(d, category) {
+    var that = this;
     var today;
     var index;
-    var plus;  // need to change element number depending
-                // on category being processed
-    (category === "spec")
-    ? plus = 0
-    : plus = 6;
+    // need to change element number depending
+    // on category being processed
+    var plus = category === "spec" ? 0 : 6;
 
     if(d.last_pub) {
-      today = that.displayData[that.findDate(d.last_pub)].actions[0 + plus];
-      today.total++;
-      today.details.push(d);
+        today = that.displayData[that.findDate(d.last_pub)].actions[0 + plus];
+        today.total++;
+        today.details.push(d);
     }
 
     // COMMITS
     if(d.commits) {
-      d.commits.forEach(function(c) {
-          today = that.displayData[that.findDate(c.date)].actions[1 + plus];
-          today.total += (c.line_added + c.line_deleted);
-          today.details.push(c);
-      });
+        d.commits.forEach(function(c) {
+            today = that.displayData[that.findDate(c.date)].actions[1 + plus];
+            today.total += (c.line_added + c.line_deleted);
+            today.details.push(c);
+        });
     }
 
-      if( (category == "spec" && d.issues) || category == "test") {
+    if( (category == "spec" && d.issues) || category == "test") {
         var process = d.issues ? d.issues : [d];
 
         process.forEach(function(c) {
-        // is it a PR or an issue
+            // is it a PR or an issue
             if(c.type === "pull" || c.type === "test") {
-          // when was it created
-          today = that.displayData[that.findDate(c.created_at)].actions[2 + plus];
-          today.total += (c.line_added + c.line_deleted);
-          today.details.push(c);
-          // when was it possibly closed
-          if(c.closed_at) {
-            today = that.displayData[that.findDate(c.closed_at)].actions[3 + plus];
-            today.total += (c.line_added + c.line_deleted);
-            today.details.push(c);
-          }
-        }
-        else if(c.type === "issue") {
-          // when was it created
-          today = that.displayData[that.findDate(c.created_at)].actions[4 + plus];
+                // when was it created
+                today = that.displayData[that.findDate(c.created_at)].actions[2 + plus];
+                today.total += (c.line_added + c.line_deleted);
+                today.details.push(c);
+                // when was it possibly closed
+                if(c.closed_at) {
+                    today = that.displayData[that.findDate(c.closed_at)].actions[3 + plus];
+                    today.total += (c.line_added + c.line_deleted);
+                    today.details.push(c);
+                }
+            }
+            else if(c.type === "issue") {
+                // when was it created
+                today = that.displayData[that.findDate(c.created_at)].actions[4 + plus];
 
-          // how hard is it
-          var value;
-          if(c.difficulty) {
-            (c.difficulty === "easy") ? value = 1 : value = 2
-          }
-          // not flagged, flag it this way
-          else {
-            value = 3;
-          }
-          today.total += value;
-          c.difficulty_value = value;
-          today.details.push(c);
-          // when was it possibly closed
-          if(c.closed_at) {
-            today = that.displayData[that.findDate(c.closed_at)].actions[5 + plus];
-            today.total += value;
-            today.details.push(c);
-          }
-        }
-        else { console.log("What is this?"); console.log(c); }
-      });
+                // how hard is it
+                var value;
+                if(c.difficulty) {
+                    (c.difficulty === "easy") ? value = 1 : value = 2
+                }
+                // not flagged, flag it this way
+                else {
+                    value = 3;
+                }
+                today.total += value;
+                c.difficulty_value = value;
+                today.details.push(c);
+                // when was it possibly closed
+                if(c.closed_at) {
+                    today = that.displayData[that.findDate(c.closed_at)].actions[5 + plus];
+                    today.total += value;
+                    today.details.push(c);
+                }
+            }
+            else { console.log("What is this?"); console.log(c); }
+        });
     } // end of d.issues work
-  }
-
-
-  // CREATE DISPLAYDATA by CALLING
-  // the main data-wrangling function on each
-  //   set of data we have
-  this.displayData = [];
-  this.data.specs.forEach(function(d)
-  {
-    processData(d, "spec");
-  });
-// console.log(this.data.tests);
-  this.data.tests.forEach(function(d)
-  {
-    processData(d, "test");
-  });
-
-// removed for performance sake
-// this.displayData.sort(function(a,b)
-        // {return Date.parse(a.date) - Date.parse(b.date); });
-// console.log("displayData");
-// console.log(displayData);
 };
-
-
-TimelineVis.prototype.wrangleData = function(filters)
-{
-  // this is where we will apply filters and recalculate totals
-  // and remove all bits that don't have any data in them anyway
-  //
-  var that = this;
-  that.vizData = { max_linesCode : 0,
-                  // max_codedate : "",
-                  // max_issdate : "",
-                   max_numIssues : 0,
-                   dates         : []
-                 };
-
-  // TEMPORARY, UNTIL WE COORDINATE
-  filters = { "start_date"  : "2014-01-01",
-              "end_date"    : "2015-05-05",
-              "categories"  : ["spec", "test"],
-              "actions"     : ["ISS_O", "ISS_C",
-                               "PR_O", "PR_C",
-                               "COM", "PUB"],
-              "specs"       : [],
-              "who"         : [],
-              "number_who"  : 20
-            };
-
-  this.displayData.forEach(function(d)
-  {
-    var day = {};
-
-    // if we're in the timeframe
-    if( ((!filters.start_date) || (d.date >= filters.start_date))
-        &&
-        ((!filters.end_date) || (d.date <= filters.end_date)) )
-    {
-      day = { "date"    : d.date,
-              "actions" : []
-            };
-
-      // evaluate data for this date
-      d.actions.forEach(function(dd)
-      {
-        if (dd.total > 0)  // we have some data we might want to see
-        {
-          if(    filters.categories.indexOf(dd.cat) !== -1
-              && filters.actions.indexOf(dd.type) !== -1)
-// ADD WHO LATER, AND SPECS!!
-          {
-// if added who, need to recalculate TOTAL
-            day.actions.push(dd);
-            // check if either maximum needs to be updated
-            if(dd.scale == "code")
-            {
-              if (dd.total > that.vizData.max_linesCode)
-              {
-                that.vizData.max_linesCode = dd.total;
-                // that.vizData.max_codedate = d.date;
-              }
-            }
-            else
-            {
-              if (dd.total > that.vizData.max_numIssues)
-              {
-                that.vizData.max_numIssues = dd.total;
-                // that.vizData.max_issdate = d.date;
-              }
-            }
-          }
-        }
-      });
-    }
-
-    // IF we found data meeting the criteria, add it to vizData
-    if(day.actions && day.actions.length > 0)
-    {
-      that.vizData.dates.push(day);
-    }
-  });
-// console.log("vizData: ");
-// console.log(this.vizData);
-};
-
 
 //Looks for the array index of a date in the displayData array
 //If it's not found create a new day object at the end of the array
