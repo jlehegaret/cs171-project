@@ -193,10 +193,10 @@ header .navigation {
 }
 #cssmenu ul ul {
   margin-top: 1px;
-  visibility: hidden;
-  position: absolute;
+  margin-bottom: 5px;
+  position:relative;
   top: 1px;
-  left: 99%;
+  left: 5%;
   z-index: 598;
   width: 100%;
 }
@@ -205,7 +205,7 @@ header .navigation {
 }
 #cssmenu ul ul ul {
   top: 1px;
-  left: 99%;
+  left: 100%;
 }
 #cssmenu ul li:hover > ul {
   visibility: visible;
@@ -272,7 +272,7 @@ header .navigation {
   background: #fff;
 }
 #cssmenu ul ul li:last-child {
-  border-bottom: 3px solid #d7d8da;
+  
   padding-bottom: 10px;
 }
 #cssmenu ul ul li:first-child {

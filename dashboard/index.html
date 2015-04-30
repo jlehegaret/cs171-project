@@ -51,32 +51,49 @@
 
     <div class="container">
 
-        <div id='cssmenu'>
+        <nav id='cssmenu'>
             <ul>
-                <li class='active has-sub'><a href='#'><span>Sort by</span></a>
+
+         <li class='active'><a href='#'><span>View By Status</span></a>
                     <ul>
-                        <li class='has-sub'><a href='#'><span>Working Group</span></a>
+                        <li class='has-sub'><a href='#'><span>All</span></a>
 
                         </li>
-                        <li class='has-sub'><a href='#'><span>Spec</span></a>
-                        </li>
-                    </ul>
-                </li>
-                <li class='active has-sub'><a href='#'><span>Filer by</span></a>
-                    <ul>
-                        <li class='has-sub'><a href='#'><span>Issue</span></a>
-
-                        </li>
-                        <li class='has-sub'><a href='#'><span>Pull Request</span></a>
+                        <li class='has-sub'><a href='#'><span>Unresolved Items</span></a>
                         </li>
                     </ul>
                 </li>
 
-                <li><a href='#'><span>Choose Year</span></a></li>
+                <li class='active'><a href='#'><span>View By Category</span></a>
+                    <ul>
+                        <li class='has-sub'><a href='#'><span>All </span></a>
+
+                        </li>
+                        <li class='has-sub'><a href='#'><span>Spec Edits</span></a>
+                        </li>
+
+                        <li class='has-sub'><a href='#'><span>Test Suite Updates</span></a>
+                        </li>
+
+                    </ul>
+                </li>
+
+
+                 <li class='active has-sub'><a href='#'><span>Sort Contributors</span></a>
+                    <ul>
+                        <li class='has-sub'><a href='#'><span>By Lines of Code Touched</span></a>
+
+                        </li>
+                        <li class='has-sub'><a href='#'><span>By Issues Raised</span></a>
+                        </li>
+                    </ul>
+                </li>
 
                 <li class='last'><a href='#'><span>About</span></a></li>
+
             </ul>
-        </div>
+        </nav>
+
         <div style="float:left" id="specVis"></div>
 
         <div id="filterUI"></div>
@@ -176,7 +193,24 @@
                     .await(dataLoaded);
         };
         init();
+
+        ////for navbar transition/////
+
+        $(function () {
+    $('nav').on('click', '.active', function () {
+        $(this).children('ul').slideToggle(function() {
+            $(this).toggleClass('in out');
+        });
+        
+        $(this).siblings().find('ul').slideUp(function() {
+            $(this).removeClass('in').addClass('out');
+        });
+    });
+});
     });
 </script>
+
+
+
 </body>
 </html>
