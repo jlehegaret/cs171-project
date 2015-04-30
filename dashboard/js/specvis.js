@@ -169,7 +169,7 @@ SpecVis.prototype.updateVis = function () {
             return d.key;
         });
 
-    var path_enter = path
+     var path_enter = path
         .enter()
         .append("path")
         .attr("class", function (d) {

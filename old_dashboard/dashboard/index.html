@@ -150,6 +150,8 @@ function getNonClosed(data, pull, label) {
    total = entry.number;
   });
 
+    console.log(entries);
+
   return entries;
 }
 
@@ -277,6 +279,9 @@ d3.json("http://hanuman.jit.su/issues", function(error, raw) {
     d3.min(data, function(d) { return d.created_at;}),
     new Date()]);
   x.nice(d3.time.week);
+  
+  console.log(d3.min(data, function(d) { return d.created_at;}));
+  console.log(x(new Date()));
 
   y.domain([0, data.length]);
 
