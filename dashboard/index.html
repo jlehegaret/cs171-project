@@ -122,22 +122,6 @@
 </div>
 
 <script>
-
-$(function () {
-    $('nav').on('click', '.active', function () {
-        $(this).children('ul').slideToggle(function() {
-            $(this).toggleClass('in out');
-        });
-        
-        $(this).siblings().find('ul').slideUp(function() {
-            $(this).removeClass('in').addClass('out');
-        });
-    });
-});
-
-</script>
-
-<script>
     $(document).ready(function() {
         //Global data variables
         var allData = {caniuse: [], groups: [], specs: [], tests: []};
@@ -209,6 +193,20 @@ $(function () {
                     .await(dataLoaded);
         };
         init();
+
+        ////for navbar transition/////
+
+        $(function () {
+    $('nav').on('click', '.active', function () {
+        $(this).children('ul').slideToggle(function() {
+            $(this).toggleClass('in out');
+        });
+        
+        $(this).siblings().find('ul').slideUp(function() {
+            $(this).removeClass('in').addClass('out');
+        });
+    });
+});
     });
 </script>
 
