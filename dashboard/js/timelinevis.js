@@ -8,7 +8,7 @@ TimelineVis = function(_parentElement, _data, _eventHandler, _filters, _options)
         width:1200, height:300
     };
     this.filters = _filters || {
-        start_date: "2014-01-01",
+        start_date: "2015-01-01",
         end_date: new Date(),    //new Date() for now
         state: "open"             //open, closed, or all
     };
@@ -27,7 +27,8 @@ TimelineVis = function(_parentElement, _data, _eventHandler, _filters, _options)
 TimelineVis.prototype.initVis = function() {
 
     var that = this;
-    var space = this.height/8; // REMOVE HARD-# IF FINAL LAYOUT
+    var space = this.height/4; // REMOVE HARD-# IF FINAL LAYOUT
+console.log("space is " + space);
 
     // constructs SVG layout
     this.svg = this.parentElement.append("svg")
@@ -52,11 +53,11 @@ TimelineVis.prototype.initVis = function() {
 
 //  Right now, have pull requests next to commits
 //    but perhaps we can/should stack those eventually
-    this.x1 = d3.scale.ordinal()
-                      .domain(["ISS_O", "ISS_C",
-                               "PR_O", "PR_C",
-                              "COM", "PUB"])
-                      .range([0, 0, 1, 1, 0, 0]);
+    // this.x1 = d3.scale.ordinal()
+    //                   .domain(["ISS_O", "ISS_C",
+    //                            "PR_O", "PR_C",
+    //                           "COM", "PUB"])
+    //                   .range([0, 0, 0, 0, 0, 0]);
 
     this.y_axisType = d3.scale.ordinal()
                       .domain([
@@ -68,16 +69,16 @@ TimelineVis.prototype.initVis = function() {
                       .range([
                               space,
                               3*space,
-                              5*space,
-                              7*space
+                              space,
+                              3*space
                               ]);
 
 // how high should each bar be?
     this.height_lines = d3.scale.pow()
-        .exponent(.2)
+        .exponent(1) // was .2, but pow does not work with stacked bars
         .range([0, space]);
     this.height_count = d3.scale.pow()
-        .exponent(.5)
+        .exponent(1) // was .5, but pow does not work with stacked bars
         .range([0, space]);
 
     // create x axis  - saving y-axis for later if ever
@@ -132,8 +133,6 @@ TimelineVis.prototype.updateVis = function() {
 
     var that = this;
 
-// console.log("In updateVis #7");
-
     // update scales
     this.x0.domain(d3.extent(this.vizData.dates, function(d)
                     { return Date.parse(d.date); } ));
@@ -151,6 +150,9 @@ TimelineVis.prototype.updateVis = function() {
                         .data(this.vizData.dates, function(d)
                           { return d.date; });
 
+    // update bar widths - subtracting 2 pixels for padding
+    this.bar_width = (this.width / this.vizData.dates.length) - 2;
+
     // create necessary containers for new dates
     dates.enter()
           .append("g")
@@ -166,7 +168,93 @@ TimelineVis.prototype.updateVis = function() {
     var bars
     = dates.call(this.tip)
           .selectAll("rect.timebar")
-          .data(function(d) { return d.actions; })
+          .data(function(d) {
+            // to make a stacked bar chart, we need to process
+            //   the data here to define each bar's height
+            //   and resulting y value when stacked
+// console.log(d);
+            // we process the d.actions array
+            // first, we calculate all the heights
+            var heights;
+
+            heights = {
+                        "spec_COM"    : 0,
+                        "spec_PR_C"   : 0,
+                        "spec_PR_O"   : 0,
+                        "spec_ISS_C"  : 0,
+                        "spec_ISS_O"  : 0,
+                        "test_COM"    : 0,
+                        "test_PR_C"   : 0,
+                        "test_PR_O"   : 0,
+                        "test_ISS_C"  : 0,
+                        "test_ISS_O"  : 0
+                      };
+
+            d.actions.forEach(function(dd)
+            {
+              if(dd.type == "PUB") {
+                  dd.height = that.height;
+              } else if(dd.scale == "code") {
+                  dd.height = that.height_lines(dd.total);
+              } else {
+                  dd.height =  that.height_count(dd.total);
+              }
+              heights[dd.cat + "_" + dd.type] = dd.height;
+            });
+
+            // next, calculate the resulting y values
+            d.actions.forEach(function(dd)
+            {
+              if(dd.type == "PUB")
+              {
+                  dd.y = 0;
+              }
+              else if(dd.cat === "spec")
+              {
+                // all of these point up
+                if(dd.type == "COM") {
+                  dd.y = that.y_axisType(dd.cat + " " + dd.scale)
+                              - dd.height;
+                } else if(dd.type == "PR_C") {
+                  dd.y = that.y_axisType(dd.cat + " " + dd.scale)
+                          - heights["spec_COM"]
+                          - dd.height;
+                } else if(dd.type == "PR_O") {
+                  dd.y = that.y_axisType(dd.cat + " " + dd.scale)
+                          - heights["spec_COM"]
+                          - heights["spec_PR_C"]
+                          - dd.height;
+                } else if(dd.type == "ISS_C") {
+                  dd.y = that.y_axisType(dd.cat + " " + dd.scale)
+                          - dd.height;
+                } else if(dd.type == "ISS_O") {
+                  dd.y = that.y_axisType(dd.cat + " " + dd.scale)
+                          - heights["spec_ISS_C"]
+                          - dd.height;
+                }
+              }
+              else if(dd.cat === "test") // test work points down
+              {
+                if(dd.type == "COM") {
+                  dd.y = that.y_axisType(dd.cat + " " + dd.scale);
+                } else if(dd.type == "PR_C") {
+                  dd.y = that.y_axisType(dd.cat + " " + dd.scale)
+                          + heights["test_COM"];
+                } else if(dd.type == "PR_O") {
+                  dd.y = that.y_axisType(dd.cat + " " + dd.scale)
+                          + heights["test_COM"]
+                          + heights["test_PR_C"];
+                } else if(dd.type == "ISS_C") {
+                  dd.y = that.y_axisType(dd.cat + " " + dd.scale);
+                } else if(dd.type == "ISS_O") {
+                  dd.y = that.y_axisType(dd.cat + " " + dd.scale)
+                          + heights["test_ISS_C"];
+                }
+              }
+            });
+
+            return d.actions;
+           })
           .enter()
           .append("rect")
           .attr("class", function(d)
@@ -182,52 +270,21 @@ TimelineVis.prototype.updateVis = function() {
                     return res;
                   }
                 )
+          .on("click", this.tip.show)
           .on("mouseover", this.tip.show)
-          .on("click", this.tip.show);
-          // .on("mouseout", this.tip.hide);
+          .on("mouseout", this.tip.hide);
 
     // for all bars, new and changing
+// THICKEN UP BASED ON DATE RANGE LATER
     bars.attr("width", function(d) {
         if(d.type == "PUB") {
             return 1;
         } else {
-            return 1.5
+            return that.bar_width;
         }})
-        .attr("height", function(d) {
-            if(d.type == "PUB") {
-                d.height = that.height;
-            } else if(d.scale == "code") {
-                d.height = that.height_lines(d.total)*2.5;
-            } else {
-                d.height =  that.height_count(d.total)*2.5;
-            }
-            return d.height;
-        })
-        .attr("x", function(d) {
-                                  // return 0; // for stacked charts
-                                  // for grouped bar
-                                  return that.x1(d.type);
-                                })
-        .attr("y", function(d)
-                  {
-                    if(d.type == "PUB")
-                    {
-                      d.y = 0;
-                    }
-                    else
-                    {
-                      if(d.dir == "up")
-                      {
-                        d.y = that.y_axisType(d.cat + " " + d.scale)
-                              - d.height;
-                      }
-                      else  // opened issues or PRs
-                      {
-                        d.y = that.y_axisType(d.cat + " " + d.scale);
-                      }
-                    }
-                    return d.y;
-                  });
+        .attr("x", function(d) { return 0; })
+        .attr("y", function(d) { return d.y; })
+        .attr("height", function(d) { return d.height; });
 
 // WILL NEED TO DO THIS WHEN START FILTERING
     // remove any not-needed-bars
@@ -258,7 +315,8 @@ TimelineVis.prototype.onAuthorChange = function(author) {
 };
 
 
-TimelineVis.prototype.wrangleData = function(_filters) {
+TimelineVis.prototype.wrangleData = function(_filters)
+{
   // this is where we will apply filters and recalculate totals
   // and remove all bits that don't have any data in them anyway
 
@@ -272,10 +330,10 @@ TimelineVis.prototype.wrangleData = function(_filters) {
         dates         : []
     };
 
-  // TEMPORARY, UNTIL WE COORDINATE
+    // TEMPORARY, UNTIL WE COORDINATE
 
     filters = _filters || {
-        "start_date"  : "2014-01-01",
+        "start_date"  : "2015-01-01",
         "end_date"    : "2015-05-05",
         "categories"  : ["spec", "test"],
         "actions"     : ["ISS_O", "ISS_C", "PR_O", "PR_C", "COM", "PUB"],
@@ -284,50 +342,70 @@ TimelineVis.prototype.wrangleData = function(_filters) {
         "number_who"  : 20
     };
 
-    this.displayData.forEach(function(d) {
-        var day = {};
+    this.displayData.forEach(function(d)
+    {
+      var day = {};
+      var days_max;
+      // if we're in the timeframe
+      if( (!filters.start_date || (d.date >= filters.start_date)) &&
+          (!filters.end_date || (d.date <= filters.end_date)) )
+      {
+          day = {
+              "date"    : d.date,
+              "actions" : []
+                };
+          // evaluate data for this date
+          d.actions.forEach(function(dd)
+          {
+              if (dd.total > 0)
+              { // we have some data we might want to see
+                  if(filters.categories.indexOf(dd.cat) !== -1
+                     && filters.actions.indexOf(dd.type) !== -1)
+                  {
+                      // ADD WHO LATER, AND SPECS!!
+                      // if added who, need to recalculate TOTAL
+                      day.actions.push(dd);
+                  }
+              }
+          });
+      }
 
-        // if we're in the timeframe
-        if( (!filters.start_date || (d.date >= filters.start_date)) &&
-            (!filters.end_date || (d.date <= filters.end_date)) ) {
-            day = {
-                "date"    : d.date,
-                "actions" : []
-            };
+      // IF we found data meeting the criteria, add it to vizData
+      if(day.actions && day.actions.length > 0)
+      {
+        that.vizData.dates.push(day);
 
-            // evaluate data for this date
-            d.actions.forEach(function(dd) {
-                if (dd.total > 0)  { // we have some data we might want to see
-                    if(filters.categories.indexOf(dd.cat) !== -1 && filters.actions.indexOf(dd.type) !== -1) {
-                        // ADD WHO LATER, AND SPECS!!
-                        // if added who, need to recalculate TOTAL
-                        day.actions.push(dd);
-                        // check if either maximum needs to be updated
-                        if(dd.scale == "code") {
-                            if (dd.total > that.vizData.max_linesCode) {
-                                that.vizData.max_linesCode = dd.total;
-                                // that.vizData.max_codedate = d.date;
-                                }
-                        } else {
-                            if (dd.total > that.vizData.max_numIssues) {
-                                that.vizData.max_numIssues = dd.total;
-                                // that.vizData.max_issdate = d.date;
-                                }
-                        }
-                    }
-                }
-            });
+        // and check if either maximum needs to be updated
+        //  first, lines of code:
+        days_max = day.actions.map(function(d)
+                                  { if(d.scale !== undefined && d.scale === "code") {
+                                      return d.total;
+                                  } else {
+                                      return 0;
+                                  }})
+                              .reduce(function(x,y) { return x+y; }, 0);
+        if (days_max > that.vizData.max_linesCode)
+        {
+          that.vizData.max_linesCode = days_max;
         }
-
-    // IF we found data meeting the criteria, add it to vizData
-
-        if(day.actions && day.actions.length > 0) {
-            that.vizData.dates.push(day);
+        //  then, number of issues:
+        days_max = day.actions.map(function(d)
+                                  { if(d.scale !== undefined && d.scale === "count") {
+                                      return d.total;
+                                  } else {
+                                      return 0;
+                                  }})
+                              .reduce(function(x,y) { return x+y; }, 0);
+        if (days_max > that.vizData.max_numIssues)
+        {
+          that.vizData.max_numIssues = days_max;
         }
+      }
     });
+
     // console.log("vizData: ");
     // console.log(this.vizData);
-};
+}
 
 TimelineVis.prototype.reorderData = function() {
     var that = this;
@@ -453,7 +531,7 @@ TimelineVis.prototype.findDate = function (day) {
             "cat": "spec",
             "type": "PR_O",
             "scale": "code",
-            "dir": "down",
+            "dir": "up",
             "total": 0,
             "details": []
         }, {
@@ -467,7 +545,7 @@ TimelineVis.prototype.findDate = function (day) {
             "cat": "spec",
             "type": "ISS_O",
             "scale": "count",
-            "dir": "down",
+            "dir": "up",
             "total": 0,
             "details": []
         }, {
@@ -486,7 +564,7 @@ TimelineVis.prototype.findDate = function (day) {
             "cat": "test",
             "type": "COM",
             "scale": "code",
-            "dir": "up",
+            "dir": "down",
             "total": 0,
             "details": []
         }, {
@@ -500,7 +578,7 @@ TimelineVis.prototype.findDate = function (day) {
             "cat": "test",
             "type": "PR_C",
             "scale": "code",
-            "dir": "up",
+            "dir": "down",
             "total": 0,
             "details": []
         }, {
@@ -514,7 +592,7 @@ TimelineVis.prototype.findDate = function (day) {
             "cat": "test",
             "type": "ISS_C",
             "scale": "count",
-            "dir": "up",
+            "dir": "down",
             "total": 0,
             "details": []
         }]
@@ -530,33 +608,40 @@ TimelineVis.prototype.tooltip = function() {
         .html(function(d)
         {
             var fields = [];
-            var text = "<ul class='d3-tip'>";
-            d.details.forEach(function(dd)
-            {
-                text = text + "<li>";
 
-                // define how to access this dd
-                if(d.type == "PUB")
-                {
-                    text = text + "<a href='" + dd.url + "'>"
-                    + dd.title + "</a><br>" +
-                    dd.status;
-                }
-                else if(d.cat === "spec" && d.type === "COM")
-                {
-                    text = text + "<a href='" + dd.html_url + "'>"
-                    + dd.title + "</a>";
-                }
-                else
-                {
-                    text = text + "<a href='" + dd.html_url + "'>"
-                    + dd.title + "</a><br>"
-                    + dd.state;
-                }
+            text = "<p class='d3-tip'>"
+                    + d.cat + " " + d.type + "<br>"
+                    + "total: " + d.total + " height: " + d.height
+                    + "y " + d.y
+                    + "</p>";
 
-                text = text + "</li>";
-            });
-            text = text + "</ul>";
+            // var text = "<ul class='d3-tip'>";
+            // d.details.forEach(function(dd)
+            // {
+            //     text = text + "<li>";
+
+            //     // define how to access this dd
+            //     if(d.type == "PUB")
+            //     {
+            //         text = text + "<a href='" + dd.url + "'>"
+            //         + dd.title + "</a><br>" +
+            //         dd.status;
+            //     }
+            //     else if(d.cat === "spec" && d.type === "COM")
+            //     {
+            //         text = text + "<a href='" + dd.html_url + "'>"
+            //         + dd.title + "</a>";
+            //     }
+            //     else
+            //     {
+            //         text = text + "<a href='" + dd.html_url + "'>"
+            //         + dd.title + "</a><br>"
+            //         + dd.state;
+            //     }
+
+            //     text = text + "</li>";
+            // });
+            // text = text + "</ul>";
 
             return text;
         });
