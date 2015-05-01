@@ -17,7 +17,7 @@ WhoVis = function(_parentElement, _data, _eventHandler, _filters, _options) {
         "specs"       : [],
         "who"         : [],
         "number_who"  : 20,
-        "who_sort"    : "issue"
+        "who_sort"    : "code"
     };
 
 
