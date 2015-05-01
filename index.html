@@ -1,11 +1,216 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>Git The Web Forward</title>
-  </head>
-  <body>
-    <p>Here we have some exciting storytelling.</p>
-    <p>Now experimenting with setup.</p>
-  </body>
+<head>
+    <meta charset="utf-8">
+    <title>Web Platform Test Dashboard | Test the Web Forward</title>
+    <!--Library code -->
+    <script src="js/lib/jquery-2.1.3.js"></script>
+    <script src="js/lib/d3.js" charset="utf-8"></script>
+    <script src="js/lib/queue.v1.js"></script>
+    <script src="js/lib/d3.tip.v0.6.6.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+    <!-- Styles from http://testthewebforward.org/ -->
+    <link rel="stylesheet" href="css/custom.css" type="text/css" media="screen">
+    <!-- Visualization Styles -->
+    <link rel="stylesheet" href="css/vis.css" type="text/css" media="screen">
+    <link href="css/style.css" rel="stylesheet" />
+
+    <!--Vis code-->
+    <script src="js/util.js"></script>
+    <script src="js/processData.js"></script>
+    <script src="js/specvis.js"></script>
+    <script src="js/whovis.js"></script>
+    <script src="js/timelinevis.js"></script>
+    <script src="js/filterui.js"></script>
+</head>
+<body>
+
+<div id="wrapper">
+
+    <!-- header -->
+
+    <header>
+
+        <div class="navbar navbar-default navbar-static-top">
+            <div class="container">
+                <div class="navbar-header"></div>
+                <h1><span class="navbar-header"><img src="images/w3c.jpg" width="218" height="48"></span></h1>
+
+                <div class="navbar-collapse collapse ">
+
+                    <ul class="nav navbar-nav">
+                        <h1>W3C - Git the Web Forward</h1>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- main D3 stuff -->
+
+    <div class="container">
+
+        <nav id='cssmenu'>
+            <ul>
+
+         <li class='active'><a href='#'><span>View By Status</span></a>
+                    <ul>
+                        <li class='has-sub'><a href='#'><span>All</span></a>
+
+                        </li>
+                        <li class='has-sub'><a href='#'><span>Unresolved Items</span></a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class='active'><a href='#'><span>View By Category</span></a>
+                    <ul>
+                        <li class='has-sub'><a href='#'><span>All </span></a>
+
+                        </li>
+                        <li class='has-sub'><a href='#'><span>Spec Edits</span></a>
+                        </li>
+
+                        <li class='has-sub'><a href='#'><span>Test Suite Updates</span></a>
+                        </li>
+
+                    </ul>
+                </li>
+
+
+                 <li class='active has-sub'><a href='#'><span>Sort Contributors</span></a>
+                    <ul>
+                        <li class='has-sub'><a href='#'><span>By Lines of Code Touched</span></a>
+
+                        </li>
+                        <li class='has-sub'><a href='#'><span>By Issues Raised</span></a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class='last'><a href='#'><span>About</span></a></li>
+
+            </ul>
+        </nav>
+
+        <div style="float:left" id="specVis"></div>
+
+        <div id="filterUI"></div>
+        <div id="whoVis"></div>
+        <div id="timelineVis"></div>
+
+    </div>
+
+    <div class="footer">
+        <!--
+        <div id="socnet">
+            <ul class="social-network">
+              <li><a href="#" data-placement="top" title="Facebook"><i class="fa fa-facebook"></i></a></li>
+              <li><a href="#" data-placement="top" title="Twitter"><i class="fa fa-twitter"></i></a></li>
+              <li><a href="#" data-placement="top" title="Linkedin"><i class="fa fa-linkedin"></i></a></li>
+              <li><a href="#" data-placement="top" title="Pinterest"><i class="fa fa-pinterest"></i></a></li>
+              <li><a href="#" data-placement="top" title="Google plus"><i class="fa fa-google-plus"></i></a></li>
+            </ul>
+            </div>-->
+
+        <!-- <div class="copyright">
+           <p> <span>&copy; </span>W3C 2015</p>
+         </div>-->
+  </div>
+
+</div>
+
+<script>
+    $(document).ready(function() {
+        //Global data variables
+        var allData = {caniuse: [], groups: [], specs: [], tests: []};
+
+        //If this object is passed to visualization, it will override the default filters
+        var initialFilters = {
+            start_date: "2015-03-01",
+            end_date: new Date(),    //new Date() for now
+            state: "open"             //open, closed, or all
+        };
+
+        var initVis = function () {
+            //Handles timeline brushing
+            var brushHandler = {};
+            //Handles sunburst selection changing
+            var selectionHandler = {};
+            //Handles whovis author selection changing
+            var authorHandler = {};
+            //Handles filter options from UI
+            var filterHandler = {};
+
+
+            //Create visualizations
+            spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler, initialFilters);
+            who_vis = new WhoVis(d3.select("#whoVis"), allData, authorHandler, null);
+            timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler, initialFilters);
+            //filter_ui = new FilterUI(d3.select("#filterUI"), allData, filterHandler);
+
+            //Wire up event handlers
+            $(brushHandler).bind("brushChanged", function (event, selectionStart, selectionEnd) {
+                spec_vis.onTimelineChange(selectionStart, selectionEnd);
+                who_vis.onTimelineChange(selectionStart, selectionEnd);
+            });
+            $(selectionHandler).bind("selectionChanged", function (event, specSelection) {
+                timeline_vis.onSelectionChange(specSelection);
+                who_vis.onSelectionChange(specSelection);
+                console.log(specSelection);
+            });
+            $(authorHandler).bind("authorChanged", function (event, author) {
+                spec_vis.onAuthorChange(author);
+                timeline_vis.onAuthorChange(author);
+            });
+            $(filterHandler).bind("filterChanged", function(event, filters) {
+                spec_vis.onFilterChange(filters);
+                //timeline_vis.onFilterChange(filters);
+                //who_vis.onFilterChange(filters);
+                console.log(filters);
+            });
+        };
+        var dataLoaded = function (error, _caniuse, _groups, _specs, _tests) {
+            if (!error) {
+                //See processData.js
+                allData = processData(_caniuse, _groups, _specs, _tests);
+
+                //log the data structures, remove for production
+                //logData();
+                initVis();
+            } else {
+                console.log("Error loading data!:" + error);
+            }
+        };
+        var init = function () {
+            //asynchronously load data
+            queue()
+                    .defer(d3.json, "data/caniuse.json")
+                    .defer(d3.json, "data/groups.json")
+                    .defer(d3.json, "data/specs.json")
+                    .defer(d3.json, "data/tests.json")
+                    .await(dataLoaded);
+        };
+        init();
+
+        ////for navbar transition/////
+
+        $(function () {
+    $('nav').on('click', '.active', function () {
+        $(this).children('ul').slideToggle(function() {
+            $(this).toggleClass('in out');
+        });
+        
+        $(this).siblings().find('ul').slideUp(function() {
+            $(this).removeClass('in').addClass('out');
+        });
+    });
+});
+    });
+</script>
+
+
+
+</body>
 </html>
