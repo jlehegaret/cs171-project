@@ -14,7 +14,7 @@ TimelineVis = function(_parentElement, _data, _eventHandler, _filters, _options)
     };
 
     // defines constants
-    this.margin = {top: 20, right: 20, bottom: 20, left: 50};
+    this.margin = {top: 20, right: 20, bottom: 20, left: 40};
     this.width = this.options.width - this.margin.left - this.margin.right;
     this.height = this.options.height - this.margin.top - this.margin.bottom;
 
@@ -25,8 +25,6 @@ TimelineVis = function(_parentElement, _data, _eventHandler, _filters, _options)
 };
 
 TimelineVis.prototype.initVis = function() {
-console.log("Here we go!");
-
     var that = this;
     var space = this.height/2; // REMOVE HARD-# IF FINAL LAYOUT
 
@@ -105,13 +103,13 @@ console.log("Here we go!");
     this.tip = this.tooltip();
 
     // brushing
-    // this.brush = d3.svg.brush()
-    //     .on("brush", function(){
-    //         $(that.eventHandler).trigger("brushChanged",
-    //         that.brush.extent());
-    //     });
-    // this.context.append("g")
-    //     .attr("class", "brush");
+    this.brush = d3.svg.brush()
+         .on("brush", function(){
+             $(that.eventHandler).trigger("brushChanged",
+             that.brush.extent());
+        });
+    this.context.append("g")
+         .attr("class", "brush");
 
 
     // filter, aggregate, modify data
@@ -121,12 +119,7 @@ console.log("Here we go!");
 };
 
 TimelineVis.prototype.updateVis = function() {
-// console.log("TimeVis:");
-// console.log(this.displayData);
-
     var that = this;
-
-// console.log("In updateVis #7");
 
     // update scales
     this.x0.domain(d3.extent(this.vizData.dates, function(d)
@@ -175,28 +168,25 @@ TimelineVis.prototype.updateVis = function() {
                 });
 
     // create new bars within each date
-    var bars
-    = dates.call(this.tip)
-          .selectAll("rect.timebar")
-          .data(function(d) { return d.actions; })
-          .enter()
-          .append("rect")
-          .attr("class", function(d)
-                  {
-                    var res = "timebar " + d.type;
-                    if(d.type == "PUB" && d.details.length
-                         == d.details.filter(function(dd)
-                            { return dd.status == "REC"; }
-                            ).length )
-                    {
-                            res = res + " REC";
-                    }
-                    return res;
-                  }
-                )
-          .on("mouseover", this.tip.show)
-          .on("click", this.tip.show);
-          // .on("mouseout", this.tip.hide);
+    var bars = dates
+        .call(this.tip)
+        .selectAll("rect.timebar")
+        .data(function(d) { return d.actions; })
+        .enter()
+        .append("rect")
+        .attr("class", function(d) {
+            var res = "timebar " + d.type;
+            var detailsRec = d.details.filter(function(dd) {
+                    return dd.status == "REC"; }
+            );
+            if(d.type === "PUB" && d.details.length === detailsRec.length ) {
+                res = res + " REC";
+            }
+            return res;
+        })
+        .on("mouseover", this.tip.show)
+        .on("click", this.tip.show);
+     // .on("mouseout", this.tip.hide);
 
     // for all bars, new and changing
     bars.attr("width", function(d) {
@@ -243,7 +233,6 @@ TimelineVis.prototype.updateVis = function() {
                     }
                     return d.y;
                   });
-
 // WILL NEED TO DO THIS WHEN START FILTERING
     // remove any not-needed-bars
     // d3.selectAll("rect.timebar").exit().remove();
@@ -252,11 +241,11 @@ TimelineVis.prototype.updateVis = function() {
     dates.exit().remove();
 
     // update brush
-    // this.brush.x(this.x0);
-    // this.context.select(".brush")
-    //     .call(this.brush)
-    //     .selectAll("rect")
-    //     .attr("height", this.height);
+    this.brush.x(this.x0);
+    this.context.select(".brush")
+         .call(this.brush)
+         .selectAll("rect")
+         .attr("height", this.height);
 
 // console.log("Finished updateVis");
 };
