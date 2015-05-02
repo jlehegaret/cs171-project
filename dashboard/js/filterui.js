@@ -14,33 +14,33 @@ FilterUI = function  (_filters, _eventHandler) {
     });
 
     document.getElementById("cat_all").addEventListener("click", function(d) {
-        that.category = "all";
+        that.filters.category = "all";
         $(that.eventHandler).trigger("filterChanged", that.filters);
     });
     document.getElementById("cat_spec").addEventListener("click", function(d) {
-        that.category = "spec";
+        that.filters.category = "spec";
         $(that.eventHandler).trigger("filterChanged", that.filters);
     });
     document.getElementById("cat_test").addEventListener("click", function(d) {
-        that.category = "test";
+        that.filters.category = "test";
         $(that.eventHandler).trigger("filterChanged", that.filters);
     });
 
     document.getElementById("sort_code").addEventListener("click", function(d) {
-        that.who_sort = "code";
+        that.filters.who_sort = "code";
         $(that.eventHandler).trigger("filterChanged", that.filters);
     });
     document.getElementById("sort_issue").addEventListener("click", function(d) {
-        that.who_sort = "issues";
+        that.filters.who_sort = "issues";
         $(that.eventHandler).trigger("filterChanged", that.filters);
     });
 
     document.getElementById("caniuse_true").addEventListener("click", function(d) {
-        that.caniuse = "true";
+        that.filters.caniuse = "true";
         $(that.eventHandler).trigger("filterChanged", that.filters);
     });
     document.getElementById("caniuse_false").addEventListener("click", function(d) {
-        that.caniuse = "false";
+        that.filters.caniuse = "false";
         $(that.eventHandler).trigger("filterChanged", that.filters);
     });
 
