@@ -23,13 +23,14 @@ TimelineVis = function(_parentElement, _data, _eventHandler, _filters, _options)
                                 "PR_O", "PR_C",
                                 "COM", "PUB"];
     }
-    if(this.filters.category === "all"
-      || (Array.isArray(this.filters.category)
-            && this.filters.category.length == 2))
+    if(!Array.isArray(this.filters.category))
     {
+      if(this.filters.category == "all")
+      {
         this.filters.category = ["spec", "test"];
-    } else {
+      } else {
         this.filters.category = [this.filters.category];
+      }
     }
 
     // defines constants
@@ -98,12 +99,13 @@ TimelineVis.prototype.initVis = function() {
 
     // prepare for display bars
     this.context.append("g")
-            .attr("class", "bars");
+            .attr("class", "bars")
+            .attr("transform", "translate(0," + this.margin.top + ")");
 
     // Add axes visual elements
     this.context.append("g")
-        .attr("class", "x axis")  // put it in the middle
-        .attr("transform", "translate(0," + this.height + ")");
+        .attr("class", "x axis");  // put it in the middle
+        // .attr("transform", "translate(0," + this.height + ")");
 
     // draw the various x-axis lines
     this.context.append("g")
@@ -140,12 +142,22 @@ TimelineVis.prototype.initVis = function() {
 TimelineVis.prototype.updateVis = function() {
     var that = this;
 
-// console.log("Display Data is");
+// console.log("TimeVis Display Data is");
 // console.log(this.displayData);
 
-    // update scales
-    this.x0.domain(d3.extent(this.displayData.dates, function(d)
-                    { return Date.parse(d.date); } ));
+    // update scales - would be nice though if zoom part stays consistent
+    //  per chosen start & end dates rather than based on data
+//     this.x0.domain(d3.extent(this.displayData.dates,
+//                               function(d)
+//                               {
+// // console.log(Date.parse(d.date));
+//                                 return Date.parse(d.date); } ));
+    this.x0.domain([
+                    Date.parse(this.filters.start_date),
+                    Date.parse(this.filters.end_date)
+                   ]);
+// console.log(Date.parse(this.filters.start_date));
+// console.log(Date.parse(this.filters.end_date));
 
     // when grouping bars
     // update bar widths - right now we have 6 bars in each group
@@ -183,8 +195,11 @@ if(this.displayData.dates.length > 0)
     // create necessary containers for new dates
     dates.enter()
           .append("g")
-          .attr("class", "date")
-          .attr("transform", function(d)
+          .attr("class", "date");
+
+    // move around as necessary (?)
+    dates.transition()
+         .attr("transform", function(d)
                 {
                   return "translate("
                           + that.x0(Date.parse(d.date))
@@ -194,8 +209,9 @@ if(this.displayData.dates.length > 0)
     // create new bars within each date
     var bars = dates //.call(this.tip)
         .selectAll("rect.timebar")
-        .data(function(d) { return d.actions; })
-        .enter()
+        .data(function(d) { return d.actions; }, function(dd) { return dd.type; });
+
+    bars.enter()
         .append("rect")
         .attr("class", function(d) {
             var res = "timebar " + d.type;
@@ -212,13 +228,15 @@ if(this.displayData.dates.length > 0)
      // .on("mouseout", this.tip.hide);
 
     // for all bars, new and changing
-    bars.attr("width", function(d) {
-        if(d.type === "PUB") {
+    bars.transition()
+        .attr("width", function(d) {
+          if(d.type === "PUB") {
             return 1;
-        } else {
+          } else {
             return that.bar_width;
-        }})
+          }})
         .attr("height", function(d) {
+// console.log("Supposedly updating timebar height");
             if(d.type === "PUB") {
                 d.height = that.height;
             } else if(d.scale === "code") {
@@ -258,13 +276,13 @@ if(this.displayData.dates.length > 0)
                     }
                     return d.y;
                   });
+        bars.exit().remove();
 }
-// WILL NEED TO DO THIS WHEN START FILTERING
-    // remove any not-needed-bars
-    // d3.selectAll("rect.timebar").exit().remove();
 
     // remove any not-needed-dates
     dates.exit().remove();
+
+
 
     // update brush
     this.brush.x(this.x0);
@@ -295,7 +313,7 @@ TimelineVis.prototype.wrangleData = function() {
                         dates: []
                       };
 
-// console.log("Reassembling with these filters");
+// console.log("TimeVis filters");
 // console.log(that.filters);
 
   // we will check each day's complete data for data we want to display
@@ -320,8 +338,10 @@ TimelineVis.prototype.wrangleData = function() {
             {
               //  We may want to see this item
               if( (that.filters.who === null
-                      && that.filters.specs.length == 0)
-                  || dd.type == "PUB")
+                      && that.filters.specs.length == 0))
+                  // || dd.type == "PUB")
+                  // sometimes it seems like it's handy to view these
+                  //  all the time.  other times, not.
               {
                   // we do not have any work to do
                   filtered = dd;
@@ -756,14 +776,15 @@ WhoVis.prototype.onUISelectionChange = function(choices) {
                                 "PR_O", "PR_C",
                                 "COM", "PUB"];
     }
-    if(choices.category === "all"
-        || (Array.isArray(choices.category)
-            && choices.category.length == 2)) {
+    if(!Array.isArray(this.filters.category))
+    {
+      if(this.filters.category == "all")
+      {
         this.filters.category = ["spec", "test"];
-    } else {
-        this.filters.category = [choices.category];
+      } else {
+        this.filters.category = [this.filters.category];
+      }
     }
-
     // console.log("After UI choice:");
     // console.log(this.filters);
     this.wrangleData();

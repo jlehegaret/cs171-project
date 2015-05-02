@@ -1,6 +1,6 @@
 #whoVis {
     height: 410px;
-    width: 330px;
+    width: 310px;
 	margin-top:10px;
     overflow-y: hidden;
     overflow-x: scroll;
@@ -13,7 +13,7 @@
     text-align:right;
     float:right;
     height:150px;
-    width:310px;
+    width:300px;
     margin-right:20px;
     margin-top:10px;
 
