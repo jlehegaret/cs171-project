@@ -309,24 +309,24 @@ SpecVis.prototype.createHierarchy = function(group_lookup, spec_lookup, test_loo
 
 // Event handler to filter data by timeline selections
 SpecVis.prototype.onTimelineChange = function (selectionStart, selectionEnd) {
-    // this.wrangleData(filters = {_dateFilterFunction: this.dateFilter(selectionStart, selectionEnd)});
-    // this.updateVis();
+     this.wrangleData(filters = {_dateFilterFunction: this.dateFilter(selectionStart, selectionEnd)});
+     this.updateVis();
 };
 
 // Event handler to filter data by author selections
 SpecVis.prototype.onAuthorChange = function(authorSelection) {
-    // this.wrangleData(filters = {_authorFilterFunction: this.authorFilter(authorSelection)});
-    // this.updateVis();
+    this.wrangleData(filters = {_authorFilterFunction: this.authorFilter(authorSelection)});
+    this.updateVis();
 };
 
 // Event handler to filter date by additional options.
 // Expects _filters to be and object with at least a "state" field
 SpecVis.prototype.onFilterChange = function(_filters) {
-    // filters = {
-    //     _stateFilterFunction: this.stateFilter(_filters.state)
-    // };
-    // this.wrangleDate(filters);
-    // this.updateVis();
+     filters = {
+         _stateFilterFunction: this.stateFilter(_filters.state)
+     };
+     this.wrangleDate(filters);
+     this.updateVis();
 };
 
 
