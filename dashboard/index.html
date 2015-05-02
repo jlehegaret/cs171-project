@@ -8,6 +8,7 @@
     <script src="js/lib/d3.js" charset="utf-8"></script>
     <script src="js/lib/queue.v1.js"></script>
     <script src="js/lib/d3.tip.v0.6.6.js"></script>
+    <script src="js/preloader.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 
     <!-- Styles from http://testthewebforward.org/ -->
@@ -15,6 +16,7 @@
     <!-- Visualization Styles -->
     <link rel="stylesheet" href="css/vis.css" type="text/css" media="screen">
     <link href="css/style.css" rel="stylesheet" />
+    <link href="css/preloader.css" rel="stylesheet" />
 
     <!--Vis code-->
     <script src="js/util.js"></script>
@@ -54,8 +56,8 @@
         <nav id='cssmenu'>
             <ul>
 
-         <li class='active'><a href='#'><span>View By Status</span></a>
-                    <ul>
+                <li class='active'><a href='#'><span>View By Status</span></a>
+                    <ul class='child'>
                         <li class='has-sub'><a href='#'><span>All</span></a>
 
                         </li>
@@ -65,7 +67,7 @@
                 </li>
 
                 <li class='active'><a href='#'><span>View By Category</span></a>
-                    <ul>
+                    <ul class='child'>
                         <li class='has-sub'><a href='#'><span>All </span></a>
 
                         </li>
@@ -79,8 +81,8 @@
                 </li>
 
 
-                 <li class='active has-sub'><a href='#'><span>Sort Contributors</span></a>
-                    <ul>
+                <li class='active'><a href='#'><span>Sort Contributors</span></a>
+                    <ul class='child'>
                         <li class='has-sub'><a href='#'><span>By Lines of Code Touched</span></a>
 
                         </li>
@@ -89,10 +91,28 @@
                     </ul>
                 </li>
 
+                <li class='active'><a href='#'><span>CanIUse</span></a>
+                    <ul class='child'>
+                        <li class='has-sub'><a href='#'><span>Show</span></a>
+
+                        </li>
+                        <li class='has-sub'><a href='#'><span>Hide</span></a>
+                        </li>
+                    </ul>
+                </li>
+
                 <li class='last'><a href='#'><span>About</span></a></li>
 
             </ul>
         </nav>
+
+        <div id="loader-wrapper">
+            <div id="loader"></div>
+
+            <div class="loader-section section-left"></div>
+            <div class="loader-section section-right"></div>
+
+        </div>
 
         <div style="float:left" id="specVis"></div>
         <div id="whereAmI"> <p> Where am I? </p> </div>
@@ -194,20 +214,22 @@
         ////for navbar transition/////
 
         $(function () {
-    $('nav').on('click', '.active', function () {
-        $(this).children('ul').slideToggle(function() {
-            $(this).toggleClass('in out');
+            $('.active').on('click', function () {
+                $(this).children('.child').slideToggle(function() {
+                    $(this).toggleClass('in out');
+                });
+            });
+
+            $('.child').on('click', function () {
+                $(this).toggleClass('blue');
+            });
+
         });
 
-        $(this).siblings().find('ul').slideUp(function() {
-            $(this).removeClass('in').addClass('out');
-        });
-    });
-});
     });
 </script>
 
-
+    <script>window.jQuery || document.write('<script src="js/lib/jquery-1.9.1.min.js"><\/script>')</script>
 
 </body>
 </html>
