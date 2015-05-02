@@ -99,12 +99,13 @@ TimelineVis.prototype.initVis = function() {
 
     // prepare for display bars
     this.context.append("g")
-            .attr("class", "bars");
+            .attr("class", "bars")
+            .attr("transform", "translate(0," + this.margin.top + ")");
 
     // Add axes visual elements
     this.context.append("g")
-        .attr("class", "x axis")  // put it in the middle
-        .attr("transform", "translate(0," + this.height + ")");
+        .attr("class", "x axis");  // put it in the middle
+        // .attr("transform", "translate(0," + this.height + ")");
 
     // draw the various x-axis lines
     this.context.append("g")
@@ -141,18 +142,20 @@ TimelineVis.prototype.initVis = function() {
 TimelineVis.prototype.updateVis = function() {
     var that = this;
 
-// console.log("Display Data is");
-// console.log(this.displayData);
+console.log("TimeVis Display Data is");
+console.log(this.displayData);
 
     // update scales - would be nice though if zoom part stays consistent
     //  per chosen start & end dates rather than based on data
-    this.x0.domain(d3.extent(this.displayData.dates,
-                              function(d)
-                              {
-// console.log(Date.parse(d.date));
-                                return Date.parse(d.date); } ));
-    // this.x0.domain([Date.parse(this.filters.start_date),
-    //                 Date.parse(this.filters.end_date]));
+//     this.x0.domain(d3.extent(this.displayData.dates,
+//                               function(d)
+//                               {
+// // console.log(Date.parse(d.date));
+//                                 return Date.parse(d.date); } ));
+    this.x0.domain([
+                    Date.parse(this.filters.start_date),
+                    Date.parse(this.filters.end_date)
+                   ]);
 // console.log(Date.parse(this.filters.start_date));
 // console.log(Date.parse(this.filters.end_date));
 
@@ -206,8 +209,9 @@ if(this.displayData.dates.length > 0)
     // create new bars within each date
     var bars = dates //.call(this.tip)
         .selectAll("rect.timebar")
-        .data(function(d) { return d.actions; })
-        .enter()
+        .data(function(d) { return d.actions; }, function(dd) { return dd.type; });
+
+    bars.enter()
         .append("rect")
         .attr("class", function(d) {
             var res = "timebar " + d.type;
@@ -232,6 +236,7 @@ if(this.displayData.dates.length > 0)
             return that.bar_width;
           }})
         .attr("height", function(d) {
+console.log("Supposedly updating timebar height");
             if(d.type === "PUB") {
                 d.height = that.height;
             } else if(d.scale === "code") {
@@ -271,13 +276,13 @@ if(this.displayData.dates.length > 0)
                     }
                     return d.y;
                   });
+        bars.exit().remove();
 }
-// WILL NEED TO DO THIS WHEN START FILTERING
-    // remove any not-needed-bars
-    // d3.selectAll("rect.timebar").exit().remove();
 
     // remove any not-needed-dates
     dates.exit().remove();
+
+
 
     // update brush
     this.brush.x(this.x0);
@@ -308,8 +313,8 @@ TimelineVis.prototype.wrangleData = function() {
                         dates: []
                       };
 
-// console.log("Reassembling with these filters");
-// console.log(that.filters);
+console.log("TimeVis filters");
+console.log(that.filters);
 
   // we will check each day's complete data for data we want to display
   this.processedData.forEach(function(d) {
@@ -333,8 +338,10 @@ TimelineVis.prototype.wrangleData = function() {
             {
               //  We may want to see this item
               if( (that.filters.who === null
-                      && that.filters.specs.length == 0)
-                  || dd.type == "PUB")
+                      && that.filters.specs.length == 0))
+                  // || dd.type == "PUB")
+                  // sometimes it seems like it's handy to view these
+                  //  all the time.  other times, not.
               {
                   // we do not have any work to do
                   filtered = dd;
