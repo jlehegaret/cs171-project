@@ -122,8 +122,10 @@
                             // new Date() breaks whovis filtering code
             state: "all",           //open or all
             category: "all",        // all, spec, or test
-            specs: [],          // array of which specs to show.  empty = all.
-            caniuse: false,     // change sunburst color to reflect caniuse score
+            specs: [],          // array of which specs to show.
+                                //    empty = all.
+            caniuse: false,     // change sunburst color
+                                // to reflect caniuse score
             who: null,          // or can be one name
             who_sort: "code"   // or issues
         };
@@ -148,11 +150,11 @@
             //Wire up event handlers
             $(brushHandler).bind("brushChanged", function (event, selectionStart, selectionEnd) {
                 spec_vis.onTimelineChange(selectionStart, selectionEnd);
-                // who_vis.onTimelineChange(selectionStart, selectionEnd);
+                who_vis.onTimelineChange(selectionStart, selectionEnd);
             });
             $(selectionHandler).bind("selectionChanged", function (event, specSelection) {
                 timeline_vis.onSelectionChange(specSelection);
-                // who_vis.onSelectionChange(specSelection);
+                who_vis.onSelectionChange(specSelection);
                 // console.log(specSelection);
             });
             $(authorHandler).bind("authorChanged", function (event, author) {
@@ -162,7 +164,7 @@
             $(filterHandler).bind("filterChanged", function(event, filters) {
                 spec_vis.onFilterChange(filters);
                 timeline_vis.onFilterChange(filters);
-                //who_vis.onFilterChange(filters);
+                who_vis.onFilterChange(filters);
                 // console.log(filters);
             });
         };
