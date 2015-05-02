@@ -19,7 +19,8 @@ body {
 }
 
 a:active {
-	outline:0;
+    outline:0;
+    color: #6CAED7;
 }
 
 .clear {
@@ -214,9 +215,6 @@ header .navigation {
 #cssmenu ul ul li {
     font-weight: normal;
 }
-
-.child .blue { color: blue; }
-
 /* Custom CSS Styles */
 #cssmenu {
     font-family: 'Lato', sans-serif;
@@ -227,7 +225,6 @@ header .navigation {
 #cssmenu ul a:link,
 #cssmenu ul a:visited {
     display: block;
-    color: #848889;
     text-decoration: none;
     font-weight: 200;
 }
@@ -254,9 +251,10 @@ header .navigation {
 #cssmenu ul li:hover > a {
     color: #6CAED7;
 }
-#cssmenu > ul > li:hover {
-    background: #eff2f5;
-}
+
+/*#cssmenu > ul > li:hover {*/
+    /*background: #eff2f5;*/
+/*}*/
 
 /* Sub Menu */
 #cssmenu ul ul a:link,
