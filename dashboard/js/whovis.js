@@ -629,7 +629,7 @@ WhoVis.prototype.onSelectionChange = function(sunburstSelection) {
     this.updateVis();
 };
 
-WhoVis.prototype.onUISelectionChange = function(choices) {
+WhoVis.prototype.onFilterChange = function(choices) {
     //TODO: This function is triggered by a selection of an arc on a sunburst, wrangle data needs to be called on this selection
     // console.log(choices);
     if(choices.status === "open") {
