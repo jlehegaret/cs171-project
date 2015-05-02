@@ -142,8 +142,8 @@ TimelineVis.prototype.initVis = function() {
 TimelineVis.prototype.updateVis = function() {
     var that = this;
 
-console.log("TimeVis Display Data is");
-console.log(this.displayData);
+// console.log("TimeVis Display Data is");
+// console.log(this.displayData);
 
     // update scales - would be nice though if zoom part stays consistent
     //  per chosen start & end dates rather than based on data
@@ -236,7 +236,7 @@ if(this.displayData.dates.length > 0)
             return that.bar_width;
           }})
         .attr("height", function(d) {
-console.log("Supposedly updating timebar height");
+// console.log("Supposedly updating timebar height");
             if(d.type === "PUB") {
                 d.height = that.height;
             } else if(d.scale === "code") {
@@ -313,8 +313,8 @@ TimelineVis.prototype.wrangleData = function() {
                         dates: []
                       };
 
-console.log("TimeVis filters");
-console.log(that.filters);
+// console.log("TimeVis filters");
+// console.log(that.filters);
 
   // we will check each day's complete data for data we want to display
   this.processedData.forEach(function(d) {

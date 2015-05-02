@@ -107,8 +107,8 @@ WhoVis.prototype.updateVis = function() {
     var that = this;
     var who_enter;
 
-console.log("WhoVis display data is:");
-console.log(this.displayData);
+// console.log("WhoVis display data is:");
+// console.log(this.displayData);
 
     // if want more space between bars, change this.barPadding
     //   here, we display two bars per person, so we need the "2"
@@ -244,8 +244,8 @@ if(this.displayData.length > 0)
 WhoVis.prototype.wrangleData = function() {
     var that = this;
 
-console.log("WhoVis filter options");
-console.log(this.filters);
+// console.log("WhoVis filter options");
+// console.log(this.filters);
 
     // reset possible old data
     this.displayData = [];
