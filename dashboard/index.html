@@ -8,7 +8,9 @@
     <script src="js/lib/d3.js" charset="utf-8"></script>
     <script src="js/lib/queue.v1.js"></script>
     <script src="js/lib/d3.tip.v0.6.6.js"></script>
+    <!--
     <script src="js/preloader.js"></script>
+    -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 
     <!-- Styles from http://testthewebforward.org/ -->
@@ -163,6 +165,9 @@
             who_vis = new WhoVis(d3.select("#whoVis"), allData, authorHandler, initialFilters);
             timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler, initialFilters);
             filter_ui = new FilterUI(initialFilters, filterHandler);
+
+            //End preload animation
+            $('body').addClass('loaded');
 
             //Wire up event handlers
             $(brushHandler).bind("brushChanged", function (event, selectionStart, selectionEnd) {
