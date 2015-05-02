@@ -6,6 +6,19 @@
     overflow-x: scroll;
 }
 
+#whereAmI{
+
+    background-color:#E8E8E8;
+    color:darkgrey;
+    text-align:right;
+    float:right;
+    height:150px;
+    width:310px;
+    margin-right:20px;
+    margin-top:10px;
+
+}
+
 .axis text {
     font: 10px sans-serif;
 }
