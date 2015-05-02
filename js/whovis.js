@@ -85,6 +85,9 @@ WhoVis.prototype.initVis = function() {
     //     .attr("class", "x axis")
     //     .attr("transform", "translate(0," + -10 + ")");
 
+    // set up tooltips
+    this.tip = this.tooltip();
+
     // filter, aggregate, modify data
     this.wrangleData();
     // call the update method
@@ -145,6 +148,7 @@ WhoVis.prototype.updateVis = function() {
                     that.filters.who = null;
                 }
         })
+        .on("mouseover", this.tip.show)
         .call(function(who) // for every who we just added
         {
           if(!who) { console.log("Null enter who ?!?");
@@ -227,6 +231,7 @@ WhoVis.prototype.updateVis = function() {
             {
                 return "translate("+ that.x(d.who)+","+ 0 +")";
             })
+        .call(this.tip)
         .call(function(who)
         {
 // console.log(who);
@@ -473,6 +478,8 @@ WhoVis.prototype.processData = function processData(d, category) {
                     && c.closed_at >= that.filters.start_date
                     && c.closed_at <= that.filters.end_date)
                     // when was it created
+//  THIS IS VERY WEIRD, BUT LEAVE THIS IN; SOMEDAY WE CAN
+//  FIGURE OUT HOW TO KEEP IT WORKING WITHOUT THIS CONSOLE.LOG
 console.log("Looking for " + c.closed_by);
                     who = that.findWho(c.closed_by);
 // if(!who) { console.log("Not found."); console.log(c); }
@@ -581,6 +588,19 @@ WhoVis.prototype.createWho = function (name) {
                 "total": 0
             }]
     };
+};
+
+//Sets up the tooltip function
+WhoVis.prototype.tooltip = function() {
+    return d3.tip()
+        .offset([0, 0])
+        .html(function (d) {
+            return "<div class='d3-tip'>"
+                + d.who + "<br>"
+                + "Lines of Code: " + d.total_code + "<br>"
+                + "Num. Issues: " + d.total_issues
+                + "</div>";
+        });
 };
 
 // EVENT HANDLERS
