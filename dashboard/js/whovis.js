@@ -31,7 +31,7 @@ WhoVis = function(_parentElement, _data, _eventHandler, _filters, _options) {
     }
 
     // defines constants
-    this.margin = {top: 20, right: 10, bottom: 20, left: 50};
+    this.margin = {top: 0, right: 10, bottom: 20, left: 50};
     this.width = this.options.width - this.margin.left - this.margin.right;
     // height is going to be as high as it needs to be for all bars
     //  but here is a default
@@ -59,10 +59,9 @@ WhoVis.prototype.initVis = function() {
         .append("g");
 
     this.y_code = d3.scale.linear()
-        .range([this.y_for_axis, 0]);
+                        .range([this.y_for_axis, 0]);
     this.y_issues = d3.scale.linear()
-        .range([this.y_for_axis, 0]);
-
+                        .range([this.y_for_axis, 0]);
 
     this.x = d3.scale.ordinal();
 
