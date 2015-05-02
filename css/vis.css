@@ -1,9 +1,22 @@
 #whoVis {
-    height: 510px;
+    height: 410px;
     width: 330px;
 	margin-top:10px;
     overflow-y: hidden;
     overflow-x: scroll;
+}
+
+#whereAmI{
+
+    background-color:#E8E8E8;
+    color:darkgrey;
+    text-align:right;
+    float:right;
+    height:150px;
+    width:310px;
+    margin-right:20px;
+    margin-top:10px;
+
 }
 
 .axis text {
@@ -99,3 +112,8 @@
     stroke-width: 1;
 }
 */
+
+/* WhoVis bars */
+.unselected {
+    opacity: .5;
+}

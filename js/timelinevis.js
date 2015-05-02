@@ -1,17 +1,32 @@
 TimelineVis = function(_parentElement, _data, _eventHandler, _filters, _options) {
     this.parentElement = _parentElement;
     this.data = _data;
+    this.processedData = [];
     this.displayData = [];
-    this.vizData = [];
     this.eventHandler = _eventHandler;
     this.options = _options || {
         width:1200, height:200
     };
     this.filters = _filters || {
-        start_date: "2014-01-01",
-        end_date: new Date(),    //new Date() for now
-        state: "open"             //open, closed, or all
+        "start_date"  : "2015-01-01",
+        "end_date"    : "2015-05-05",
+        "category"  : ["spec", "test"],
+        "actions"     : ["ISS_O", "PR_O", "PUB"],
+        "specs"       : [],
+        "who"         : []
     };
+    // adapt filters object to the info it was given
+    if(this.filters.state === "open") {
+        this.filters.actions = ["ISS_O","PR_O", "PUB"];
+    } else {
+        this.filters.actions = ["ISS_O", "ISS_C",
+                                "PR_O", "PR_C",
+                                "COM", "PUB"];
+    }
+    if(this.filters.category == "all")
+    {
+        this.filters.category = ["spec", "test"];
+    }
 
     // defines constants
     this.margin = {top: 20, right: 20, bottom: 20, left: 40};
@@ -20,13 +35,13 @@ TimelineVis = function(_parentElement, _data, _eventHandler, _filters, _options)
 
     this.dateFormatter = d3.time.format("%Y-%m-%d");
 
-    this.reorderData(); // creates .displayData by date but complete
+    this.reorderData(); // creates .processedData by date but complete
     this.initVis();
 };
 
 TimelineVis.prototype.initVis = function() {
     var that = this;
-    var space = this.height/2; // REMOVE HARD-# IF FINAL LAYOUT
+    var space = this.height/2;
 
     // constructs SVG layout
     this.svg = this.parentElement.append("svg")
@@ -113,7 +128,7 @@ TimelineVis.prototype.initVis = function() {
 
 
     // filter, aggregate, modify data
-    this.wrangleData(null); // will create filtered VizData
+    this.wrangleData(); // will create displayData, which is filtered
     // call the update method
     this.updateVis();
 };
@@ -121,8 +136,11 @@ TimelineVis.prototype.initVis = function() {
 TimelineVis.prototype.updateVis = function() {
     var that = this;
 
+// console.log("in update vis");
+// console.log(this.displayData);
+
     // update scales
-    this.x0.domain(d3.extent(this.vizData.dates, function(d)
+    this.x0.domain(d3.extent(this.displayData.dates, function(d)
                     { return Date.parse(d.date); } ));
 
     // when grouping bars
@@ -143,8 +161,8 @@ TimelineVis.prototype.updateVis = function() {
                                 (5 * this.bar_place)
                             ]);
 
-    this.height_lines.domain([0, this.vizData.max_linesCode]);
-    this.height_count.domain([0, this.vizData.max_numIssues]);
+    this.height_lines.domain([0, this.displayData.max_linesCode]);
+    this.height_count.domain([0, this.displayData.max_numIssues]);
 
     // update axis
    this.context.select(".x.axis")
@@ -153,9 +171,11 @@ TimelineVis.prototype.updateVis = function() {
     // update graph:
     var dates = this.context.select(".bars")
                         .selectAll(".date")
-                        .data(this.vizData.dates, function(d)
+                        .data(this.displayData.dates, function(d)
                           { return d.date; });
 
+if(this.displayData.dates.length > 0)
+{
     // create necessary containers for new dates
     dates.enter()
           .append("g")
@@ -190,15 +210,15 @@ TimelineVis.prototype.updateVis = function() {
 
     // for all bars, new and changing
     bars.attr("width", function(d) {
-        if(d.type == "PUB") {
+        if(d.type === "PUB") {
             return 1;
         } else {
             return that.bar_width;
         }})
         .attr("height", function(d) {
-            if(d.type == "PUB") {
+            if(d.type === "PUB") {
                 d.height = that.height;
-            } else if(d.scale == "code") {
+            } else if(d.scale === "code") {
                 d.height = that.height_lines(d.total);
                 // NOTE:  If you want "fill in" the space more,
                 //   use the exponent in the POW scale function instead
@@ -215,13 +235,13 @@ TimelineVis.prototype.updateVis = function() {
                                 })
         .attr("y", function(d)
                   {
-                    if(d.type == "PUB")
+                    if(d.type === "PUB")
                     {
                       d.y = 0;
                     }
                     else
                     {
-                      if(d.dir == "up")
+                      if(d.dir === "up")
                       {
                         d.y = that.y_axisType(d.cat + " " + d.scale)
                               - d.height;
@@ -233,6 +253,7 @@ TimelineVis.prototype.updateVis = function() {
                     }
                     return d.y;
                   });
+}
 // WILL NEED TO DO THIS WHEN START FILTERING
     // remove any not-needed-bars
     // d3.selectAll("rect.timebar").exit().remove();
@@ -247,99 +268,183 @@ TimelineVis.prototype.updateVis = function() {
          .selectAll("rect")
          .attr("height", this.height);
 
-// console.log("Finished updateVis");
+console.log("FINISHED updateVis");
 };
 
 
-
-TimelineVis.prototype.onSelectionChange = function(sunburstSelection) {
-    //TODO: This function is triggered by a selection of an arc on a sunburst, wrangle data needs to be called on this selection
-    console.log("Filter by " + sunburstSelection.type + " " + sunburstSelection.name);
-};
-
-TimelineVis.prototype.onAuthorChange = function(author) {
-
-};
-
-
-TimelineVis.prototype.wrangleData = function(_filters) {
+TimelineVis.prototype.wrangleData = function() {
   // this is where we will apply filters and recalculate totals
   // and remove all bits that don't have any data in them anyway
 
+  var that = this;
+  var filtered;
+  var value;
+  var keep_going;
+  var yes;
+  var spec_match;
 
-    var that = this;
-    that.vizData = {
-        max_linesCode : 0,
-        // max_codedate : "",
-        // max_issdate : "",
-        max_numIssues : 0,
-        dates         : []
-    };
+  // start new
+  that.displayData =  {
+                        max_linesCode : 0,
+                        max_numIssues : 0,
+                        dates: []
+                      };
 
-  // TEMPORARY, UNTIL WE COORDINATE
+console.log("Reassembling with these filters");
+console.log(that.filters);
 
-    filters = _filters || {
-        "start_date"  : "2015-01-01",
-        "end_date"    : "2015-05-05",
-        "categories"  : ["spec", "test"],
-        "actions"     : ["ISS_O", "ISS_C", "PR_O", "PR_C", "COM", "PUB"],
-        "specs"       : [],
-        "who"         : [],
-        "number_who"  : 20
-    };
+  // we will check each day's complete data for data we want to display
+  this.processedData.forEach(function(d) {
 
-    this.displayData.forEach(function(d) {
-        var day = {};
-
-        // if we're in the timeframe
-        if( (!filters.start_date || (d.date >= filters.start_date)) &&
-            (!filters.end_date || (d.date <= filters.end_date)) ) {
-            day = {
-                "date"    : d.date,
+      var day = {};
+      // if we're in the timeframe
+      if( d.date >= that.filters.start_date
+          && d.date <= that.filters.end_date )
+      {
+        day = { "date"    : d.date,
                 "actions" : []
-            };
+              };
+        // evaluate data for this date
+        d.actions.forEach(function(dd) {
+          if (dd.total > 0)  // we have some data we might want to see
+          {
+            if(that.filters.category.indexOf(dd.cat) !== -1
+               && that.filters.actions.indexOf(dd.type) !== -1)
+            {
+              //  We may want to see this item
+              if( (that.filters.who === null
+                      & that.filters.specs.length == 0)
+                  || dd.type == "PUB")
+              {
+                  // we do not have any work to do
+                  filtered = dd;
+              } else {
+                filtered= {};
+                filtered.cat = dd.cat;
+                filtered.dir = dd.dir;
+                filtered.scale = dd.scale;
+                filtered.type = dd.type;
+                filtered.details = [];
+                filtered.total = 0;
+                dd.details.forEach(function(ddd)
+                {
+                  yes = false;
+                  keep_going = false;
 
-            // evaluate data for this date
-            d.actions.forEach(function(dd) {
-                if (dd.total > 0)  { // we have some data we might want to see
-                    if(filters.categories.indexOf(dd.cat) !== -1 && filters.actions.indexOf(dd.type) !== -1) {
-                        // ADD WHO LATER, AND SPECS!!
-                        // if added who, need to recalculate TOTAL
-                        day.actions.push(dd);
-                        // check if either maximum needs to be updated
-                        if(dd.scale == "code") {
-                            if (dd.total > that.vizData.max_linesCode) {
-                                that.vizData.max_linesCode = dd.total;
-                                // that.vizData.max_codedate = d.date;
-                                }
-                        } else {
-                            if (dd.total > that.vizData.max_numIssues) {
-                                that.vizData.max_numIssues = dd.total;
-                                // that.vizData.max_issdate = d.date;
-                                }
-                        }
+                  if(that.filters.specs.length = 0)
+                  {
+                    keep_going = true;
+                  } else { // need to check spec first
+                    if(ddd.url !== undefined)
+                    {
+                      if(that.filters.specs.indexOf(ddd.url) !== -1)
+                      {
+                        keep_going = true;
+                      }
+                    } else if (ddd.specs !== undefined)
+                    {
+                      spec_match = ddd.specs.filter(function(e)
+                              { return that.filters.specs.indexOf(e) !== -1; });
+                      if(spec_match.length > 0)
+                      {
+                        keep_going = true;
+                      }
+                    } else {
+console.log("What is this ddd?");
+console.log(ddd);
                     }
+                  }
+                  // check if we're interested in this spec
+                  if(keep_going)
+                  {
+// console.log("Found relevant spec");
+                    if(!that.filters.who) // it's just null
+                    {
+// console.log("Don't need to check who");
+                      yes = true;
+                    } else { // need to check who as well
+console.log("Checking for " + that.filters.who);
+                      // and it's complicated because we need to
+                      //  be sure that our who of interest
+                      //  did whatever action is THIS DAY'S action
+                      if( ( dd.type === "PR_O"
+                            || dd.type === "ISS_O")
+                          && ddd.author.login === that.filters.who) {
+                          yes = true;
+                      } else {
+console.log(dd.type);
+console.log(ddd);
+                      }
+
+                    }
+                  } // done checking
+                  // if the above filter found the data worthy
+                  if(yes)
+                  { // add the data and update the total
+                    filtered.details.push(ddd);
+                    if(dd.scale === "code")
+                    {
+                      filtered.total += ddd.line_added
+                                        + ddd.line_deleted;
+                    } else {
+                        if(ddd.difficulty !== undefined)
+                        {
+                          (ddd.difficulty === "easy") ? value = 1 : value = 2
+                        } else { // not flagged, flag it this way
+                          value = 3;
+                        }
+                        filtered.total += value;
+                    }
+                  }
+                });
+              }
+              if(filtered.total > 0)
+              {
+                day.actions.push(filtered);
+                // check if either maximum needs to be updated
+                if(dd.scale === "code")
+                {
+                  if (filtered.total > that.displayData.max_linesCode)
+                  {
+                      that.displayData.max_linesCode = dd.total;
+                      // that.displayData.max_codedate = d.date;
+                  }
+                } else
+                {
+                  if (filtered.total > that.displayData.max_numIssues)
+                  {
+                    that.displayData.max_numIssues = dd.total;
+                    // that.displayData.max_issdate = d.date;
+                  }
                 }
-            });
-        }
+                // console.log("day.actions is now");
+                // console.log(day.actions);
+              }
+            }
+          }
+        });
+      }
+  // IF we found data meeting the criteria, add it to displayData
+      if(day.actions && day.actions.length > 0) {
+        that.displayData.dates.push(day);
+      }
+  });
 
-    // IF we found data meeting the criteria, add it to vizData
-
-        if(day.actions && day.actions.length > 0) {
-            that.vizData.dates.push(day);
-        }
-    });
-    // console.log("vizData: ");
-    // console.log(this.vizData);
+  if(that.displayData.dates !== undefined && that.displayData.dates.length > 0)
+  {
+    that.displayData.dates.sort(function(a,b) { return a.date < b.date; });
+  }
+  // console.log("displayData is now: ");
+  // console.log(this.displayData);
 };
 
 TimelineVis.prototype.reorderData = function() {
     var that = this;
 
-    // CREATE DISPLAYDATA by CALLING
+    // CREATE processedData by CALLING
     // the main data-wrangling function on each
     //   set of data we have
-    this.displayData = [];
+    this.processedData = [];
     this.data.specs.forEach(function(d) {
         that.processData(d, "spec");
     });
@@ -366,45 +471,53 @@ TimelineVis.prototype.processData = function(d, category) {
     // on category being processed
     var plus = category === "spec" ? 0 : 6;
 
-    if(d.last_pub) {
-        today = that.displayData[that.findDate(d.last_pub)].actions[0 + plus];
+    if(d.last_pub !== undefined) {
+        today = that.processedData[that.findDate(d.last_pub)].actions[0 + plus];
         today.total++;
         today.details.push(d);
     }
 
     // COMMITS
-    if(d.commits) {
+    if(d.commits !== undefined) {
         d.commits.forEach(function(c) {
-            today = that.displayData[that.findDate(c.date)].actions[1 + plus];
+            c.url = d.url; // copy spec url in there
+            today = that.processedData[that.findDate(c.date)].actions[1 + plus];
             today.total += (c.line_added + c.line_deleted);
             today.details.push(c);
         });
     }
 
-    if( (category == "spec" && d.issues) || category == "test") {
+    if( (category === "spec" && d.issues !== undefined) || category == "test")
+    {
         var process = d.issues ? d.issues : [d];
 
         process.forEach(function(c) {
+            // copy spec url in there
+            if(d.specs !== undefined && c.specs === undefined) {
+              c.specs = d.specs;
+            } else {
+              c.url = d.url;
+            }
             // is it a PR or an issue
             if(c.type === "pull" || c.type === "test") {
                 // when was it created
-                today = that.displayData[that.findDate(c.created_at)].actions[2 + plus];
+                today = that.processedData[that.findDate(c.created_at)].actions[2 + plus];
                 today.total += (c.line_added + c.line_deleted);
                 today.details.push(c);
                 // when was it possibly closed
-                if(c.closed_at) {
-                    today = that.displayData[that.findDate(c.closed_at)].actions[3 + plus];
+                if(c.closed_at !== undefined) {
+                    today = that.processedData[that.findDate(c.closed_at)].actions[3 + plus];
                     today.total += (c.line_added + c.line_deleted);
                     today.details.push(c);
                 }
             }
             else if(c.type === "issue") {
                 // when was it created
-                today = that.displayData[that.findDate(c.created_at)].actions[4 + plus];
+                today = that.processedData[that.findDate(c.created_at)].actions[4 + plus];
 
                 // how hard is it
                 var value;
-                if(c.difficulty) {
+                if(c.difficulty !== undefined) {
                     (c.difficulty === "easy") ? value = 1 : value = 2
                 }
                 // not flagged, flag it this way
@@ -415,8 +528,8 @@ TimelineVis.prototype.processData = function(d, category) {
                 c.difficulty_value = value;
                 today.details.push(c);
                 // when was it possibly closed
-                if(c.closed_at) {
-                    today = that.displayData[that.findDate(c.closed_at)].actions[5 + plus];
+                if(c.closed_at !== undefined) {
+                    today = that.processedData[that.findDate(c.closed_at)].actions[5 + plus];
                     today.total += value;
                     today.details.push(c);
                 }
@@ -426,20 +539,20 @@ TimelineVis.prototype.processData = function(d, category) {
     } // end of d.issues work
 };
 
-//Looks for the array index of a date in the displayData array
+//Looks for the array index of a date in the processedData array
 //If it's not found create a new day object at the end of the array
 TimelineVis.prototype.findDate = function (day) {
     var that = this;
     var found = false;
 
-    for (var i = 0; i < that.displayData.length; i++) {
-        if (that.displayData[i].date == day) {
+    for (var i = 0; i < that.processedData.length; i++) {
+        if (that.processedData[i].date === day) {
             return i;
         }
     }
 
     // if we're here, we need to create a new element
-    that.displayData.push({
+    that.processedData.push({
         "date": day,
         "actions": [{
             "cat": "spec",
@@ -525,7 +638,7 @@ TimelineVis.prototype.findDate = function (day) {
     });
 
     // returns the location of the newly created last element at the end of the array
-    return (that.displayData.length - 1);
+    return (that.processedData.length - 1);
 };
 
 TimelineVis.prototype.tooltip = function() {
@@ -546,7 +659,7 @@ TimelineVis.prototype.tooltip = function() {
                 text = text + "<li>";
 
                 // define how to access this dd
-                if(d.type == "PUB")
+                if(d.type === "PUB")
                 {
                     text = text + "<a href='" + dd.url + "'>"
                     + dd.title + "</a><br>" +
@@ -570,4 +683,49 @@ TimelineVis.prototype.tooltip = function() {
 
             return text;
         });
+};
+
+// EVENT HANDLERS
+
+
+TimelineVis.prototype.onSelectionChange = function(sunburstSelection) {
+    if(sunburstSelection.type === "root")
+    {
+        this.filters.specs = [];
+    }
+    else if(sunburstSelection.type === "group")
+    {
+        this.filters.specs = sunburstSelection.children
+                            .map(function(d) { return d.url; });
+    }
+    else if (sunburstSelection.type === "spec")
+    {
+        this.filters.specs = [sunburstSelection.url];
+    }
+    else if (sunburstSelection.type === "HTML"
+                || sunburstSelection.type === "Tests")
+    {
+        this.filters.specs = [sunburstSelection.parent.url];
+    }
+    else // we are (probably) dealing with the outer layer
+    {
+        if(sunburstSelection.children === undefined)
+        {
+            this.filters.specs = [sunburstSelection.parent.parent.url]
+        } else {
+            console.log("How should WhoVis interpret Sunburst's");
+            console.log(sunburstSelection);
+        }
+    }
+    // and a "just in case"
+    if(this.filters.specs === undefined) { this.filters.specs = []; }
+
+    this.wrangleData();
+    this.updateVis();
+};
+
+TimelineVis.prototype.onAuthorChange = function(author) {
+    this.filters.who = author;
+    this.wrangleData();
+    this.updateVis();
 };
