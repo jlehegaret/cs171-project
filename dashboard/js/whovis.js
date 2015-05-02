@@ -159,7 +159,7 @@ WhoVis.prototype.updateVis = function() {
               .text(function(d){return d.who})
               .style("font-size", "8px")
               .style("text-anchor", "end")
-              .attr("dx", "-17em")
+              .attr("dx", "-17.7em")
               .attr("dy", "0.7em")
               .style("font-family", "sans-serif")
               .attr("transform", "rotate(-90)");
