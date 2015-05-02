@@ -149,6 +149,7 @@ WhoVis.prototype.updateVis = function() {
                 }
         })
         .on("mouseover", this.tip.show)
+        .on("mouseout", this.tip.hide)
         .call(function(who) // for every who we just added
         {
           if(!who) { console.log("Null enter who ?!?");

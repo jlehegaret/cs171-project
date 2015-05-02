@@ -23,9 +23,13 @@ TimelineVis = function(_parentElement, _data, _eventHandler, _filters, _options)
                                 "PR_O", "PR_C",
                                 "COM", "PUB"];
     }
-    if(this.filters.category == "all")
+    if(this.filters.category === "all"
+      || (Array.isArray(this.filters.category)
+            && this.filters.category.length == 2))
     {
         this.filters.category = ["spec", "test"];
+    } else {
+        this.filters.category = [this.filters.category];
     }
 
     // defines constants
@@ -136,7 +140,7 @@ TimelineVis.prototype.initVis = function() {
 TimelineVis.prototype.updateVis = function() {
     var that = this;
 
-// console.log("in update vis");
+// console.log("Display Data is");
 // console.log(this.displayData);
 
     // update scales
@@ -240,7 +244,9 @@ if(this.displayData.dates.length > 0)
                     }
                     else
                     {
-                      if(d.dir === "up")
+  // console.log(that.filters.category);
+                      if(d.dir === "up"
+                          || that.filters.category.length === 1)
                       {
                         d.y = that.y_axisType(d.cat + " " + d.scale)
                               - d.height;
@@ -267,7 +273,7 @@ if(this.displayData.dates.length > 0)
          .selectAll("rect")
          .attr("height", this.height);
 
-console.log("FINISHED updateVis");
+// console.log("FINISHED updateVis");
 };
 
 
@@ -289,8 +295,8 @@ TimelineVis.prototype.wrangleData = function() {
                         dates: []
                       };
 
-console.log("Reassembling with these filters");
-console.log(that.filters);
+// console.log("Reassembling with these filters");
+// console.log(that.filters);
 
   // we will check each day's complete data for data we want to display
   this.processedData.forEach(function(d) {
@@ -307,12 +313,14 @@ console.log(that.filters);
         d.actions.forEach(function(dd) {
           if (dd.total > 0)  // we have some data we might want to see
           {
+// console.log(that.filters.category);
+// console.log(dd.cat);
             if(that.filters.category.indexOf(dd.cat) !== -1
                && that.filters.actions.indexOf(dd.type) !== -1)
             {
               //  We may want to see this item
               if( (that.filters.who === null
-                      & that.filters.specs.length == 0)
+                      && that.filters.specs.length == 0)
                   || dd.type == "PUB")
               {
                   // we do not have any work to do
@@ -330,7 +338,7 @@ console.log(that.filters);
                   yes = false;
                   keep_going = false;
 
-                  if(that.filters.specs.length = 0)
+                  if(that.filters.specs.length == 0)
                   {
                     keep_going = true;
                   } else { // need to check spec first
@@ -349,32 +357,43 @@ console.log(that.filters);
                         keep_going = true;
                       }
                     } else {
-console.log("What is this ddd?");
-console.log(ddd);
+                        console.log("What is this ddd?");
                     }
                   }
                   // check if we're interested in this spec
                   if(keep_going)
                   {
-// console.log("Found relevant spec");
                     if(!that.filters.who) // it's just null
                     {
-// console.log("Don't need to check who");
                       yes = true;
                     } else { // need to check who as well
-console.log("Checking for " + that.filters.who);
                       // and it's complicated because we need to
                       //  be sure that our who of interest
                       //  did whatever action is THIS DAY'S action
-                      if( ( dd.type === "PR_O"
-                            || dd.type === "ISS_O")
-                          && ddd.author.login === that.filters.who) {
-                          yes = true;
-                      } else {
-console.log(dd.type);
-console.log(ddd);
+                      if(dd.type === "COM")
+                      {
+                        if(ddd.author === that.filters.who)
+                          {
+                            yes = true;
+                          }
                       }
-
+                      else if(dd.type === "PR_O" || dd.type === "ISS_O")
+                      {
+                          if(ddd.author.login === that.filters.who)
+                          {
+                            yes = true;
+                          }
+                      } else if(dd.type === "PR_C" || dd.type === "ISS_C")
+                      {
+                          if(ddd.merged_by === that.filters.who
+                              || ddd.closed_by === that.filters.who)
+                          {
+                            yes = true;
+                          }
+                      } else
+                      {
+                        console.log("How to 'who' filter this data?");
+                      }
                     }
                   } // done checking
                   // if the above filter found the data worthy
@@ -416,8 +435,6 @@ console.log(ddd);
                     // that.displayData.max_issdate = d.date;
                   }
                 }
-                // console.log("day.actions is now");
-                // console.log(day.actions);
               }
             }
           }
@@ -712,7 +729,7 @@ TimelineVis.prototype.onSelectionChange = function(sunburstSelection) {
         {
             this.filters.specs = [sunburstSelection.parent.parent.url]
         } else {
-            console.log("How should WhoVis interpret Sunburst's");
+            console.log("How should TimeVis interpret Sunburst's");
             console.log(sunburstSelection);
         }
     }
@@ -725,6 +742,30 @@ TimelineVis.prototype.onSelectionChange = function(sunburstSelection) {
 
 TimelineVis.prototype.onAuthorChange = function(author) {
     this.filters.who = author;
+    this.wrangleData();
+    this.updateVis();
+};
+
+WhoVis.prototype.onUISelectionChange = function(choices) {
+    //TODO: This function is triggered by a selection of an arc on a sunburst, wrangle data needs to be called on this selection
+    // console.log(choices);
+    if(choices.status === "open") {
+        this.filters.actions = ["ISS_O","PR_O", "PUB"];
+    } else {
+        this.filters.actions = ["ISS_O", "ISS_C",
+                                "PR_O", "PR_C",
+                                "COM", "PUB"];
+    }
+    if(choices.category === "all"
+        || (Array.isArray(choices.category)
+            && choices.category.length == 2)) {
+        this.filters.category = ["spec", "test"];
+    } else {
+        this.filters.category = [choices.category];
+    }
+
+    // console.log("After UI choice:");
+    // console.log(this.filters);
     this.wrangleData();
     this.updateVis();
 };

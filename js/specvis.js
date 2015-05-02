@@ -186,7 +186,8 @@ SpecVis.prototype.updateVis = function () {
          })
         .style("fill", this.sunburstFill)
         .on("click", click)
-        .on("mouseover", this.tip.show);
+        .on("mouseover", this.tip.show)
+        .on("mouseout", this.tip.hide);
     //       .each(this.stash);
 
     path
@@ -237,7 +238,8 @@ SpecVis.prototype.createHierarchy = function(group_lookup, spec_lookup, test_loo
                     },
                     {   name: "Tests",
                         type:"Tests",
-                        url: "", // WOULD BE NICE TO FILL THIS IN
+ // WOULD BE NICE TO FILL THIS IN
+                        url: "",
                         key: spec.key + "Tests",
                         children: []
                     }];
@@ -278,7 +280,7 @@ SpecVis.prototype.createHierarchy = function(group_lookup, spec_lookup, test_loo
             //looks for tests in the test lookup table, creates copies if found
             if (test_lookup[_spec.url]) {
                 var _allTests = test_lookup[_spec.url];
-console.log(_allTests);
+// IS IT HERE THAT WE CAN ADD THE URL OF THE TEST SUITE?
                 _allTests.forEach(function (_test) {
                     var test = {};
                     test.title = _test.title;
@@ -307,24 +309,24 @@ console.log(_allTests);
 
 // Event handler to filter data by timeline selections
 SpecVis.prototype.onTimelineChange = function (selectionStart, selectionEnd) {
-    this.wrangleData(filters = {_dateFilterFunction: this.dateFilter(selectionStart, selectionEnd)});
-    this.updateVis();
+    // this.wrangleData(filters = {_dateFilterFunction: this.dateFilter(selectionStart, selectionEnd)});
+    // this.updateVis();
 };
 
 // Event handler to filter data by author selections
 SpecVis.prototype.onAuthorChange = function(authorSelection) {
-    this.wrangleData(filters = {_authorFilterFunction: this.authorFilter(authorSelection)});
-    this.updateVis();
+    // this.wrangleData(filters = {_authorFilterFunction: this.authorFilter(authorSelection)});
+    // this.updateVis();
 };
 
 // Event handler to filter date by additional options.
 // Expects _filters to be and object with at least a "state" field
 SpecVis.prototype.onFilterChange = function(_filters) {
-    filters = {
-        _stateFilterFunction: this.stateFilter(_filters.state)
-    };
-    this.wrangleDate(filters);
-    this.updateVis();
+    // filters = {
+    //     _stateFilterFunction: this.stateFilter(_filters.state)
+    // };
+    // this.wrangleDate(filters);
+    // this.updateVis();
 };
 
 
