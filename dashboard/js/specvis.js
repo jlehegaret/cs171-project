@@ -325,7 +325,7 @@ SpecVis.prototype.onFilterChange = function(_filters) {
      filters = {
          _stateFilterFunction: this.stateFilter(_filters.state)
      };
-     this.wrangleDate(filters);
+     this.wrangleData(filters);
      this.updateVis();
 };
 
