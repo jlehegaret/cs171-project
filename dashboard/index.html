@@ -172,6 +172,7 @@
             $(selectionHandler).bind("selectionChanged", function (event, specSelection) {
                 timeline_vis.onSelectionChange(specSelection);
                 who_vis.onSelectionChange(specSelection);
+                document.getElementById("whereAmI").innerHTML = specSelection.name;
                 // console.log(specSelection);
             });
             $(authorHandler).bind("authorChanged", function (event, author) {
@@ -179,7 +180,8 @@
                 timeline_vis.onAuthorChange(author);
             });
             $(filterHandler).bind("filterChanged", function(event, filters) {
-               // console.log(filters);
+                console.log("Filters changed");
+                console.log(filters);
                 spec_vis.onFilterChange(filters);
                 timeline_vis.onFilterChange(filters);
                 who_vis.onFilterChange(filters);
