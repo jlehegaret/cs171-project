@@ -497,7 +497,7 @@ console.log("Looking for " + c.closed_by);
 
 };
 
-//TODO:method comments
+//Finds the entry for a given name, creates a new object if it's not found
 WhoVis.prototype.findWho = function findWho(name) {
     var that = this;
 
