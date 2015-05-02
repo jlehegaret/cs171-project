@@ -18,11 +18,11 @@ Also, this graph only represents the status of the test suite.  However, W3C nee
 
 Here are three examples of those per-working group table reports:
 
-[Web Apps Working Group](https://jlehegaret.github.io/cs171-project/sample_repts/webapps.html)
+[Web Apps Working Group](https://jlehegaret.github.io/cs171-project/current_repts/sample_repts/webapps.html)
 
-[Web Performance Working Group](https://jlehegaret.github.io/cs171-project/sample_repts/webperf.html)
+[Web Performance Working Group](https://jlehegaret.github.io/cs171-project/current_repts/sample_repts/webperf.html)
 
-[Web RTC Working Group](https://jlehegaret.github.io/cs171-project/sample_repts/webrtc.html)
+[Web RTC Working Group](https://jlehegaret.github.io/cs171-project/current_repts/sample_repts/webrtc.html)
 
 In each of these reports, we see, sorted by Spec status (WD = Working Draft, LCWD = "Last Call Working Draft", CR = "Candidate Recommendation", and REC = "Recommendation):
 

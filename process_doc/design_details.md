@@ -19,7 +19,7 @@ A second, full view (showing working groups, specs, issues, pull requests) is al
 
 ### Timeline
 
-Timeline needs to represent all easy issues, hard issues, pull requests and the number of lines merged via those pull requests by using different colors. First,  we will present the total amount of issues, pull requests and lines merged (using the simple sunburst view). Second, when the user chooses to present specs per working group, the timeline will update accordingly. Also, timeline brushing will affect the number of elements shown on the sunburst.
+The timeline needs to represent all easy issues, hard issues, pull requests and the number of lines merged via those pull requests by using different colors. First,  we will present the total amount of issues, pull requests and lines merged (using the simple sunburst view). Second, when the user chooses to present specs per working group, the timeline will update accordingly. Also, timeline brushing will affect the number of elements shown on the sunburst.
 
 ## Design Meeting, 4/4/15
 
@@ -64,6 +64,10 @@ By organizing components like this, we successfully establish a visual balance. 
 ## W3C Feedback, 4/23/15
 
 We were fortunate to receive feedback directly from W3C as to our three-part Visualization as it stood so far:
+
+<p align="center">
+    <img src="images/SCREENSHOT AT ROBIN SAW IT" width="600"/>
+</p>
 
 *Given the data that we have, what are the questions you envision
 asking of it most often?*
@@ -125,5 +129,14 @@ Yes, aside from the small bugs I mentioned it's really nice and usable.
 * Consider adding a fourth, network graph if at all possible.
 * For post-project efforts:  try to obtain data about comment-making from GitHub as well as the test suite commits.  Those TWO additions would hopefully comprise the full set of contributions to W3C spec development via GitHub.
 
+## Check-In Meeting, 4/30/15
 
+At this meeting, we reviewed where we were compared to where we wanted to end up.  By this time, based on the W3C feedback, we had added back in commits data and expanded the data visualized in the who graph, and, overall, we were in good shape and did not have any major design issues.
 
+Some discussions were made about specific visualizations, which are detailed in their specific histories.  Also, some new elements did need to be added: a user selection tool for choosing some of our filter options, and an area in which we could display text summarizing the chosen filter options.  Luckily, both of these promised to fit in well with our current layout.
+
+<p align="center">
+    <img src="images/SCREENSHOT AS OF NOW" width="600"/>
+</p>
+
+We find it rather remarkable, really, how closely this matches the ambitious original vision at this point.

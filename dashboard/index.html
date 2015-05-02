@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Web Platform Test Dashboard | Test the Web Forward</title>
+    <title>GitHub and the Web | Dashboard</title>
     <!--Library code -->
     <script src="js/lib/jquery-2.1.3.js"></script>
     <script src="js/lib/d3.js" charset="utf-8"></script>
@@ -40,7 +40,7 @@
                 <div class="navbar-collapse collapse ">
 
                     <ul class="nav navbar-nav">
-                        <h1>W3C - Git the Web Forward</h1>
+                        <h1>Git the Web Forward</h1>
                     </ul>
                 </div>
             </div>
@@ -128,9 +128,15 @@
 
         //If this object is passed to visualization, it will override the default filters
         var initialFilters = {
-            start_date: "2015-03-01",
-            end_date: new Date(),    //new Date() for now
-            state: "open"             //open, closed, or all
+            start_date: "2014-01-01",
+            end_date: "2015-05-05",    // needs to be in this format
+                            // new Date() breaks whovis filtering code
+            state: "all",           //open or all
+            category: "all",        // all, spec, or test
+            specs: [],          // array of which specs to show.  empty = all.
+            caniuse: false,     // change sunburst color to reflect caniuse score
+            who: null,          // or can be one name
+            who_sort: "code"   // or issues
         };
 
         var initVis = function () {
@@ -146,19 +152,19 @@
 
             //Create visualizations
             spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler, initialFilters);
-            who_vis = new WhoVis(d3.select("#whoVis"), allData, authorHandler, null);
+            who_vis = new WhoVis(d3.select("#whoVis"), allData, authorHandler, initialFilters);
             timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler, initialFilters);
             //filter_ui = new FilterUI(d3.select("#filterUI"), allData, filterHandler);
 
             //Wire up event handlers
             $(brushHandler).bind("brushChanged", function (event, selectionStart, selectionEnd) {
                 spec_vis.onTimelineChange(selectionStart, selectionEnd);
-                who_vis.onTimelineChange(selectionStart, selectionEnd);
+                // who_vis.onTimelineChange(selectionStart, selectionEnd);
             });
             $(selectionHandler).bind("selectionChanged", function (event, specSelection) {
                 timeline_vis.onSelectionChange(specSelection);
-                who_vis.onSelectionChange(specSelection);
-                console.log(specSelection);
+                // who_vis.onSelectionChange(specSelection);
+                // console.log(specSelection);
             });
             $(authorHandler).bind("authorChanged", function (event, author) {
                 spec_vis.onAuthorChange(author);
@@ -166,9 +172,9 @@
             });
             $(filterHandler).bind("filterChanged", function(event, filters) {
                 spec_vis.onFilterChange(filters);
-                //timeline_vis.onFilterChange(filters);
+                timeline_vis.onFilterChange(filters);
                 //who_vis.onFilterChange(filters);
-                console.log(filters);
+                // console.log(filters);
             });
         };
         var dataLoaded = function (error, _caniuse, _groups, _specs, _tests) {
@@ -201,7 +207,7 @@
         $(this).children('ul').slideToggle(function() {
             $(this).toggleClass('in out');
         });
-        
+
         $(this).siblings().find('ul').slideUp(function() {
             $(this).removeClass('in').addClass('out');
         });
