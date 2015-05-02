@@ -25,9 +25,15 @@ WhoVis = function(_parentElement, _data, _eventHandler, _filters, _options) {
                                 "PR_O", "PR_C",
                                 "COM", "PUB"];
     }
-    if(this.filters.category === "all")
+
+    if(!Array.isArray(this.filters.category))
     {
+      if(this.filters.category == "all")
+      {
         this.filters.category = ["spec", "test"];
+      } else {
+        this.filters.category = [this.filters.category];
+      }
     }
 
     // defines constants
@@ -98,8 +104,10 @@ WhoVis.prototype.initVis = function() {
 WhoVis.prototype.updateVis = function() {
 
     var that = this;
-// console.log("UpdateVis display data is:");
-// console.log(this.displayData);
+    var who_enter;
+
+console.log("UpdateVis display data is:");
+console.log(this.displayData);
 
     // if want more space between bars, change this.barPadding
     //   here, we display two bars per person, so we need the "2"
@@ -131,9 +139,6 @@ WhoVis.prototype.updateVis = function() {
                         .data(this.displayData,
                             function(d) { return d.who; });
 
-// console.log("Before enter, whos is");
-// console.log(whos);
-
     whos.enter()
         .append("g")
         .attr("class", "who")
@@ -150,52 +155,41 @@ WhoVis.prototype.updateVis = function() {
         })
         .on("mouseover", this.tip.show)
         .on("mouseout", this.tip.hide)
-        .call(function(who) // for every who we just added
-        {
-          if(!who) { console.log("Null enter who ?!?");
-                      return; }
+        .append("text") // every who has a name
+        .text(function(d){return d.who})
+        .style("font-size", "8px")
+        .style("text-anchor", "end")
+        .attr("dx", "-19em")
+        .attr("dy", "0.7em")
+        .style("font-family", "sans-serif")
+        .attr("transform", "rotate(-90)");
 
-            who.append("text")  // every who has a name
-              .text(function(d){return d.who})
-              .style("font-size", "8px")
-              .style("text-anchor", "end")
-              .attr("dx", "-17em")
-              .attr("dy", "0.7em")
-              .style("font-family", "sans-serif")
-              .attr("transform", "rotate(-90)");
+    // move groups as needed
+    whos.transition()
+        .attr("transform", function(d)
+            {
+                return "translate("+ that.x(d.who)+","+ 0 +")";
+            })
+        .call(this.tip);
 
-            who.append("rect")  // a code bar
-              .data(that.displayData.map(function(d)
-                    { return { "who" : d.who,
-                               "total" : d.total_code,
-                               "type" : "code" };
-                    }), function(d) { return d.who + "code"; })
+    // now deal with bars inside of the who group
+    var bars = whos.selectAll("rect")  // each who has a code bar and issues bar
+              .data(function(d)
+              {
+                  return [ {"type" : "code",   "total" : d.total_code   },
+                           {"type" : "issues", "total" : d.total_issues }
+                         ];
+              })
+              .enter()
+              .append("rect")
               .attr("class", function(d){
                         if(that.filters.who !== null
                            && d.who !== d.filters.who) {
-                            return "bar code unselected";
+                            return "bar unselected " + d.type;
                         } else {
-                            return "bar code";
+                            return "bar code " + d.type;
                         }
                     })
-              .attr("x", 0)
-              .attr("width", that.barWidth);
-
-            who.append("rect") // and an issues bar
-              .data(that.displayData.map(function(d)
-                    { return { "who" : d.who,
-                               "total" : d.total_issues,
-                               "type" : "issues" };
-                    }), function(d) { return d.who + "issues"; })
-              .attr("class", function(d) {
-                        if(that.filters.who !== null
-                            && d.who !== d.filters.who) {
-                            return "bar issues unselected";
-                        } else {
-                            return "bar issues";
-                        }
-                    })
-              .attr("width", that.barWidth)
               .attr("x", function(d)
                     {
                         if(d.type === "issues")
@@ -204,67 +198,37 @@ WhoVis.prototype.updateVis = function() {
                             return that.barWidth + that.barPadding;
                         }
                         return 0;
-                    }
-                );
-          }); // done with entering items
+                    })
+              .attr("width", that.barWidth);
 
-// console.log("Update data");
-
-    // update data for all whos children with data
-    whos.selectAll(".bar.code")
-        .data(that.displayData.map(function(d)
-                    { return { "who" : d.who,
-                               "total" : d.total_code,
-                               "type" : "code" };
-                    }), function(d) { return d.who + "code"; });
-
-    whos.selectAll(".bar.issues")
-        .data(that.displayData.map(function(d)
-                    { return { "who" : d.who,
-                               "total" : d.total_issues,
-                               "type" : "issues" };
-                    }), function(d) { return d.who + "issues"; });
-
-// console.log("Now onto transitions");
-    // make updates
-    whos.transition()
-        .attr("transform", function(d)
-            {
-                return "translate("+ that.x(d.who)+","+ 0 +")";
-            })
-        .call(this.tip)
-        .call(function(who)
+    bars.transition()
+        .attr("y", function(d)
         {
-// console.log(who);
-          who.selectAll("rect.bar")
-              .attr("y", function(d)
-              {
-                if (d.type === "code") {
-                    return that.y_code(d.total);
-                } else {
-                    return that.y_issues(d.total);
-                }
-              })
-              .attr("height", function(d)
-              {
-                  if(d.type === "code")
-                  {
-                      return that.y_for_axis - that.y_code(d.total);
-                  }
-                  else
-                  {
-                      return that.y_for_axis - that.y_issues(d.total);
-                  }
-              })
-              .style("fill", function(d)
-              {
-                  if(d.type === "code") {
-                      return that.color_code(d.who);
-                  } else {
-                      return that.color_issues(d.who);
-                  }
+          if (d.type === "code") {
+              return that.y_code(d.total);
+          } else {
+              return that.y_issues(d.total);
+          }
+        })
+        .attr("height", function(d)
+        {
+            if(d.type === "code")
+            {
+                return that.y_for_axis - that.y_code(d.total);
+            }
+            else
+            {
+                return that.y_for_axis - that.y_issues(d.total);
+            }
+        })
+        .style("fill", function(d)
+        {
+            if(d.type === "code") {
+                return that.color_code(d.who);
+            } else {
+                return that.color_issues(d.who);
+            }
               });
-          });
 
     whos.exit().remove();
 
@@ -275,8 +239,8 @@ WhoVis.prototype.updateVis = function() {
 WhoVis.prototype.wrangleData = function() {
     var that = this;
 
-// console.log("WrangleData filter options");
-// console.log(this.filters);
+console.log("WrangleData filter options");
+console.log(this.filters);
 
     // reset possible old data
     this.displayData = [];
@@ -607,8 +571,10 @@ WhoVis.prototype.tooltip = function() {
 // EVENT HANDLERS
 
 WhoVis.prototype.onTimelineChange = function(selectionStart, selectionEnd) {
-    this.filters.start_date = selectionStart;
-    this.filters.end_date = selectionEnd;
+
+    this.filters.start_date = stripTime(selectionStart);
+    this.filters.end_date = stripTime(selectionEnd);
+
     this.wrangleData();
     this.updateVis();
 };
@@ -663,10 +629,15 @@ WhoVis.prototype.onUISelectionChange = function(choices) {
                                 "PR_O", "PR_C",
                                 "COM", "PUB"];
     }
-    if(choices.category === "all") {
+
+    if(!Array.isArray(this.filters.category))
+    {
+      if(this.filters.category == "all")
+      {
         this.filters.category = ["spec", "test"];
-    } else {
-        this.filters.category = [choices.category];
+      } else {
+        this.filters.category = [this.filters.category];
+      }
     }
 
     if(choices.who_sort === "issues") {
