@@ -115,7 +115,7 @@ TimelineVis.prototype.initVis = function() {
       .attr("y2", function(d) { return d; });
 
     // define our tooltip function
-    this.tip = this.tooltip();
+    // this.tip = this.tooltip();
 
     // brushing
     this.brush = d3.svg.brush()
@@ -188,8 +188,7 @@ if(this.displayData.dates.length > 0)
                 });
 
     // create new bars within each date
-    var bars = dates
-        .call(this.tip)
+    var bars = dates //.call(this.tip)
         .selectAll("rect.timebar")
         .data(function(d) { return d.actions; })
         .enter()
@@ -203,9 +202,9 @@ if(this.displayData.dates.length > 0)
                 res = res + " REC";
             }
             return res;
-        })
-        .on("mouseover", this.tip.show)
-        .on("click", this.tip.show);
+        });
+        // .on("mouseover", this.tip.show)
+        // .on("click", this.tip.show);
      // .on("mouseout", this.tip.hide);
 
     // for all bars, new and changing

@@ -228,16 +228,19 @@ SpecVis.prototype.createHierarchy = function(group_lookup, spec_lookup, test_loo
                 var _fullSpec = spec_lookup[_spec.url];
 
                 //every spec will have two children, a group of issues for the HTML spec and a group of tests
-                spec.children = [{  name: "HTML",
-                    type:"HTML",
-                    key: spec.key + "HTML",
-                    url: spec.url,
-                    children: []},
+                spec.children = [
+                    {   name: "HTML",
+                        type:"HTML",
+                        key: spec.key + "HTML",
+                        url: spec.url,
+                        children: []
+                    },
                     {   name: "Tests",
                         type:"Tests",
                         url: "", // WOULD BE NICE TO FILL THIS IN
                         key: spec.key + "Tests",
-                        children: []}];
+                        children: []
+                    }];
 
                 spec.name = _fullSpec.name;
                 if (_fullSpec.issues) {
@@ -275,6 +278,7 @@ SpecVis.prototype.createHierarchy = function(group_lookup, spec_lookup, test_loo
             //looks for tests in the test lookup table, creates copies if found
             if (test_lookup[_spec.url]) {
                 var _allTests = test_lookup[_spec.url];
+console.log(_allTests);
                 _allTests.forEach(function (_test) {
                     var test = {};
                     test.title = _test.title;
@@ -530,37 +534,70 @@ SpecVis.prototype.tooltip = function() {
         .html(function (d) {
             var text;
             var link;
+            var tooltip;
+            // Links to specific issues at times
+            // if (d.name !== undefined) {
+            //     if (d.name == "HTML") {
+            //         text = "Spec";
+            //     }
+            //     else {
+            //         text = d.name;
+            //     }
+            // } else {
+            //     text = d.title;
+            // }
+            // if(d.type === "pull"
+            //     || d.type === "commit"
+            //     || d.type === "issue")
+            // {
+            //     text = d.state + " " + d.type + ": " + text;
+            // }
 
-            if (d.name) {
-                if (d.name == "HTML") {
-                    text = "Spec";
-                }
-                else {
-                    text = d.name;
-                }
-            } else {
-                text = d.title;
-            }
-            if(d.type === "pull"
-                || d.type === "commit"
-                || d.type === "issue")
+            // if(d.url !== undefined) {
+            //     link = d.url;
+            // } else if(d.html_url !== undefined) {
+            //     link = d.html_url;
+            // } else if(d.name !== "W3C") {
+            //     console.log("Error: Object missing URL");
+            //     console.log(d);
+            // }
+
+            // Spec-level-only tooltips
+            if(d.type == "root" || d.type == "group"
+                || d.type == "spec")
             {
-                text = d.state + " " + d.type + ": " + text;
+                text = d.name;
+                if(d.type == "root") {
+                    link = "https://www.w3.org";
+                } else {
+                    link = d.url;
+                }
+            } else if(d.type === "HTML" || d.type === "Tests")
+            {
+                if(d.type === "HTML")
+                {
+                    text = d.parent.name + " Spec Edits";
+                } else {
+                    text = d.parent.name + " Test Suite";
+                }
+                link = d.parent.url;
+            } else { // pull, issue, or commit
+                if(d.parent.name === "HTML")
+                {
+                    text = d.parent.parent.name + " Spec Edits - ";
+                } else {
+                    text = d.parent.parent.name + " Test Suite - ";
+                }
+                text = text + d.state + " " + d.type;
+                link = d.parent.parent.url;
             }
 
-            if(d.url !== undefined) {
-                link = d.url;
-            } else if(d.html_url !== undefined) {
-                link = d.html_url;
-            } else if(d.name !== "W3C") {
-                console.log("Error: Object missing URL");
-                console.log(d);
-            }
-
-            return "<div class='d3-tip'>"
+            tooltip = "<div class='d3-tip'>"
                 + "<a href='" + link
                 + "'>" + text
                 + "</a></div>";
+
+            return tooltip;
         });
 };
 
