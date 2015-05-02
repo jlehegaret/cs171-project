@@ -25,7 +25,7 @@ WhoVis = function(_parentElement, _data, _eventHandler, _filters, _options) {
     this.processedData = d3.map();
 
     // defines constants
-    this.margin = {top: 20, right: 10, bottom: 20, left: 50};
+    this.margin = {top: 0, right: 10, bottom: 20, left: 50};
     this.width = this.options.width - this.margin.left - this.margin.right;
     // height is going to be as high as it needs to be for all bars
     //  but here is a default
@@ -51,11 +51,11 @@ WhoVis.prototype.initVis = function() {
         .append("g");
 
     this.y_code = d3.scale.linear()
-        .range([this.height/2, 0]);
+        .range([this.height/4, -60]);
 
 
     this.y_issues = d3.scale.linear()
-        .range([this.height/2, 0]);
+        .range([this.height/4, -60]);
 
 
     this.x = d3.scale.ordinal();
@@ -224,11 +224,11 @@ WhoVis.prototype.updateVis = function() {
         {
             if(d.type === "code")
             {
-                return that.height/33 - that.y_code(d.total);
+                return that.height/60 - that.y_code(d.total);
             }
             else
             {
-                return that.height/33 - that.y_issues(d.total);
+                return that.height/60 - that.y_issues(d.total);
             }
         });
 
@@ -237,7 +237,7 @@ WhoVis.prototype.updateVis = function() {
         .text(function(d){return d.who})
         .style("font-size", "8px")
         .style("text-anchor", "end")
-        .attr("dx", "-30em")
+        .attr("dx", "-17em")
         .attr("dy", "0.7em")
         .style("font-family", "sans-serif")
         .attr("transform", function(d) {
