@@ -216,7 +216,7 @@ if(this.displayData.length > 0)
         .append("rect")
         .attr("class", function(d){
                   if(that.filters.who !== null
-                     && d.who !== d.filters.who) {
+                     && d.who !== that.filters.who) {
                       return "bar unselected " + d.type;
                   } else {
                       return "bar code " + d.type;
@@ -637,23 +637,23 @@ WhoVis.prototype.onFilterChange = function(choices) {
 //     var reSort = false;
 //     var reWrangle = false;
 
-//     if(choices.state === "open") {
-//         if(this.filters.actions.length !== 2)
-//         {
+    if(choices.state === "open") {
+        if(this.filters.actions.length !== 2)
+        {
 // console.log("Changed actions");
-//             reWrangle = true;
-//             this.filters.actions = ["ISS_O","PR_O"];
-//         }
-//     } else {
-//         if(this.filters.actions.length !== 6)
-//         {
+            reWrangle = true;
+            this.filters.actions = ["ISS_O","PR_O"];
+        }
+    } else {
+        if(this.filters.actions.length !== 6)
+        {
 // console.log("Changed actions");
-//             reWrangle = true;
-//             this.filters.actions = ["ISS_O", "ISS_C",
-//                                     "PR_O", "PR_C",
-//                                     "COM", "PUB"];
-//         }
-//     }
+            reWrangle = true;
+            this.filters.actions = ["ISS_O", "ISS_C",
+                                    "PR_O", "PR_C",
+                                    "COM", "PUB"];
+        }
+    }
 
 //     if(choices.category[0] !==  this.filters.category[0]
 //         || this.filters.category.length !== choices.category.length)

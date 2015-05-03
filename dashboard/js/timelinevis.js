@@ -255,8 +255,7 @@ if(this.displayData.dates.length > 0)
                     else
                     {
   // console.log(that.filters.category);
-                      if(d.dir === "up"
-                          || that.filters.category.length === 1)
+                      if(d.dir === "up" || that.filters.category.length === 1)
                       {
                         d.y = that.y_axisType(d.cat + " " + d.scale)
                               - d.height;
@@ -310,7 +309,6 @@ TimelineVis.prototype.wrangleData = function() {
 
   // we will check each day's complete data for data we want to display
   this.processedData.forEach(function(d) {
-
       var day = {};
       // if we're in the timeframe
       if( d.date >= that.filters.start_date
@@ -750,6 +748,9 @@ TimelineVis.prototype.onSelectionChange = function(sunburstSelection) {
     // and a "just in case"
     if(this.filters.specs === undefined) { this.filters.specs = []; }
 
+// console.log("After UI choice:");
+// console.log(this.filters);
+
     this.wrangleData();
     this.updateVis();
 };
@@ -763,7 +764,7 @@ TimelineVis.prototype.onAuthorChange = function(author) {
 TimelineVis.prototype.onFilterChange = function(choices) {
     //TODO: This function is triggered by a selection of an arc on a sunburst, wrangle data needs to be called on this selection
     // console.log(choices);
-    if(choices.status === "open") {
+    if(choices.state === "open") {
         this.filters.actions = ["ISS_O","PR_O", "PUB"];
     } else {
         this.filters.actions = ["ISS_O", "ISS_C",
