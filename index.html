@@ -8,7 +8,9 @@
     <script src="js/lib/d3.js" charset="utf-8"></script>
     <script src="js/lib/queue.v1.js"></script>
     <script src="js/lib/d3.tip.v0.6.6.js"></script>
+    <!--
     <script src="js/preloader.js"></script>
+    -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 
     <!-- Styles from http://testthewebforward.org/ -->
@@ -56,47 +58,46 @@
         <nav id='cssmenu'>
             <ul>
 
-                <li class='active'><a href='#'><span>View By Status</span></a>
+                <li class='active'><a class="links" href='#'><span>View By Status</span></a>
                     <ul class='child'>
-                        <li class='has-sub'><a href='#'><span>All</span></a>
-
+                        <li class='has-sub'><a id="state_all" href='#'><span>All</span></a>
                         </li>
-                        <li class='has-sub'><a href='#'><span>Unresolved Items</span></a>
+                        <li class='has-sub'><a id="state_open" href='#'><span>Unresolved Items</span></a>
                         </li>
                     </ul>
                 </li>
 
-                <li class='active'><a href='#'><span>View By Category</span></a>
+                <li class='active'><a class="links" href='#'><span>View By Category</span></a>
                     <ul class='child'>
-                        <li class='has-sub'><a href='#'><span>All </span></a>
+                        <li class='has-sub'><a id="cat_all" href='#'><span>All </span></a>
 
                         </li>
-                        <li class='has-sub'><a href='#'><span>Spec Edits</span></a>
+                        <li class='has-sub'><a id="cat_spec" href='#'><span>Spec Edits</span></a>
                         </li>
 
-                        <li class='has-sub'><a href='#'><span>Test Suite Updates</span></a>
+                        <li class='has-sub'><a id= "cat_test" href='#'><span>Test Suite Updates</span></a>
                         </li>
 
                     </ul>
                 </li>
 
 
-                <li class='active'><a href='#'><span>Sort Contributors</span></a>
+                <li class='active'><a class="links" href='#'><span>Sort Contributors</span></a>
                     <ul class='child'>
-                        <li class='has-sub'><a href='#'><span>By Lines of Code Touched</span></a>
+                        <li class='has-sub'><a id="sort_code" href='#'><span>By Lines of Code Touched</span></a>
 
                         </li>
-                        <li class='has-sub'><a href='#'><span>By Issues Raised</span></a>
+                        <li class='has-sub'><a id="sort_issue" href='#'><span>By Issues Raised</span></a>
                         </li>
                     </ul>
                 </li>
 
-                <li class='active'><a href='#'><span>CanIUse</span></a>
+                <li class='active'><a class="links" href='#'><span>CanIUse</span></a>
                     <ul class='child'>
-                        <li class='has-sub'><a href='#'><span>Show</span></a>
+                        <li class='has-sub'><a id="caniuse_true" href='#'><span>Show</span></a>
 
                         </li>
-                        <li class='has-sub'><a href='#'><span>Hide</span></a>
+                        <li class='has-sub'><a id="caniuse_false" href='#'><span>Hide</span></a>
                         </li>
                     </ul>
                 </li>
@@ -163,7 +164,10 @@
             spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler, initialFilters);
             who_vis = new WhoVis(d3.select("#whoVis"), allData, authorHandler, initialFilters);
             timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler, initialFilters);
-            //filter_ui = new FilterUI(d3.select("#filterUI"), allData, filterHandler);
+            filter_ui = new FilterUI(initialFilters, filterHandler);
+
+            //End preload animation
+            $('body').addClass('loaded');
 
             //Wire up event handlers
             $(brushHandler).bind("brushChanged", function (event, selectionStart, selectionEnd) {
@@ -173,6 +177,7 @@
             $(selectionHandler).bind("selectionChanged", function (event, specSelection) {
                 timeline_vis.onSelectionChange(specSelection);
                 who_vis.onSelectionChange(specSelection);
+                document.getElementById("whereAmI").innerHTML = specSelection.name;
                 // console.log(specSelection);
             });
             $(authorHandler).bind("authorChanged", function (event, author) {
@@ -180,10 +185,11 @@
                 timeline_vis.onAuthorChange(author);
             });
             $(filterHandler).bind("filterChanged", function(event, filters) {
+                // console.log("Filters changed");
+                // console.log(filters);
                 spec_vis.onFilterChange(filters);
                 timeline_vis.onFilterChange(filters);
                 who_vis.onFilterChange(filters);
-                // console.log(filters);
             });
         };
         var dataLoaded = function (error, _caniuse, _groups, _specs, _tests) {
@@ -211,17 +217,14 @@
 
         ////for navbar transition/////
 
+        ////for navbar transition/////
+
         $(function () {
-            $('.active').on('click', function () {
-                $(this).children('.child').slideToggle(function() {
+            $('.links').on('click', function () {
+                $(this).parent('.active').children('.child').slideToggle(function() {
                     $(this).toggleClass('in out');
                 });
             });
-
-            $('.child').on('click', function () {
-                $(this).toggleClass('blue');
-            });
-
         });
 
     });

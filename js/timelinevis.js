@@ -145,19 +145,11 @@ TimelineVis.prototype.updateVis = function() {
 // console.log("TimeVis Display Data is");
 // console.log(this.displayData);
 
-    // update scales - would be nice though if zoom part stays consistent
-    //  per chosen start & end dates rather than based on data
-//     this.x0.domain(d3.extent(this.displayData.dates,
-//                               function(d)
-//                               {
-// // console.log(Date.parse(d.date));
-//                                 return Date.parse(d.date); } ));
+    // update scales
     this.x0.domain([
                     Date.parse(this.filters.start_date),
                     Date.parse(this.filters.end_date)
                    ]);
-// console.log(Date.parse(this.filters.start_date));
-// console.log(Date.parse(this.filters.end_date));
 
     // when grouping bars
     // update bar widths - right now we have 6 bars in each group
@@ -263,8 +255,7 @@ if(this.displayData.dates.length > 0)
                     else
                     {
   // console.log(that.filters.category);
-                      if(d.dir === "up"
-                          || that.filters.category.length === 1)
+                      if(d.dir === "up" || that.filters.category.length === 1)
                       {
                         d.y = that.y_axisType(d.cat + " " + d.scale)
                               - d.height;
@@ -318,7 +309,6 @@ TimelineVis.prototype.wrangleData = function() {
 
   // we will check each day's complete data for data we want to display
   this.processedData.forEach(function(d) {
-
       var day = {};
       // if we're in the timeframe
       if( d.date >= that.filters.start_date
@@ -410,9 +400,11 @@ TimelineVis.prototype.wrangleData = function() {
                           {
                             yes = true;
                           }
-                      } else
-                      {
+                      } else if(dd.type === "PUB") {
+                        //ignore
+                      } else {
                         console.log("How to 'who' filter this data?");
+                        console.log(dd);
                       }
                     }
                   } // done checking
@@ -756,6 +748,9 @@ TimelineVis.prototype.onSelectionChange = function(sunburstSelection) {
     // and a "just in case"
     if(this.filters.specs === undefined) { this.filters.specs = []; }
 
+// console.log("After UI choice:");
+// console.log(this.filters);
+
     this.wrangleData();
     this.updateVis();
 };
@@ -766,10 +761,10 @@ TimelineVis.prototype.onAuthorChange = function(author) {
     this.updateVis();
 };
 
-WhoVis.prototype.onUISelectionChange = function(choices) {
+TimelineVis.prototype.onFilterChange = function(choices) {
     //TODO: This function is triggered by a selection of an arc on a sunburst, wrangle data needs to be called on this selection
     // console.log(choices);
-    if(choices.status === "open") {
+    if(choices.state === "open") {
         this.filters.actions = ["ISS_O","PR_O", "PUB"];
     } else {
         this.filters.actions = ["ISS_O", "ISS_C",
