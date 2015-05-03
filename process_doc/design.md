@@ -66,10 +66,10 @@ As Zona processed this hierarchy, she imagined this storytelling process:
 The idea of introducing our interface using step-by-step animation is to simplify the main view. Going through the different steps, we can tell a story about W3C and at the same time introduce users to our different visual variables and what they represent.
 
 These are the steps, per row of her diagram:
-1. Display W3C as one circle
-2. Introduce working groups and specs per working group
-3. From specs to overall W3C contribution
-4. Represent overall W3C contribution.
+1. W3C as a whole is represented by one circle
+2. That circle encompasses 15 Working Groups that use GitHub.  Each Working Group is responsible for multiple Specications.
+3. Different kinds of work are done to get a Specification to Recommendation status.
+4. We can then conglomerate all of those pieces of work to see the summary at the overall W3C level.
 
 For the main page, which needs to show thousands of datapoints across multiple categories, Zona envisioned the dashboard along these lines:
 

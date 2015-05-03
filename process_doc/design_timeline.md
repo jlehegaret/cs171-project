@@ -34,14 +34,37 @@ However, we wanted our color-coding by contribution type.  Also, given that ever
 
 Due to the crowdedness of the data, we broke up the types of work into yet more axes, so that that every day could be just 1-2 pixels wide rather than 5.  The top two lines represent code and issues for the specs themselves, while the bottom two lines represent code and issues for the test suite.
 
-Even so, the complete history of data seemed too much for the graph.  We turned to pre-emptive filtering to show data for the most recent year and a half.  This seemed reasonable, given that W3C seems most interested in trends over the last few months:
+Even so, the complete history of data seemed too much for the graph.  We turned to pre-emptive filtering to show data for the most recent year and a half.  This seemed reasonable, given that W3C seems most interested in trends over the last few months.
+
+However, we also added informational elements:
+
+Gray lines represent "last published" dates of non-Recommendation-status specs, while black lines represent "last published" dates of Recommendation-status specs.  W3C hopes that all of its non-Recommendation specs are updated everything three months, so we can already see that a lot is falling through the cracks - many specs are older than three months.
+
+Tooltips list all of the pieces that went into forming each bar help identify what happened when, and which specs were published when.
 
 <p align="center">
     <img src="images/Timeline3.png" width="600"/>
 </p>
 
-Gray lines represent "last published" dates of non-Recommendation-status specs, while black lines represent "last published" dates of Recommendation-status specs.  W3C hopes that all of its non-Recommendation specs are updated everything three months, so we can already see that a lot is falling through the cracks - many specs are older than three months.
+Anticipating rendering help from the "focus and context" axis, we reconsolidated the data onto one axis.  Specification work generally points up while test suite work points down -- however, if the user chooses to see only test suite work, then that points up as well.
 
-We then added tooltips to list all of the pieces that went into forming each bar help identify what happened when, and which specs were published when.
+At this point, the timeline also reacts to other events on the page.  It can be filtered to show only work done by a particular Working Group, on a particular spec, by a particular person, only still-unresolved issues or all issues, and particular branches of work - only spec edits, only test suite development, or both.
+
+However, at this point, the timeline has had its tooltips deactivated, as they do not work well with the brushing in the current iteration, and we want first to change to the "focus and context" axis format before revisiting this issue.
+
+<p align="center">
+    <img src="images/Timeline4.png" width="600"/>
+</p>
 
 
+WITH FOCUS AND CONTEXT AXIS
+
+<p align="center">
+    <img src="images/Timeline5.png" width="600"/>
+</p>
+
+IN THE END - what tooltips are there.
+
+<p align="center">
+    <img src="images/Timeline6.png" width="600"/>
+</p>

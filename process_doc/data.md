@@ -86,9 +86,9 @@ As we worked with the data, we found some missing pieces of information.  While 
 * **spec closed issues missing closed by name** - fixed
 * **spec issues missing difficulty level** - actually, spec issues are not assigned a difficulty level.  Decided to treat them all as "easy" in that case.
 * **test data missing commit info** - outstanding - too many different API requests needed to generate to obtain this information (ie, too complicated even if GitHub was still allowing access).  As a result, we decided to drop commits altogether, rather than displaying half of them, although we hoped to revisit this decision before the end of the project.
-* **missing "closed by" name when pull requests closed without being merged** - outstanding - too late to download additional field of information.  As a result, we include all we can, but we are careful to filter out "unknown" and "undefined" from our graph of the top contributors.
-* **duplicate name information** - people may be listed by their full name (in the case of commits) or by their login name (in the case of pull requests).  Resolution of this data problem was a byproduct of our decision to drop commits given the incomplete nature of the commits data.  If we do add back commits, we would have to live with this fragmentation in the short-term - it would require perhaps an additional hash lookup or somesuch truly to resolve the matter.
-* **missing Working Group name** for one spec - our source data was able to be corrected and the name provided.
+* **missing "closed by" name when pull requests closed without being merged** - outstanding - too late to download additional field of information from GitHub.  As a result, we include all we can, but we are careful to filter out "unknown" and "undefined" from our graph of the top contributors.
+* **duplicate name information** - people may be listed by their full name (in the case of commits) or by their login name (in the case of pull requests).  This is a remnant of inconsistency in the original data.  While the data now has login consistently, we have not yet incorporated that improvement into our code.
+* **missing Working Group name** for one spec - our source data was able to be corrected and the name provided.  However, there are still more "unknown" entries which are only now coming to light via use of our Visualization.  These will be corrected over time.
 
 ## Further Data Exploration
 

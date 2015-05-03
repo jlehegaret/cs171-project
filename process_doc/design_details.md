@@ -8,18 +8,18 @@
 In its first iteration, the dashboard consisted of two parts:  a sunburst tree diagram and a timeline.
 
 <p align="center">
-    <img src="images/w3_proposal.jpg" width="600"/>
+    <img src="images/w3_proposal.png" width="600"/>
 </p>
 
 ### Sunburst
 
-This simple sunburst shows only the working groups, not individual specs.  We can compare overall contribution by using the amounts of existing pull requests (blue left) and issues (red right). Dark red are hard issues. The idea is to see the amount of work that has been done as compared to work still outstanding.
+This simple sunburst shows only the working groups, not individual specs.  We can evaluate the amount of work being done by viewing existing pull requests (blue left) and issues (red right). Here, dark red signifies hard issues. The idea is to see the amount of work that has been done as compared to work still outstanding.
 
-A second, full view (showing working groups, specs, issues, pull requests) is also possible. At this point we can compare working groups, issues per working group, issues per spec… The idea to visualize all at once is to assess the maximum amount of visual elements we might have at a particular moment. Data will be filtered by spec or working group, so that the information provided via the sunburst will be most meaningful.
+A second, full view (showing working groups, specs, issues, pull requests) would also be possible. At this point we can compare working groups, issues per working group, issues per spec… The idea to visualize all at once is to assess the maximum amount of visual elements we might have at a particular moment. Data will be filtered by spec or working group, so that the information provided via the sunburst will be most meaningful.
 
 ### Timeline
 
-The timeline needs to represent all easy issues, hard issues, pull requests and the number of lines merged via those pull requests by using different colors. First,  we will present the total amount of issues, pull requests and lines merged (using the simple sunburst view). Second, when the user chooses to present specs per working group, the timeline will update accordingly. Also, timeline brushing will affect the number of elements shown on the sunburst.
+The timeline needs to represent all easy issues, hard issues, pull requests and the number of lines merged via those pull requests by using different colors. First,  we will present the total amount of issues, pull requests and lines merged. Second, when the user uses the sunburst to select a certain working group or spec, the timeline will update accordingly. Also, timeline brushing will affect the number of elements shown on the sunburst.
 
 ## Design Meeting, 4/4/15
 
@@ -133,10 +133,17 @@ Yes, aside from the small bugs I mentioned it's really nice and usable.
 
 At this meeting, we reviewed where we were compared to where we wanted to end up.  By this time, based on the W3C feedback, we had added back in commits data and expanded the data visualized in the who graph, and, overall, we were in good shape and did not have any major design issues.
 
-Some discussions were made about specific visualizations, which are detailed in their specific histories.  Also, some new elements did need to be added: a user selection tool for choosing some of our filter options, and an area in which we could display text summarizing the chosen filter options.  Luckily, both of these promised to fit in well with our current layout.
+Some discussions were made about specific visualizations, which are detailed in their specific histories.  Also, some new elements did need to be added: a user selection tool for choosing some of our filter options, and an area in which we could display text summarizing the chosen filter options.  Luckily, both of these promised to fit in well with our current layout.  We also discussed adding a splash screen that would display as our data loads.
 
 <p align="center">
     <img src="images/SCREENSHOT AS OF NOW" width="600"/>
 </p>
 
-We find it rather remarkable, really, how closely this matches the ambitious original vision at this point.
+We find it rather remarkable, really, how closely this matches the ambitious original vision.
+
+## Final Iteration, 5/5/15
+
+<p align="center">
+    <img src="images/FINAL" width="600"/>
+</p>
+

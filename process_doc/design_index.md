@@ -20,9 +20,17 @@ However, by the time that we met with our TF (or "marker"), we had dared to go a
     <img src="images/Index2.png" width="600"/>
 </p>
 
-Once the fundamental graphs were in place, Zona was able to spend some time further improving the overall look:
+Once the fundamental graphs were in place, Zona was able to spend some time further improving the overall look while Jennifer re-consolidated the timeline in anticipation of taking advantage of the "focus and context" axis recommended by our TF:
 
-[ screenshot here ]
+<p align="center">
+    <img src="images/NOW.png" width="600"/>
+</p>
 
-[ AND THEN, WHAT LIES AHEAD EVEN AFTER THAT...]
+
+As we continued work on each visualization within the pages, improving focus capabilities and adding descriptive text and legends, the dashboard finally looked like:
+
+<p align="center">
+    <img src="images/FINISHED.png" width="600"/>
+</p>
+
 

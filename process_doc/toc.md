@@ -1,4 +1,4 @@
-# W3C - Test the Web Forward
+# Git the Web Forward
 
 **The CS 171 Group Project created by**
 

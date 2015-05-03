@@ -1,4 +1,4 @@
-# W3C - Test the Web Forward
+# Git the Web Forward
 **by Jennifer Le Hegaret, Zona Kostic, and John Greeley**
 
 ## Section 1 - Background and Objectives

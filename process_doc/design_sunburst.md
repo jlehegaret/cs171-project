@@ -37,6 +37,15 @@ Also, these colors, being quite flat, appeared quite amateur, and so we chose a 
     <img src="images/Sunburst4.png" width="600"/>
 </p>
 
+As we progressed, we added tooltips providing URLs to the source GitHub pages so that the user could drill down into every item on display.  Like that, when surprising data showed, or when the data showing was of concern (ie, still-open issues), there is very speedy access to the heart of the matter.
 
+We also added outward-going interaction - as the user zooms in and out of the different levels offered in the sunburst, to see a particular Working Group or Specification, the other visualizations on the pages are notified of the current selection and update accordingly.
+
+<p align="center">
+    <img src="images/Sunburst5.png" width="600"/>
+</p>
+
+
+In our final version,  -- inward interaction, final tooltip format.
 
 

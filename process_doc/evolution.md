@@ -1,4 +1,4 @@
-# Section 6- The Evolution
+# Section 6- The End Result
 
 * *return to [Section 5, Our Proposed Feature Set](proposal.md)*
 * *proceed to [Section 7, Interesting Discoveries](discoveries.md)*
