@@ -39,6 +39,9 @@ SpecVis.prototype.initVis = function () {
     // sets up default state filter
     this.currentStateFilter = this.stateFilter(this.filters.state);
 
+    this.currentCategoryFilter = this.categoryFilter(this.filters.category);
+
+
 
     //use standard descending ordering for all elements
     //except group issues and pulls separately
@@ -113,6 +116,12 @@ SpecVis.prototype.wrangleData = function (_filters) {
     //Create a new filter chain from currentFilters and new _filters
     var filterChain = this.createFilterChain(_filters);
 
+    var categoryFilter = this.currentCategoryFilter;
+    if (_filters && _filters._categoryFilterFunction) {
+        categoryFilter = _filters._categoryFilterFunction;
+    }
+    this.currentCategoryFilter = categoryFilter;
+
     //create a lookup table of specs keyed by spec url, apply filters to data
     this.displayData.spec_lookup = {};
     this.data.specs.forEach(function (d) {
@@ -121,10 +130,10 @@ SpecVis.prototype.wrangleData = function (_filters) {
         spec.url = d.url;
         spec.name = d.title;
         spec.score = d.score;  // this is here now, but I don't see it showing up elsewhere
-        if (d.issues) {
+        if (d.issues && categoryFilter("issue")) {
             spec.issues = d.issues.filter(filterChain);
         }
-        if (d.commits) {
+        if (d.commits && categoryFilter("commit")) {
             spec.commits = d.commits.filter(filterChain);
         }
         that.displayData.spec_lookup[d.url] = spec;
@@ -132,17 +141,20 @@ SpecVis.prototype.wrangleData = function (_filters) {
 
     //creates a lookup table of tests keyed by spec url, apply filters to data
     this.displayData.test_lookup = {};
-    this.data.tests.forEach(function (test) {
-        if (filterChain(test)) {
-            test.specs.forEach(function (spec) {
-                //check if an entry already exists, if not create one
-                if (!that.displayData.test_lookup[spec]) {
-                    that.displayData.test_lookup[spec] = [];
-                }
-                that.displayData.test_lookup[spec].push(test);
-            })
-        }
-    });
+
+    if(categoryFilter("test")) {
+        this.data.tests.forEach(function (test) {
+            if (filterChain(test)) {
+                test.specs.forEach(function (spec) {
+                    //check if an entry already exists, if not create one
+                    if (!that.displayData.test_lookup[spec]) {
+                        that.displayData.test_lookup[spec] = [];
+                    }
+                    that.displayData.test_lookup[spec].push(test);
+                })
+            }
+        });
+    }
 
     //create the tree hierarchy needed by the partition layout from the filtered data
     this.displayData.root = this.createHierarchy(
@@ -323,7 +335,8 @@ SpecVis.prototype.onAuthorChange = function(authorSelection) {
 // Expects _filters to be and object with at least a "state" field
 SpecVis.prototype.onFilterChange = function(_filters) {
      filters = {
-         _stateFilterFunction: this.stateFilter(_filters.state)
+         _stateFilterFunction: this.stateFilter(_filters.state),
+         _categoryFilterFunction: this.categoryFilter(_filters.category)
      };
      this.wrangleData(filters);
      this.updateVis();
@@ -354,6 +367,22 @@ SpecVis.prototype.createFilterChain = function (filters) {
     return filterChain = function(d) {
         return dateFilterFunction(d) && authorFilterFunction(d) && stateFilterFunction(d);
     };
+};
+
+SpecVis.prototype.categoryFilter = function(category) {
+    var categories = [];
+
+    if(category === "all" || category === "spec") {
+        categories.push("issue");
+        categories.push("commit")
+    }
+    if(category === "all" || category === "test") {
+        categories.push("test");
+    }
+
+    return function(d) {
+        return categories.indexOf(d) != -1;
+    }
 };
 
 // returns closure with filter for start to end date
