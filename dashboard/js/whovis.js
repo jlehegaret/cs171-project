@@ -3,7 +3,7 @@ WhoVis = function(_parentElement, _data, _eventHandler, _filters, _options) {
     this.data = _data;
     this.eventHandler = _eventHandler;
     this.options = _options || {
-        "width"       : 7670,
+        "width"       : 700,
         "height"      : 300
     };
 
@@ -37,9 +37,9 @@ WhoVis = function(_parentElement, _data, _eventHandler, _filters, _options) {
     }
 
     // defines constants
-    this.margin = {top: 0, right: 10, bottom: 20, left: 50};
+    this.margin = {top: 0, right: 10, bottom: 20, left: 10};
     this.width = this.options.width - this.margin.left - this.margin.right;
-    // height is going to be as high as it needs to be for all bars
+    // width is going to be as big as it needs to be for all bars
     //  but here is a default
     this.height = this.options.height - this.margin.top - this.margin.bottom;
     this.y_for_axis = this.height/2; // we give bars half the space, names the other half
@@ -107,14 +107,44 @@ WhoVis.prototype.updateVis = function() {
     var that = this;
     var who_enter;
 
-// console.log("WhoVis display data is:");
-// console.log(this.displayData);
 
     // if want more space between bars, change this.barPadding
     //   here, we display two bars per person, so we need the "2"
-    this.width = this.displayData.length * 2 * (this.barWidth + this.barPadding);
+    this.width = (this.displayData.length * 2) * (this.barWidth + this.barPadding);
+    this.parentElement.select("svg").attr("width",
+    this.width + this.margin.left + this.margin.right);
 
-    this.parentElement.select("svg");
+    // Moving sorting here in case some day
+    // we are more efficient to process events
+    // Helper functions
+    var codeSort = function(a, b) {
+        if(b.total_code < a.total_code) {
+            return -1;
+        } else if(b.total_code > a.total_code) {
+            return 1;
+        } else {
+            return b.total_issues - a.total_issues;
+        }
+    };
+
+    var issueSort = function(a, b) {
+        if(b.total_issues < a.total_issues) {
+            return -1;
+        } else if(b.total_issues > a.total_issues) {
+            return 1;
+        } else {
+            return b.total_code - a.total_code;
+        }
+    };
+
+    var tmpDomain;
+    if(this.filters.who_sort === "issues") {
+
+        tmpDomain = that.displayData.sort(issueSort).map(function(d) { return d.who; });
+    } else {
+        tmpDomain = that.displayData.sort(codeSort).map(function(d) { return d.who; });
+    }
+    this.x.domain(tmpDomain).rangeRoundBands([0, this.width], .2, 0);
 
     // for lines of code
     this.max = d3.max(this.displayData, function(d) {
@@ -128,8 +158,6 @@ WhoVis.prototype.updateVis = function() {
     });
     this.y_issues.domain([0, this.max]);
 
-    this.x.domain(this.displayData.map(function(d) { return d.who; }))
-          .rangeRoundBands([0, this.width], .2, 0);
 
     // this.svg.select(".x.axis")
     //     .call(this.xAxis)
@@ -283,33 +311,6 @@ WhoVis.prototype.wrangleData = function() {
 
     this.displayData = this.processedData.values();
 
-    // now sort according to preference
-    var codeSort = function(a, b) {
-        if(b.total_code < a.total_code) {
-            return -1;
-        } else if(b.total_code > a.total_code) {
-            return 1;
-        } else {
-            return b.total_issues - a.total_issues;
-        }
-    };
-
-    var issueSort = function(a, b) {
-        if(b.total_issues < a.total_issues) {
-            return -1;
-        } else if(b.total_issues > a.total_issues) {
-            return 1;
-        } else {
-            return b.total_code - a.total_code;
-        }
-    };
-
-    if(this.filters.who_sort === "issue") {
-        this.displayData.sort(issueSort);
-    } else {
-        this.displayData.sort(codeSort);
-    }
-
   // filter out exceptions
   // // take enough elements to cover exceptions list, just in case
   // this.displayData = this.displayData.slice(0,
@@ -318,10 +319,8 @@ WhoVis.prototype.wrangleData = function() {
         return that.exclusions.indexOf(d.who) === -1;
     });
   // // make sure it's the right length
-  // this.displayData = this.displayData.slice(0,10);
+  // this.displayData = this.displayData.slice(0, this.options.number_who);
 
-// console.log("WrangleData: display data is now:");
-// console.log(this.displayData);
 };
 
 WhoVis.prototype.processData = function processData(d, category) {
@@ -630,34 +629,60 @@ WhoVis.prototype.onSelectionChange = function(sunburstSelection) {
 };
 
 WhoVis.prototype.onFilterChange = function(choices) {
-    //TODO: This function is triggered by a selection of an arc on a sunburst, wrangle data needs to be called on this selection
-    // console.log(choices);
-    if(choices.status === "open") {
-        this.filters.actions = ["ISS_O","PR_O"];
-    } else {
-        this.filters.actions = ["ISS_O", "ISS_C",
-                                "PR_O", "PR_C",
-                                "COM", "PUB"];
-    }
 
-    if(!Array.isArray(this.filters.category))
-    {
-      if(this.filters.category == "all")
-      {
-        this.filters.category = ["spec", "test"];
-      } else {
-        this.filters.category = [this.filters.category];
-      }
-    }
+// All this checking was a nice idea but it is useless as the filters
+//   object used in the code is directly updated via the GUI
+//   Maybe later figure out how to save and check state.
+// console.log(choices);
+//     var reSort = false;
+//     var reWrangle = false;
 
-    if(choices.who_sort === "issues") {
-        this.filters.who_sort = "issues";
-    } else {
-        this.filters.who_sort = "code";
-    }
+//     if(choices.state === "open") {
+//         if(this.filters.actions.length !== 2)
+//         {
+// console.log("Changed actions");
+//             reWrangle = true;
+//             this.filters.actions = ["ISS_O","PR_O"];
+//         }
+//     } else {
+//         if(this.filters.actions.length !== 6)
+//         {
+// console.log("Changed actions");
+//             reWrangle = true;
+//             this.filters.actions = ["ISS_O", "ISS_C",
+//                                     "PR_O", "PR_C",
+//                                     "COM", "PUB"];
+//         }
+//     }
+
+//     if(choices.category[0] !==  this.filters.category[0]
+//         || this.filters.category.length !== choices.category.length)
+//     {   // know they're different
+// console.log("Changed category");
+//         reWrangle = true;
+//         this.filters.category = choices.category;
+//     }
+
+//     if(this.filters.who_sort !== choices.who_sort)
+//     {
+// console.log("Changed sort");
+//         reSort = true;
+//         this.filters.who_sort = choices.who_sort;
+//     }
+
+// console.log("Resulting filters");
+// console.log(this.filters);
 
     // console.log("After UI choice:");
     // console.log(this.filters);
-    this.wrangleData();
-    this.updateVis();
+//     if(reWrangle)
+//     {
+// console.log("ReWrangling");
+        this.wrangleData();
+//     }
+//     if(reWrangle || reSort)
+//     {
+// console.log("Updating");
+        this.updateVis();
+    // }
 };

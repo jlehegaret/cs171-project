@@ -145,19 +145,11 @@ TimelineVis.prototype.updateVis = function() {
 // console.log("TimeVis Display Data is");
 // console.log(this.displayData);
 
-    // update scales - would be nice though if zoom part stays consistent
-    //  per chosen start & end dates rather than based on data
-//     this.x0.domain(d3.extent(this.displayData.dates,
-//                               function(d)
-//                               {
-// // console.log(Date.parse(d.date));
-//                                 return Date.parse(d.date); } ));
+    // update scales
     this.x0.domain([
                     Date.parse(this.filters.start_date),
                     Date.parse(this.filters.end_date)
                    ]);
-// console.log(Date.parse(this.filters.start_date));
-// console.log(Date.parse(this.filters.end_date));
 
     // when grouping bars
     // update bar widths - right now we have 6 bars in each group
@@ -410,9 +402,11 @@ TimelineVis.prototype.wrangleData = function() {
                           {
                             yes = true;
                           }
-                      } else
-                      {
+                      } else if(dd.type === "PUB") {
+                        //ignore
+                      } else {
                         console.log("How to 'who' filter this data?");
+                        console.log(dd);
                       }
                     }
                   } // done checking
