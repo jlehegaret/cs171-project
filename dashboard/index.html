@@ -58,7 +58,7 @@
         <nav id='cssmenu'>
             <ul>
 
-                <li class='active'><a href='#'><span>View By Status</span></a>
+                <li class='active'><a class="links" href='#'><span>View By Status</span></a>
                     <ul class='child'>
                         <li class='has-sub'><a id="state_all" href='#'><span>All</span></a>
                         </li>
@@ -67,7 +67,7 @@
                     </ul>
                 </li>
 
-                <li class='active'><a href='#'><span>View By Category</span></a>
+                <li class='active'><a class="links" href='#'><span>View By Category</span></a>
                     <ul class='child'>
                         <li class='has-sub'><a id="cat_all" href='#'><span>All </span></a>
 
@@ -82,7 +82,7 @@
                 </li>
 
 
-                <li class='active'><a href='#'><span>Sort Contributors</span></a>
+                <li class='active'><a class="links" href='#'><span>Sort Contributors</span></a>
                     <ul class='child'>
                         <li class='has-sub'><a id="sort_code" href='#'><span>By Lines of Code Touched</span></a>
 
@@ -92,7 +92,7 @@
                     </ul>
                 </li>
 
-                <li class='active'><a href='#'><span>CanIUse</span></a>
+                <li class='active'><a class="links" href='#'><span>CanIUse</span></a>
                     <ul class='child'>
                         <li class='has-sub'><a id="caniuse_true" href='#'><span>Show</span></a>
 
@@ -217,17 +217,14 @@
 
         ////for navbar transition/////
 
+        ////for navbar transition/////
+
         $(function () {
-            $('.active').on('click', function () {
-                $(this).children('.child').slideToggle(function() {
+            $('.links').on('click', function () {
+                $(this).parent('.active').children('.child').slideToggle(function() {
                     $(this).toggleClass('in out');
                 });
             });
-
-            $('.child').on('click', function () {
-                $(this).toggleClass('blue');
-            });
-
         });
 
     });
