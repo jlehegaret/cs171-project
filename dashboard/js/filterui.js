@@ -1,8 +1,9 @@
-FilterUI = function  (_filters, _eventHandler) {
+FilterUI = function  (_parentElement, _filters, _eventHandler) {
 
     var that = this;
     this.eventHandler = _eventHandler;
     this.filters = _filters;
+    this.parentElement = _parentElement;
 
     document.getElementById("state_open").addEventListener("click", function(d) {
         that.filters.state = "open";
@@ -43,6 +44,15 @@ FilterUI = function  (_filters, _eventHandler) {
         that.filters.caniuse = "false";
         $(that.eventHandler).trigger("filterChanged", that.filters);
     });
+
+
+};
+
+FilterUI.prototype.onAuthorChange = function(author) {
+
+};
+
+FilterUI.prototype.onTimelineChange = function(startDate, endDate) {
 
 };
 

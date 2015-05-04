@@ -135,8 +135,14 @@
 
         <div style="float:left" id="specVis"></div>
 
-        <div id="filterUI"></div>
-        <div id="whereAmI"> <p> Where am I? </p> </div>
+        <div id="whereAmI">
+            <p>Where am I? </p>
+            <p>Viewing: <span id="viewingLabel">All Work Done</span></p>
+            <p>Timeframe: <span id="timeframeLabelStart">Date</span> to <span id="timeframeLabelEnd">Date</span></p>
+            <p>Working Group: <span id="wgLabel">All</span></p>
+            <p>Spec: <span id="specLabel">Spec</span></p>
+            <p>Contributor: <span id="">All</span></p>
+        </div>
 
         <div id="legend"> <img src="images/legend.png" width="100%" height="100%"> </div>
 
@@ -145,7 +151,8 @@
             <!--<p class="whoHeadline" id="line" style="float:right; margin-bottom: 0px; margin-top: 20px; margin-right: 15px;" onclick="slide()"> linear </p>-->
             <!--<p class="whoHeadline" id="fish" style="float:right; margin-bottom: 0px; margin-top: 20px; margin-right: 15px;"> fisheye </p>-->
         </div>
-        <div id="whoVis"></div>
+        <div id="whoVis">
+        </div>
 
         <div id="timelineVis"></div>
 
@@ -192,7 +199,7 @@
             spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler, initialFilters);
             who_vis = new WhoVis(d3.select("#whoVis"), allData, authorHandler, initialFilters);
             timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler, initialFilters);
-            filter_ui = new FilterUI(initialFilters, filterHandler);
+            filter_ui = new FilterUI(d3.select("#whereAmI"), initialFilters, filterHandler);
 
             //End preload animation
             $('body').addClass('loaded');
