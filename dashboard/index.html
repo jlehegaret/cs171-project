@@ -136,10 +136,10 @@
         <div style="float:left" id="specVis"></div>
 
         <div id="filterUI"></div>
+
         <div id="whereAmI"> <p> Where am I? </p> </div>
 
         <div id="legend"> <img src="images/legend.png" width="100%" height="100%"> </div>
-
         <div>
             <p class="whoHeadline" style="float:right; margin-bottom: 0px; margin-top: 20px; margin-right: 15px;"> Contributors </p>
             <!--<p class="whoHeadline" id="line" style="float:right; margin-bottom: 0px; margin-top: 20px; margin-right: 15px;" onclick="slide()"> linear </p>-->
@@ -147,8 +147,8 @@
         </div>
         <div id="whoVis"></div>
 
-        <div id="timelineVis"></div>
-
+        <div id="timelineVis-zoom"></div>
+        <div id="timelineVis-whole"></div>
     </div>
 
     <div class="footer">
@@ -191,7 +191,10 @@
             //Create visualizations
             spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler, initialFilters);
             who_vis = new WhoVis(d3.select("#whoVis"), allData, authorHandler, initialFilters);
-            timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler, initialFilters);
+            timeline_zoom = new TimelineVis(d3.select("#timelineVis-zoom"), allData, {}, initialFilters,
+                { width:1200, height:200, doBrush: false, doTooltips: true});
+            timeline_whole = new TimelineVis(d3.select("#timelineVis-whole"), allData, brushHandler, initialFilters,
+                { width:1200, height:200, doBrush: true, doTooltips: false});
             filter_ui = new FilterUI(initialFilters, filterHandler);
 
             //End preload animation
