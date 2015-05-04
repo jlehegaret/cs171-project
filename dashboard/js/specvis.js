@@ -441,7 +441,7 @@ SpecVis.prototype.authorFilter = function(who) {
                 if (d.author.login) {
                     //check merging author, otherwise just check overall author
                     if (d.merged_by) {
-                        return d.merged_by.login || d.author.login === who;
+                        return d.merged_by.login === who || d.author.login === who;
                     } else {
                         return d.author.login === who;
                     }
