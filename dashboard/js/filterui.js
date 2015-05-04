@@ -14,15 +14,15 @@ FilterUI = function  (_filters, _eventHandler) {
     });
 
     document.getElementById("cat_all").addEventListener("click", function(d) {
-        that.filters.category = "all";
+        that.filters.category = ["test", "spec"];
         $(that.eventHandler).trigger("filterChanged", that.filters);
     });
     document.getElementById("cat_spec").addEventListener("click", function(d) {
-        that.filters.category = "spec";
+        that.filters.category = ["spec"];
         $(that.eventHandler).trigger("filterChanged", that.filters);
     });
     document.getElementById("cat_test").addEventListener("click", function(d) {
-        that.filters.category = "test";
+        that.filters.category = ["test"];
         $(that.eventHandler).trigger("filterChanged", that.filters);
     });
 

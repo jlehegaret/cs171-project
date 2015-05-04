@@ -152,7 +152,7 @@
             end_date: "2015-05-05",    // needs to be in this format
                             // new Date() breaks whovis filtering code
             state: "all",           //open or all
-            category: "all",        // all, spec, or test
+            category: ["spec", "test"],        // all, spec, or test
             specs: [],          // array of which specs to show.
                                 //    empty = all.
             caniuse: false,     // change sunburst color
@@ -197,8 +197,8 @@
                 timeline_vis.onAuthorChange(author);
             });
             $(filterHandler).bind("filterChanged", function(event, filters) {
-                // console.log("Filters changed");
-                // console.log(filters);
+ //                console.log("Filters changed");
+ //                console.log(filters);
                 spec_vis.onFilterChange(filters);
                 timeline_vis.onFilterChange(filters);
                 who_vis.onFilterChange(filters);

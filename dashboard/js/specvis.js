@@ -10,7 +10,8 @@ SpecVis = function (_parentElement, _data, _eventHandler, _filters, _options) {
     this.filters = _filters || {
         start_date: "2014-01-01",
         end_date: "2015-05-05",
-        state: "open"
+        state: "open",
+        category: ["test", "spec"]
     };
 
     this.displayData = {};
@@ -327,7 +328,7 @@ SpecVis.prototype.onTimelineChange = function (selectionStart, selectionEnd) {
 
 // Event handler to filter data by author selections
 SpecVis.prototype.onAuthorChange = function(authorSelection) {
-console.log(authorSelection);
+    console.log(authorSelection);
     this.wrangleData(filters = {_authorFilterFunction: this.authorFilter(authorSelection)});
     this.updateVis();
 };
@@ -363,6 +364,7 @@ SpecVis.prototype.createFilterChain = function (filters) {
     if (filters && filters._stateFilterFunction) {
         stateFilterFunction = filters._stateFilterFunction;
     }
+    this.currentStateFilter = stateFilterFunction;
 
     //returns closure that tests all the filter functions
     return filterChain = function(d) {
@@ -370,14 +372,22 @@ SpecVis.prototype.createFilterChain = function (filters) {
     };
 };
 
-SpecVis.prototype.categoryFilter = function(category) {
+SpecVis.prototype.categoryFilter = function(_category) {
     var categories = [];
 
-    if(category === "all" || category === "spec") {
+    //if(category === "all" || category === "spec") {
+    //    categories.push("issue");
+    //    categories.push("commit")
+    //}
+    //if(category === "all" || category === "test") {
+    //    categories.push("test");
+    //}
+
+    if(_category.indexOf("spec") != -1) {
         categories.push("issue");
         categories.push("commit")
     }
-    if(category === "all" || category === "test") {
+    if(_category.indexOf("test") != -1) {
         categories.push("test");
     }
 
