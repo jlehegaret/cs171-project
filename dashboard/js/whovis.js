@@ -72,6 +72,16 @@ WhoVis.prototype.initVis = function() {
 
     this.x = d3.scale.ordinal();
 
+
+    //fisheye////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //this.xFisheye = d3.fisheye.ordinal()
+    //    .focus(400);
+
+    ///fisheye////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
     // FOR CODE
     this.color_code = d3.scale.ordinal()
     .range(["#062B59", "#09458F", "#073874", "#09458F", "#0B52AA", "#0C5FC5"]);
@@ -158,6 +168,14 @@ WhoVis.prototype.updateVis = function() {
     });
     this.y_issues.domain([0, this.max]);
 
+    ///fisheye////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    //this.xFisheye.domain(this.displayData.map(function(d) { return d.who; }))
+    //    .rangeRoundBands([0, this.width/10], .2, 0);
+
+    ///fisheye////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
     // this.svg.select(".x.axis")
     //     .call(this.xAxis)
@@ -185,12 +203,14 @@ if(this.displayData.length > 0)
                 }
         })
         .on("mouseover", this.tip.show)
-        .on("mouseout", this.tip.hide)
+        .on("mouseout", this.tip.hide);
+
+    var txt = whos
         .append("text") // every who has a name
         .text(function(d){return d.who})
-        .style("font-size", "8px")
+        .style("font-size", "6px")
         .style("text-anchor", "end")
-        .attr("dx", "-19em")
+        .attr("dx", "-25em")
         .attr("dy", "0.7em")
         .style("font-family", "sans-serif")
         .attr("transform", "rotate(-90)");
@@ -254,7 +274,64 @@ if(this.displayData.length > 0)
                 return that.color_issues(d.who);
             }
               });
+
+        bars.on("mouseover", function() {
+            d3.select(this)
+                .transition()
+                .attr("width", that.barWidth*4)
+                .attr("height", function(d)
+                {
+                    if(d.type === "code")
+                    {
+                        return that.y_code(d.total);
+                    }
+                    else
+                    {
+                        return that.y_issues(d.total);
+                    }
+                });
+        });
+
+        bars.on("mouseout", function() {
+            d3.select(this)
+                .transition()
+                .attr("width", that.barWidth)
+                .attr("height", function(d)
+                {
+                    if(d.type === "code")
+                    {
+                        return that.y_for_axis - that.y_code(d.total);
+                    }
+                    else
+                    {
+                        return that.y_for_axis - that.y_issues(d.total);
+                    }
+                });
+        });
 }
+    ///fisheye////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    //this.svg.on("mousemove", function() {
+    //    var mouse = d3.mouse(this);
+    //    that.xFisheye.focus(mouse[0]);
+    //
+    //    redraw();
+    //});
+    //
+    //function redraw() {
+    //
+    //
+    //
+    //    whos.transition()
+    //        .attr("transform", function(d)
+    //        {
+    //            return "translate("+ that.xFisheye(d.who)+","+ 0 +")";
+    //        })
+    //        .call(that.tip);
+    //}
+    //
+
+    ///fisheye////////////////////////////////////////////////////////////////////////////////////////////////////
 
     whos.exit().remove();
 

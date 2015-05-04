@@ -8,6 +8,10 @@
     <script src="js/lib/d3.js" charset="utf-8"></script>
     <script src="js/lib/queue.v1.js"></script>
     <script src="js/lib/d3.tip.v0.6.6.js"></script>
+    <script src="js/lib/fisheyeAdd.js"></script>
+    <script src="js/lib/intro.js"></script>
+
+
     <!--
     <script src="js/preloader.js"></script>
     -->
@@ -19,6 +23,7 @@
     <link rel="stylesheet" href="css/vis.css" type="text/css" media="screen">
     <link href="css/style.css" rel="stylesheet" />
     <link href="css/preloader.css" rel="stylesheet" />
+    <link href="css/introjs.css" rel="stylesheet" />
 
     <!--Vis code-->
     <script src="js/util.js"></script>
@@ -39,7 +44,7 @@
         <div class="navbar navbar-default navbar-static-top">
             <div class="container">
                 <div class="navbar-header"></div>
-                <h1><span class="navbar-header"><img src="images/w3c.jpg" width="100%" height="100%"></span></h1>
+                <h1><span class="navbar-header"><img class="w3c" src="images/w3c.jpg" width="100%" height="100%"></span></h1>
 
                 <div class="navbar-collapse collapse ">
 
@@ -58,7 +63,7 @@
         <nav id='cssmenu'>
             <ul>
 
-                <li class='active'><a class="links" href='#'><span>View By Status</span></a>
+                <li class='active'><a class="links" id="one" href='#'><span>View By Status</span></a>
                     <ul class='child'>
                         <li class='has-sub'><a id="state_all" href='#'><span>All</span></a>
                         </li>
@@ -101,7 +106,7 @@
                     </ul>
                 </li>
 
-                <li class='last'><a class="links" href='#'><span>About</span></a>
+                <li class='active'><a class="links" href='#'><span>About</span></a>
                     <ul class='child'>
                         <li class='has-sub'><a href='https://github.com/jlehegaret/cs171-project/tree/master/dashboard/data'><span>Our Data</span></a>
                         </li>
@@ -112,23 +117,35 @@
                         <li class='has-sub'><a href='#'><span>View the Screencast</span></a>
                         </li>
 
-                        <li class='has-sub'><a href='#'><span>Launch a WalkThrough</span></a>
+                        <li id="walkthrough" class='has-sub'><a href='#'><span>Launch a WalkThrough</span></a>
                         </li>
                     </ul>
                 </li>
             </ul>
         </nav>
 
-        <div id="loader-wrapper">
-            <div id="loader"></div>
 
-            <div class="loader-section section-left"></div>
-            <div class="loader-section section-right"></div>
+        <!--<div id="loader-wrapper">-->
+            <!--<div id="loader"></div>-->
+
+            <!--<div class="loader-section section-left"></div>-->
+            <!--<div class="loader-section section-right"></div>-->
+
+        <!--</div>-->
+
+        <div style="float:left" id="specVis"></div>
+
+        <div id="legend"> <img src="images/legend.png" width="100%" height="100%"> </div>
+
+        <div id="whereAmI"> <p> Where am I? </p> </div>
+
+        <div>
+            <p class="whoHeadline" style="float:right; margin-bottom: 0px; margin-top: 20px; margin-right: 15px;"> Contributors </p>
+            <!--<p class="whoHeadline" id="line" style="float:right; margin-bottom: 0px; margin-top: 20px; margin-right: 15px;" onclick="slide()"> linear </p>-->
+            <!--<p class="whoHeadline" id="fish" style="float:right; margin-bottom: 0px; margin-top: 20px; margin-right: 15px;"> fisheye </p>-->
 
         </div>
 
-        <div style="float:left" id="specVis"></div>
-        <div id="whereAmI"> <p> Where am I? </p> </div>
         <div id="filterUI"></div>
         <div id="whoVis"></div>
         <div id="timelineVis"></div>
@@ -152,7 +169,7 @@
             end_date: "2015-05-05",    // needs to be in this format
                             // new Date() breaks whovis filtering code
             state: "all",           //open or all
-            category: "all",        // all, spec, or test
+            category: ["spec", "test"],        // all, spec, or test
             specs: [],          // array of which specs to show.
                                 //    empty = all.
             caniuse: false,     // change sunburst color
@@ -197,8 +214,8 @@
                 timeline_vis.onAuthorChange(author);
             });
             $(filterHandler).bind("filterChanged", function(event, filters) {
-                // console.log("Filters changed");
-                // console.log(filters);
+ //                console.log("Filters changed");
+ //                console.log(filters);
                 spec_vis.onFilterChange(filters);
                 timeline_vis.onFilterChange(filters);
                 who_vis.onFilterChange(filters);
@@ -229,14 +246,91 @@
 
         ////for navbar transition/////
 
-        ////for navbar transition/////
-
         $(function () {
             $('.links').on('click', function () {
                 $(this).parent('.active').children('.child').slideToggle(function() {
                     $(this).toggleClass('in out');
                 });
             });
+        });
+
+        ////invisible slider/////
+
+            var $gal   =  $("#whoVis"),
+                    galW   = 1000,
+                    galSW  = 7800, // here define dynamic width with svgWhoVis
+                    wDiff  = (galSW/galW)-1,  // widths difference ratio
+                    mPadd  = 0,  // Mousemove Padding
+                    damp   = 2,  // Mousemove response softness
+                    mX     = 0,   // Real mouse position
+                    mX2    = 0,   // Modified mouse position
+                    posX   = 0,
+                    mmAA   = galW-(mPadd*2), // The mousemove available area
+                    mmAAr  = (galW/mmAA);    // get available mousemove fidderence ratio
+
+            console.log(galW, galSW)
+
+            $gal.mousemove(function(e) {
+                mX = e.pageX - $(this).parent().offset().left - this.offsetLeft;
+                mX2 = Math.min( Math.max(100, mX-mPadd), mmAA ) * mmAAr;
+            });
+
+            setInterval(function(){
+                posX += (mX2 - posX) / damp; // zeno's paradox equation "catching delay"
+                $gal.scrollLeft(posX*wDiff);
+            }, 10);
+
+
+        /////walkthrought/////
+
+        $(function(){
+            var introguide = introJs();
+           // var startbtn   = $('#startdemotour');
+
+            $("#walkthrough").click(function() {
+                introguide.start();
+            });
+
+            introguide.setOptions({
+                steps: [
+                    {
+                        element: '.navbar-collapse collapse ',
+                        intro: 'This guided tour will explain Git the Web Forward interface.<br><br>Use the arrow keys for navigation or hit ESC to exit the tour immediately.',
+                        position: 'bottom'
+                    },
+                    {
+                        element: '#specVis',
+                        intro: 'This is Sunburst/SpecVis view....',
+                        position: 'bottom'
+                    },
+                    {
+                        element: '#timelineVis',
+                        intro: 'This is Timeline view...',
+                        position: 'bottom'
+                    },
+                    {
+                        element: '#whoVis',
+                        intro: 'This is Who view...',
+                        position: 'right'
+                    },
+                    {
+                        element: '#cssmenu',
+                        intro: "This is navigation menu for sorting/filtering...",
+                        position: 'bottom'
+                    },
+                    {
+                        element: '#whereAmI',
+                        intro: "This is Where Am I part...",
+                        position: 'bottom'
+                    },
+                    {
+                        element: '#legend',
+                        intro: "The legend shows colors...",
+                        position: 'bottom'
+                    }
+                ]
+            });
+
         });
 
     });
