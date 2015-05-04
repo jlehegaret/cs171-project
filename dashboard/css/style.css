@@ -242,7 +242,7 @@ header .navigation {
 }
 
 #cssmenu > ul > li > a {
-    padding: 0px 20px;
+    padding: 5px 20px;
 }
 #cssmenu > ul > li:hover {
     border-left: 2px solid #1F6EA9;
@@ -272,11 +272,11 @@ header .navigation {
     border-bottom: 1px solid #eeeeee;
 }
 #cssmenu ul ul li {
-    padding: 0 20px;
+    padding: 0px 20px;
 }
-#cssmenu ul ul li:last-child {
 
-    padding-bottom: 10px;
+#cssmenu ul ul {
+    padding: 3px;
 }
 
 #cssmenu ul ul li:last-child > a {

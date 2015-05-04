@@ -280,7 +280,7 @@ if(this.displayData.dates.length > 0)
     this.context.select(".brush")
          .call(this.brush)
          .selectAll("rect")
-         .attr("height", this.height);
+         .attr("height", 200);
 
 // console.log("FINISHED updateVis");
 };

@@ -74,7 +74,7 @@ WhoVis.prototype.initVis = function() {
 
 
     //fisheye////////////////////////////////////////////////////////////////////////////////////////////////////
-
+    //
     this.xFisheye = d3.fisheye.ordinal()
         .focus(400);
 
@@ -273,8 +273,8 @@ if(this.displayData.length > 0)
             }
               });
 }
-
     ///fisheye////////////////////////////////////////////////////////////////////////////////////////////////////
+
     this.svg.on("mousemove", function() {
         var mouse = d3.mouse(this);
         that.xFisheye.focus(mouse[0]);
@@ -291,10 +291,10 @@ if(this.displayData.length > 0)
             {
                 return "translate("+ that.xFisheye(d.who)+","+ 0 +")";
             })
-            .call(this.tip);
-
-
+            .call(that.tip);
     }
+
+
     ///fisheye////////////////////////////////////////////////////////////////////////////////////////////////////
 
     whos.exit().remove();
