@@ -60,10 +60,15 @@ FilterUI.prototype.initUI = function() {
     this.whoLabel = this.parentElement.select("#whoLabel");
     this.specLabel = this.parentElement.select("#specLabel");
     this.wgLabel = this.parentElement.select("#wgLabel");
+    this.categoryLabel = this.parentElement.select("#categoryLabel");
+    this.statusLabel = this.parentElement.select("#statusLabel");
+
 
     this.timelineLabelStart.text(this.dateFormatter(new Date(this.filters.start_date)));
     this.timelineLabelEnd.text(this.dateFormatter(new Date(this.filters.end_date)));
     this.whoLabel.text(this.getAuthorText(this.filters.who));
+    this.categoryLabel.text(this.getCategoryText(this.filters.category));
+    this.statusLabel.text(this.getStatusText(this.filters.state));
 };
 
 FilterUI.prototype.onAuthorChange = function(author) {
@@ -84,9 +89,31 @@ FilterUI.prototype.onTimelineChange = function(startDate, endDate) {
 };
 
 FilterUI.prototype.onSelectionChange = function(sunburstSelection) {
-    console.log(sunburstSelection);
     this.wgLabel.text(this.getWgText(sunburstSelection));
     this.specLabel.text(this.getSpecText(sunburstSelection));
+};
+
+FilterUI.prototype.onFilterChange = function(_filters) {
+    this.categoryLabel.text(this.getCategoryText(_filters.category));
+    this.statusLabel.text(this.getStatusText(_filters.state));
+};
+
+FilterUI.prototype.getCategoryText = function(category) {
+    if(category.length === 2) {
+        return "All Categories";
+    } else if(category.indexOf("spec") != -1) {
+        return "Spec Edits Only";
+    } else if(category.indexOf("test") != -1) {
+        return "Test Suite Work Only";
+    }
+};
+
+FilterUI.prototype.getStatusText = function(status) {
+    if(status === "all") {
+        return "All Work Done";
+    } else if(status === "open") {
+        return "Unresolved Issues Only";
+    }
 };
 
 FilterUI.prototype.getWgText = function(sunburstSelection) {
