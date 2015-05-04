@@ -196,10 +196,10 @@
 
 
             //Create visualizations
+            filter_ui = new FilterUI(d3.select("#whereAmI"), initialFilters, filterHandler);
             spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler, initialFilters);
             who_vis = new WhoVis(d3.select("#whoVis"), allData, authorHandler, initialFilters);
             timeline_vis = new TimelineVis(d3.select("#timelineVis"), allData, brushHandler, initialFilters);
-            filter_ui = new FilterUI(d3.select("#whereAmI"), initialFilters, filterHandler);
 
             //End preload animation
             $('body').addClass('loaded');
@@ -208,6 +208,7 @@
             $(brushHandler).bind("brushChanged", function (event, selectionStart, selectionEnd) {
                 spec_vis.onTimelineChange(selectionStart, selectionEnd);
                 who_vis.onTimelineChange(selectionStart, selectionEnd);
+                filter_ui.onTimelineChange(selectionStart, selectionEnd);
             });
             $(selectionHandler).bind("selectionChanged", function (event, specSelection) {
                 timeline_vis.onSelectionChange(specSelection);

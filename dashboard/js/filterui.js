@@ -5,6 +5,11 @@ FilterUI = function  (_parentElement, _filters, _eventHandler) {
     this.filters = _filters;
     this.parentElement = _parentElement;
 
+    this.addEventHandlers();
+    this.initUI();
+};
+
+FilterUI.prototype.addEventHandlers = function() {
     document.getElementById("state_open").addEventListener("click", function(d) {
         that.filters.state = "open";
         $(that.eventHandler).trigger("filterChanged", that.filters);
@@ -44,8 +49,16 @@ FilterUI = function  (_parentElement, _filters, _eventHandler) {
         that.filters.caniuse = "false";
         $(that.eventHandler).trigger("filterChanged", that.filters);
     });
+};
 
+FilterUI.prototype.initUI = function() {
+    this.dateFormatter = d3.time.format("%Y-%m-%d");
 
+    this.timelineLabelStart = this.parentElement.select("#timeframeLabelStart");
+    this.timelineLabelEnd = this.parentElement.select("#timeframeLabelEnd");
+
+    this.timelineLabelStart.text(this.dateFormatter(new Date(this.filters.start_date)));
+    this.timelineLabelEnd.text(this.dateFormatter(new Date(this.filters.end_date)));
 };
 
 FilterUI.prototype.onAuthorChange = function(author) {
@@ -53,6 +66,7 @@ FilterUI.prototype.onAuthorChange = function(author) {
 };
 
 FilterUI.prototype.onTimelineChange = function(startDate, endDate) {
-
+    this.timelineLabelStart.text(this.dateFormatter(startDate));
+    this.timelineLabelEnd.text(this.dateFormatter(endDate));
 };
 
