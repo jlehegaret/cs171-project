@@ -58,6 +58,8 @@ FilterUI.prototype.initUI = function() {
     this.timelineLabelStart = this.parentElement.select("#timeframeLabelStart");
     this.timelineLabelEnd = this.parentElement.select("#timeframeLabelEnd");
     this.whoLabel = this.parentElement.select("#whoLabel");
+    this.specLabel = this.parentElement.select("#specLabel");
+    this.wgLabel = this.parentElement.select("#wgLabel");
 
     this.timelineLabelStart.text(this.dateFormatter(new Date(this.filters.start_date)));
     this.timelineLabelEnd.text(this.dateFormatter(new Date(this.filters.end_date)));
@@ -79,5 +81,39 @@ FilterUI.prototype.getAuthorText = function(author) {
 FilterUI.prototype.onTimelineChange = function(startDate, endDate) {
     this.timelineLabelStart.text(this.dateFormatter(startDate));
     this.timelineLabelEnd.text(this.dateFormatter(endDate));
+};
+
+FilterUI.prototype.onSelectionChange = function(sunburstSelection) {
+    console.log(sunburstSelection);
+    this.wgLabel.text(this.getWgText(sunburstSelection));
+    this.specLabel.text(this.getSpecText(sunburstSelection));
+};
+
+FilterUI.prototype.getWgText = function(sunburstSelection) {
+    switch(sunburstSelection.depth) {
+        case 0:
+        return "All";
+        case 1:
+            return sunburstSelection.name;
+        case 2:
+            return sunburstSelection.parent.name;
+        case 3:
+            return sunburstSelection.parent.parent.name;
+        case 4:
+            return sunburstSelection.parent.parent.parent.name;
+    }
+};
+
+FilterUI.prototype.getSpecText = function(sunburstSelection) {
+    switch(sunburstSelection.depth) {
+        case 0: case 1:
+            return "All";
+        case 2:
+            return sunburstSelection.name;
+        case 3:
+            return sunburstSelection.parent.name;
+        case 4:
+            return sunburstSelection.parent.parent.name;
+    }
 };
 

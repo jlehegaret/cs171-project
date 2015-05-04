@@ -140,7 +140,7 @@
             <p>Viewing: <span id="viewingLabel">All Work Done</span></p>
             <p>Timeframe: <span id="timeframeLabelStart">Date</span> to <span id="timeframeLabelEnd">Date</span></p>
             <p>Working Group: <span id="wgLabel">All</span></p>
-            <p>Spec: <span id="specLabel">Spec</span></p>
+            <p>Spec: <span id="specLabel">All</span></p>
             <p>Contributor: <span id="whoLabel">All</span></p>
         </div>
 
@@ -213,7 +213,7 @@
             $(selectionHandler).bind("selectionChanged", function (event, specSelection) {
                 timeline_vis.onSelectionChange(specSelection);
                 who_vis.onSelectionChange(specSelection);
-                document.getElementById("whereAmI").innerHTML = specSelection.name;
+                filter_ui.onSelectionChange(specSelection);
                 // console.log(specSelection);
             });
             $(authorHandler).bind("authorChanged", function (event, author) {
