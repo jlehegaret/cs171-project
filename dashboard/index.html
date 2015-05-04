@@ -212,23 +212,24 @@
                 spec_vis.onTimelineChange(selectionStart, selectionEnd);
                 who_vis.onTimelineChange(selectionStart, selectionEnd);
                 filter_ui.onTimelineChange(selectionStart, selectionEnd);
+                timeline_zoom.onTimelineChange(selectionStart, selectionEnd);
             });
             $(selectionHandler).bind("selectionChanged", function (event, specSelection) {
-                timeline_vis.onSelectionChange(specSelection);
+                timeline_zoom.onSelectionChange(specSelection);
                 who_vis.onSelectionChange(specSelection);
                 document.getElementById("whereAmI").innerHTML = specSelection.name;
                 // console.log(specSelection);
             });
             $(authorHandler).bind("authorChanged", function (event, author) {
                 spec_vis.onAuthorChange(author);
-                timeline_vis.onAuthorChange(author);
+                timeline_zoom.onAuthorChange(author);
                 filter_ui.onAuthorChange(author);
             });
             $(filterHandler).bind("filterChanged", function(event, filters) {
  //                console.log("Filters changed");
  //                console.log(filters);
                 spec_vis.onFilterChange(filters);
-                timeline_vis.onFilterChange(filters);
+                timeline_zoom.onFilterChange(filters);
                 who_vis.onFilterChange(filters);
             });
         };

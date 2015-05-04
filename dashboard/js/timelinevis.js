@@ -313,8 +313,8 @@ TimelineVis.prototype.wrangleData = function() {
   // this is where we will apply filters and recalculate totals
   // and remove all bits that don't have any data in them anyway
 
-console.log("Now in WRANGLE DATA, with filters:");
-console.log(this.filters);
+// console.log("Now in WRANGLE DATA, with filters:");
+// console.log(this.filters);
 
   var that = this;
   var filtered;
@@ -488,10 +488,10 @@ console.log(this.filters);
     that.displayData.dates.sort(function(a,b) { return a.date < b.date; });
   }
 
-console.log("doBrush is: " + this.options.doBrush);
-console.log("doTooltips is: " + this.options.doTooltips);
-console.log("displayData is now: ");
-console.log(this.displayData);
+// console.log("doBrush is: " + this.options.doBrush);
+// console.log("doTooltips is: " + this.options.doTooltips);
+// console.log("displayData is now: ");
+// console.log(this.displayData);
 };
 
 TimelineVis.prototype.reorderData = function() {
@@ -823,11 +823,11 @@ TimelineVis.prototype.onFilterChange = function(choices) {
     }
 };
 
-WhoVis.prototype.onTimelineChange = function(selectionStart, selectionEnd) {
+TimelineVis.prototype.onTimelineChange = function(selectionStart, selectionEnd) {
 
   if(!this.options.doBrush) // no brush here, so react to the brush wherever it is
   {
-console.log("See the update");
+// console.log("See the update");
     this.filters.start_date = stripTime(selectionStart);
     this.filters.end_date = stripTime(selectionEnd);
 
@@ -837,9 +837,9 @@ console.log("See the update");
         this.filters.end_date = stripTime(new Date());
     }
 
-console.log("Should call wrangleData next");
-console.log("Filters are:");
-console.log(this.filters);
+// console.log("Should call wrangleData next");
+// console.log("Filters are:");
+// console.log(this.filters);
 
     this.wrangleData();
     this.updateVis();
