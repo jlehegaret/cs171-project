@@ -1,9 +1,8 @@
 #whoVis {
-    height: 410px;
+    height: 310px;
     width: 310px;
-	margin-top:10px;
-    overflow-y: hidden;
-    overflow-x: scroll;
+    margin-top:50px;
+    overflow: hidden;
 }
 
 #whereAmI{
