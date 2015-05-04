@@ -8,7 +8,6 @@ html, body {
 height: 100%;
 }
 
-
 body {
 	font-family: 'Open Sans', Arial, sans-serif;
 	font-size: 14px;
@@ -58,6 +57,7 @@ clear: both;
  background-color:#142336;
  width:100%;
 }
+
 
 header .navbar {
     margin-bottom: 0;

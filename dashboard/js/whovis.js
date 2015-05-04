@@ -75,8 +75,8 @@ WhoVis.prototype.initVis = function() {
 
     //fisheye////////////////////////////////////////////////////////////////////////////////////////////////////
     //
-    this.xFisheye = d3.fisheye.ordinal()
-        .focus(400);
+    //this.xFisheye = d3.fisheye.ordinal()
+    //    .focus(400);
 
     ///fisheye////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -170,8 +170,8 @@ WhoVis.prototype.updateVis = function() {
 
     ///fisheye////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    this.xFisheye.domain(this.displayData.map(function(d) { return d.who; }))
-        .rangeRoundBands([0, this.width/10], .2, 0);
+    //this.xFisheye.domain(this.displayData.map(function(d) { return d.who; }))
+    //    .rangeRoundBands([0, this.width/10], .2, 0);
 
     ///fisheye////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -203,7 +203,9 @@ if(this.displayData.length > 0)
                 }
         })
         .on("mouseover", this.tip.show)
-        .on("mouseout", this.tip.hide)
+        .on("mouseout", this.tip.hide);
+
+    var txt = whos
         .append("text") // every who has a name
         .text(function(d){return d.who})
         .style("font-size", "6px")
@@ -272,28 +274,62 @@ if(this.displayData.length > 0)
                 return that.color_issues(d.who);
             }
               });
+
+        bars.on("mouseover", function() {
+            d3.select(this)
+                .transition()
+                .attr("width", that.barWidth*4)
+                .attr("height", function(d)
+                {
+                    if(d.type === "code")
+                    {
+                        return that.y_code(d.total);
+                    }
+                    else
+                    {
+                        return that.y_issues(d.total);
+                    }
+                });
+        });
+
+        bars.on("mouseout", function() {
+            d3.select(this)
+                .transition()
+                .attr("width", that.barWidth)
+                .attr("height", function(d)
+                {
+                    if(d.type === "code")
+                    {
+                        return that.y_for_axis - that.y_code(d.total);
+                    }
+                    else
+                    {
+                        return that.y_for_axis - that.y_issues(d.total);
+                    }
+                });
+        });
 }
     ///fisheye////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    this.svg.on("mousemove", function() {
-        var mouse = d3.mouse(this);
-        that.xFisheye.focus(mouse[0]);
-
-        redraw();
-    });
-
-    function redraw() {
-
-
-
-        whos.transition()
-            .attr("transform", function(d)
-            {
-                return "translate("+ that.xFisheye(d.who)+","+ 0 +")";
-            })
-            .call(that.tip);
-    }
-
+    //this.svg.on("mousemove", function() {
+    //    var mouse = d3.mouse(this);
+    //    that.xFisheye.focus(mouse[0]);
+    //
+    //    redraw();
+    //});
+    //
+    //function redraw() {
+    //
+    //
+    //
+    //    whos.transition()
+    //        .attr("transform", function(d)
+    //        {
+    //            return "translate("+ that.xFisheye(d.who)+","+ 0 +")";
+    //        })
+    //        .call(that.tip);
+    //}
+    //
 
     ///fisheye////////////////////////////////////////////////////////////////////////////////////////////////////
 
