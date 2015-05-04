@@ -448,7 +448,7 @@ SpecVis.prototype.authorFilter = function(who) {
                 }
                 //commits (has author field with name)
                 else {
-                    return d.login === who;
+                    return d.author === who;
                 }
             }
             // no author found
