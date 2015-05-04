@@ -4,13 +4,14 @@ SpecVis = function (_parentElement, _data, _eventHandler, _filters, _options) {
     this.eventHandler = _eventHandler;
     //NOTE: these options are overridden if _options is not null
     this.options = _options || {
-        width: 600, height: 530
+        width: 500, height: 500
     };
     //NOTE: these filters are overridden if _filters is not null
     this.filters = _filters || {
         start_date: "2014-01-01",
         end_date: "2015-05-05",
-        state: "open"
+        state: "open",
+        category: ["test", "spec"]
     };
 
     this.displayData = {};
@@ -38,6 +39,9 @@ SpecVis.prototype.initVis = function () {
     this.currentAuthorFilter = this.authorFilter(null);
     // sets up default state filter
     this.currentStateFilter = this.stateFilter(this.filters.state);
+
+    this.currentCategoryFilter = this.categoryFilter(this.filters.category);
+
 
 
     //use standard descending ordering for all elements
@@ -113,6 +117,12 @@ SpecVis.prototype.wrangleData = function (_filters) {
     //Create a new filter chain from currentFilters and new _filters
     var filterChain = this.createFilterChain(_filters);
 
+    var categoryFilter = this.currentCategoryFilter;
+    if (_filters && _filters._categoryFilterFunction) {
+        categoryFilter = _filters._categoryFilterFunction;
+    }
+    this.currentCategoryFilter = categoryFilter;
+
     //create a lookup table of specs keyed by spec url, apply filters to data
     this.displayData.spec_lookup = {};
     this.data.specs.forEach(function (d) {
@@ -121,10 +131,10 @@ SpecVis.prototype.wrangleData = function (_filters) {
         spec.url = d.url;
         spec.name = d.title;
         spec.score = d.score;  // this is here now, but I don't see it showing up elsewhere
-        if (d.issues) {
+        if (d.issues && categoryFilter("issue")) {
             spec.issues = d.issues.filter(filterChain);
         }
-        if (d.commits) {
+        if (d.commits && categoryFilter("commit")) {
             spec.commits = d.commits.filter(filterChain);
         }
         that.displayData.spec_lookup[d.url] = spec;
@@ -132,17 +142,20 @@ SpecVis.prototype.wrangleData = function (_filters) {
 
     //creates a lookup table of tests keyed by spec url, apply filters to data
     this.displayData.test_lookup = {};
-    this.data.tests.forEach(function (test) {
-        if (filterChain(test)) {
-            test.specs.forEach(function (spec) {
-                //check if an entry already exists, if not create one
-                if (!that.displayData.test_lookup[spec]) {
-                    that.displayData.test_lookup[spec] = [];
-                }
-                that.displayData.test_lookup[spec].push(test);
-            })
-        }
-    });
+
+    if(categoryFilter("test")) {
+        this.data.tests.forEach(function (test) {
+            if (filterChain(test)) {
+                test.specs.forEach(function (spec) {
+                    //check if an entry already exists, if not create one
+                    if (!that.displayData.test_lookup[spec]) {
+                        that.displayData.test_lookup[spec] = [];
+                    }
+                    that.displayData.test_lookup[spec].push(test);
+                })
+            }
+        });
+    }
 
     //create the tree hierarchy needed by the partition layout from the filtered data
     this.displayData.root = this.createHierarchy(
@@ -186,8 +199,8 @@ SpecVis.prototype.updateVis = function () {
          })
         .style("fill", this.sunburstFill)
         .on("click", click)
-        .on("mouseover", this.tip.show)
-        .on("mouseout", this.tip.hide);
+        .on("mouseover", this.tip.show);
+        // .on("mouseout", this.tip.hide);
     //       .each(this.stash);
 
     path
@@ -323,7 +336,8 @@ SpecVis.prototype.onAuthorChange = function(authorSelection) {
 // Expects _filters to be and object with at least a "state" field
 SpecVis.prototype.onFilterChange = function(_filters) {
      filters = {
-         _stateFilterFunction: this.stateFilter(_filters.state)
+         _stateFilterFunction: this.stateFilter(_filters.state),
+         _categoryFilterFunction: this.categoryFilter(_filters.category)
      };
      this.wrangleData(filters);
      this.updateVis();
@@ -349,11 +363,36 @@ SpecVis.prototype.createFilterChain = function (filters) {
     if (filters && filters._stateFilterFunction) {
         stateFilterFunction = filters._stateFilterFunction;
     }
+    this.currentStateFilter = stateFilterFunction;
 
     //returns closure that tests all the filter functions
     return filterChain = function(d) {
         return dateFilterFunction(d) && authorFilterFunction(d) && stateFilterFunction(d);
     };
+};
+
+SpecVis.prototype.categoryFilter = function(_category) {
+    var categories = [];
+
+    //if(category === "all" || category === "spec") {
+    //    categories.push("issue");
+    //    categories.push("commit")
+    //}
+    //if(category === "all" || category === "test") {
+    //    categories.push("test");
+    //}
+
+    if(_category.indexOf("spec") != -1) {
+        categories.push("issue");
+        categories.push("commit")
+    }
+    if(_category.indexOf("test") != -1) {
+        categories.push("test");
+    }
+
+    return function(d) {
+        return categories.indexOf(d) != -1;
+    }
 };
 
 // returns closure with filter for start to end date
@@ -401,14 +440,14 @@ SpecVis.prototype.authorFilter = function(who) {
                 if (d.author.login) {
                     //check merging author, otherwise just check overall author
                     if (d.merged_by) {
-                        return d.merged_by.login || d.author.login === who;
+                        return d.merged_by.login === who || d.author.login === who;
                     } else {
                         return d.author.login === who;
                     }
                 }
                 //commits (has author field with name)
                 else {
-                    return d.login === who;
+                    return d.author === who;
                 }
             }
             // no author found
@@ -538,61 +577,61 @@ SpecVis.prototype.tooltip = function() {
             var link;
             var tooltip;
             // Links to specific issues at times
-            // if (d.name !== undefined) {
-            //     if (d.name == "HTML") {
-            //         text = "Spec";
-            //     }
-            //     else {
-            //         text = d.name;
-            //     }
-            // } else {
-            //     text = d.title;
-            // }
-            // if(d.type === "pull"
-            //     || d.type === "commit"
-            //     || d.type === "issue")
-            // {
-            //     text = d.state + " " + d.type + ": " + text;
-            // }
-
-            // if(d.url !== undefined) {
-            //     link = d.url;
-            // } else if(d.html_url !== undefined) {
-            //     link = d.html_url;
-            // } else if(d.name !== "W3C") {
-            //     console.log("Error: Object missing URL");
-            //     console.log(d);
-            // }
-
-            // Spec-level-only tooltips
-            if(d.type == "root" || d.type == "group"
-                || d.type == "spec")
-            {
-                text = d.name;
-                if(d.type == "root") {
-                    link = "https://www.w3.org";
-                } else {
-                    link = d.url;
+            if (d.name !== undefined) {
+                if (d.name == "HTML") {
+                    text = "Spec";
                 }
-            } else if(d.type === "HTML" || d.type === "Tests")
-            {
-                if(d.type === "HTML")
-                {
-                    text = d.parent.name + " Spec Edits";
-                } else {
-                    text = d.parent.name + " Test Suite";
+                else {
+                    text = d.name;
                 }
-                link = d.parent.url;
-            } else { // pull, issue, or commit
-                if(d.parent.name === "HTML")
-                {
-                    text = d.parent.parent.name + " Spec Edits - ";
-                } else {
-                    text = d.parent.parent.name + " Test Suite - ";
-                }
-                text = text + d.state + " " + d.type;
-                link = d.parent.parent.url;
+            } else {
+                text = d.title;
             }
+            if(d.type === "pull"
+                || d.type === "commit"
+                || d.type === "issue")
+            {
+                text = d.state + " " + d.type + ": " + text;
+            }
+
+            if(d.url !== undefined) {
+                link = d.url;
+            } else if(d.html_url !== undefined) {
+                link = d.html_url;
+            } else if(d.name !== "W3C") {
+                console.log("Error: Object missing URL");
+                console.log(d);
+            }
+
+            // // Spec-level-only tooltips
+            // if(d.type == "root" || d.type == "group"
+            //     || d.type == "spec")
+            // {
+            //     text = d.name;
+            //     if(d.type == "root") {
+            //         link = "https://www.w3.org";
+            //     } else {
+            //         link = d.url;
+            //     }
+            // } else if(d.type === "HTML" || d.type === "Tests")
+            // {
+            //     if(d.type === "HTML")
+            //     {
+            //         text = d.parent.name + " Spec Edits";
+            //     } else {
+            //         text = d.parent.name + " Test Suite";
+            //     }
+            //     link = d.parent.url;
+            // } else { // pull, issue, or commit
+            //     if(d.parent.name === "HTML")
+            //     {
+            //         text = d.parent.parent.name + " Spec Edits - ";
+            //     } else {
+            //         text = d.parent.parent.name + " Test Suite - ";
+            //     }
+            //     text = text + d.state + " " + d.type;
+            //     link = d.parent.parent.url;
+            // }
 
             tooltip = "<div class='d3-tip'>"
                 + "<a href='" + link

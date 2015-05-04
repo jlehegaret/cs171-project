@@ -214,14 +214,7 @@ if(this.displayData.length > 0)
 
     bars.enter()
         .append("rect")
-        .attr("class", function(d){
-                  if(that.filters.who !== null
-                     && d.who !== that.filters.who) {
-                      return "bar unselected " + d.type;
-                  } else {
-                      return "bar code " + d.type;
-                  }
-              })
+        .attr("class", function(d){ return "bar " + d.type; })
         .attr("x", function(d)
               {
                   if(d.type === "issues")
