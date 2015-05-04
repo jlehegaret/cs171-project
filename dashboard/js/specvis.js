@@ -328,7 +328,6 @@ SpecVis.prototype.onTimelineChange = function (selectionStart, selectionEnd) {
 
 // Event handler to filter data by author selections
 SpecVis.prototype.onAuthorChange = function(authorSelection) {
-    console.log(authorSelection);
     this.wrangleData(filters = {_authorFilterFunction: this.authorFilter(authorSelection)});
     this.updateVis();
 };
