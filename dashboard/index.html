@@ -141,7 +141,7 @@
             <p>Timeframe: <span id="timeframeLabelStart">Date</span> to <span id="timeframeLabelEnd">Date</span></p>
             <p>Working Group: <span id="wgLabel">All</span></p>
             <p>Spec: <span id="specLabel">Spec</span></p>
-            <p>Contributor: <span id="">All</span></p>
+            <p>Contributor: <span id="whoLabel">All</span></p>
         </div>
 
         <div id="legend"> <img src="images/legend.png" width="100%" height="100%"> </div>
@@ -219,6 +219,7 @@
             $(authorHandler).bind("authorChanged", function (event, author) {
                 spec_vis.onAuthorChange(author);
                 timeline_vis.onAuthorChange(author);
+                filter_ui.onAuthorChange(author);
             });
             $(filterHandler).bind("filterChanged", function(event, filters) {
  //                console.log("Filters changed");
