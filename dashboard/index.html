@@ -8,7 +8,6 @@
     <script src="js/lib/d3.js" charset="utf-8"></script>
     <script src="js/lib/queue.v1.js"></script>
     <script src="js/lib/d3.tip.v0.6.6.js"></script>
-    <script src="js/lib/fisheyeAdd.js"></script>
     <script src="js/lib/intro.js"></script>
 
 
@@ -133,21 +132,21 @@
 
         <!--</div>-->
 
+
         <div style="float:left" id="specVis"></div>
 
-        <div id="legend"> <img src="images/legend.png" width="100%" height="100%"> </div>
-
+        <div id="filterUI"></div>
         <div id="whereAmI"> <p> Where am I? </p> </div>
+
+        <div id="legend"> <img src="images/legend.png" width="100%" height="100%"> </div>
 
         <div>
             <p class="whoHeadline" style="float:right; margin-bottom: 0px; margin-top: 20px; margin-right: 15px;"> Contributors </p>
             <!--<p class="whoHeadline" id="line" style="float:right; margin-bottom: 0px; margin-top: 20px; margin-right: 15px;" onclick="slide()"> linear </p>-->
             <!--<p class="whoHeadline" id="fish" style="float:right; margin-bottom: 0px; margin-top: 20px; margin-right: 15px;"> fisheye </p>-->
-
         </div>
-
-        <div id="filterUI"></div>
         <div id="whoVis"></div>
+
         <div id="timelineVis"></div>
 
     </div>
@@ -256,29 +255,29 @@
 
         ////invisible slider/////
 
-            var $gal   =  $("#whoVis"),
-                    galW   = 1000,
-                    galSW  = 7800, // here define dynamic width with svgWhoVis
-                    wDiff  = (galSW/galW)-1,  // widths difference ratio
-                    mPadd  = 0,  // Mousemove Padding
-                    damp   = 2,  // Mousemove response softness
-                    mX     = 0,   // Real mouse position
-                    mX2    = 0,   // Modified mouse position
-                    posX   = 0,
-                    mmAA   = galW-(mPadd*2), // The mousemove available area
-                    mmAAr  = (galW/mmAA);    // get available mousemove fidderence ratio
+            // var $gal   =  $("#whoVis"),
+            //         galW   = 1000,
+            //         galSW  = 7800, // here define dynamic width with svgWhoVis
+            //         wDiff  = (galSW/galW)-1,  // widths difference ratio
+            //         mPadd  = 0,  // Mousemove Padding
+            //         damp   = 2,  // Mousemove response softness
+            //         mX     = 0,   // Real mouse position
+            //         mX2    = 0,   // Modified mouse position
+            //         posX   = 0,
+            //         mmAA   = galW-(mPadd*2), // The mousemove available area
+            //         mmAAr  = (galW/mmAA);    // get available mousemove fidderence ratio
 
-            console.log(galW, galSW)
+            // console.log(galW, galSW)
 
-            $gal.mousemove(function(e) {
-                mX = e.pageX - $(this).parent().offset().left - this.offsetLeft;
-                mX2 = Math.min( Math.max(100, mX-mPadd), mmAA ) * mmAAr;
-            });
+            // $gal.mousemove(function(e) {
+            //     mX = e.pageX - $(this).parent().offset().left - this.offsetLeft;
+            //     mX2 = Math.min( Math.max(100, mX-mPadd), mmAA ) * mmAAr;
+            // });
 
-            setInterval(function(){
-                posX += (mX2 - posX) / damp; // zeno's paradox equation "catching delay"
-                $gal.scrollLeft(posX*wDiff);
-            }, 10);
+            // setInterval(function(){
+            //     posX += (mX2 - posX) / damp; // zeno's paradox equation "catching delay"
+            //     $gal.scrollLeft(posX*wDiff);
+            // }, 10);
 
 
         /////walkthrought/////
