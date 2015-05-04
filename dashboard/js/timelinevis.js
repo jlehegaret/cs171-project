@@ -4,17 +4,22 @@ TimelineVis = function(_parentElement, _data, _eventHandler, _filters, _options)
     this.processedData = [];
     this.displayData = [];
     this.eventHandler = _eventHandler;
-    this.options = _options || {
-        width:1200, height:200
-    };
-    this.filters = _filters || {
-        "start_date"  : "2015-01-01",
-        "end_date"    : "2015-05-05",
-        "category"  : ["spec", "test"],
-        "actions"     : ["ISS_O", "PR_O", "PUB"],
-        "specs"       : [],
-        "who"         : []
-    };
+    this.filters = _filters;
+    this.options = _options;
+    if(this.options.doBrush)
+    {
+      this.filters = {
+                        "start_date"  : "1900-01-01",
+                        "end_date"    : stripTime(new Date()),
+                        "category"  : ["spec", "test"],
+                        "actions"     : ["ISS_O", "ISS_C",
+                                         "PR_O", "PR_C",
+                                         "COM", "PUB"],
+                        "specs"       : [],
+                        "who"         : null
+                      };
+    }
+
     // adapt filters object to the info it was given
     if(this.filters.state === "open") {
         this.filters.actions = ["ISS_O","PR_O", "PUB"];
@@ -123,15 +128,28 @@ TimelineVis.prototype.initVis = function() {
     // define our tooltip function
     // this.tip = this.tooltip();
 
-    // brushing
-    this.brush = d3.svg.brush()
-         .on("brush", function(){
-             $(that.eventHandler).trigger("brushChanged",
-             that.brush.extent());
-        });
-    this.context.append("g")
-         .attr("class", "brush");
+    if(this.options.doBrush)
+    {
+      // we have a constant range of dates - the maximum
+      this.x0.domain([
+                    Date.parse(d3.min(this.processedData.map(function(d){
+                                        return d.date; }))),
+                    Date.parse(stripTime(new Date()))
+                   ]);
 
+      // brushing
+      this.brush = d3.svg.brush()
+           .on("brush", function(){
+               $(that.eventHandler).trigger("brushChanged",
+               that.brush.extent());
+          });
+      this.context.append("g")
+           .attr("class", "brush");
+    }
+    if(this.options.doTooltips)
+    {
+      // REINSTATE
+    }
 
     // filter, aggregate, modify data
     this.wrangleData(); // will create displayData, which is filtered
@@ -146,10 +164,13 @@ TimelineVis.prototype.updateVis = function() {
 // console.log(this.displayData);
 
     // update scales
-    this.x0.domain([
+    if(this.options.doTooltips)
+    {
+      this.x0.domain([
                     Date.parse(this.filters.start_date),
                     Date.parse(this.filters.end_date)
                    ]);
+    }
 
     // when grouping bars
     // update bar widths - right now we have 6 bars in each group
@@ -274,13 +295,15 @@ if(this.displayData.dates.length > 0)
     dates.exit().remove();
 
 
-
-    // update brush
-    this.brush.x(this.x0);
-    this.context.select(".brush")
-         .call(this.brush)
-         .selectAll("rect")
-         .attr("height", 200);
+    if(this.options.doBrush)
+    {
+      // update brush
+      this.brush.x(this.x0);
+      this.context.select(".brush")
+           .call(this.brush)
+           .selectAll("rect")
+           .attr("height", this.height);
+    }
 
 // console.log("FINISHED updateVis");
 };
@@ -289,6 +312,9 @@ if(this.displayData.dates.length > 0)
 TimelineVis.prototype.wrangleData = function() {
   // this is where we will apply filters and recalculate totals
   // and remove all bits that don't have any data in them anyway
+
+// console.log("Now in WRANGLE DATA, with filters:");
+// console.log(this.filters);
 
   var that = this;
   var filtered;
@@ -304,8 +330,7 @@ TimelineVis.prototype.wrangleData = function() {
                         dates: []
                       };
 
-// console.log("TimeVis filters");
-// console.log(that.filters);
+
 
   // we will check each day's complete data for data we want to display
   this.processedData.forEach(function(d) {
@@ -462,8 +487,11 @@ TimelineVis.prototype.wrangleData = function() {
   {
     that.displayData.dates.sort(function(a,b) { return a.date < b.date; });
   }
-  // console.log("displayData is now: ");
-  // console.log(this.displayData);
+
+// console.log("doBrush is: " + this.options.doBrush);
+// console.log("doTooltips is: " + this.options.doTooltips);
+// console.log("displayData is now: ");
+// console.log(this.displayData);
 };
 
 TimelineVis.prototype.reorderData = function() {
@@ -717,6 +745,8 @@ TimelineVis.prototype.tooltip = function() {
 
 
 TimelineVis.prototype.onSelectionChange = function(sunburstSelection) {
+  if(!this.options.doBrush) // no brush here, so don't keep whole dataset
+  {
     if(sunburstSelection.type === "root")
     {
         this.filters.specs = [];
@@ -753,35 +783,67 @@ TimelineVis.prototype.onSelectionChange = function(sunburstSelection) {
 
     this.wrangleData();
     this.updateVis();
+  }
 };
 
 TimelineVis.prototype.onAuthorChange = function(author) {
+  if(!this.options.doBrush) // no brush here, so don't keep whole dataset
+  {
     this.filters.who = author;
     this.wrangleData();
     this.updateVis();
+  }
 };
 
 TimelineVis.prototype.onFilterChange = function(choices) {
-    //TODO: This function is triggered by a selection of an arc on a sunburst, wrangle data needs to be called on this selection
-    // console.log(choices);
-    if(choices.state === "open") {
-        this.filters.actions = ["ISS_O","PR_O", "PUB"];
-    } else {
-        this.filters.actions = ["ISS_O", "ISS_C",
-                                "PR_O", "PR_C",
-                                "COM", "PUB"];
-    }
-    if(!Array.isArray(this.filters.category))
+    if(!this.options.doBrush) // no brush here, so don't keep whole dataset
     {
-      if(this.filters.category == "all")
-      {
-        this.filters.category = ["spec", "test"];
+      //TODO: This function is triggered by a selection of an arc on a sunburst, wrangle data needs to be called on this selection
+      // console.log(choices);
+      if(choices.state === "open") {
+          this.filters.actions = ["ISS_O","PR_O", "PUB"];
       } else {
-        this.filters.category = [this.filters.category];
+          this.filters.actions = ["ISS_O", "ISS_C",
+                                  "PR_O", "PR_C",
+                                  "COM", "PUB"];
       }
+      if(!Array.isArray(this.filters.category))
+      {
+        if(this.filters.category == "all")
+        {
+          this.filters.category = ["spec", "test"];
+        } else {
+          this.filters.category = [this.filters.category];
+        }
+      }
+      // console.log("After UI choice:");
+      // console.log(this.filters);
+      this.wrangleData();
+      this.updateVis();
     }
-    // console.log("After UI choice:");
-    // console.log(this.filters);
+};
+
+TimelineVis.prototype.onTimelineChange = function(selectionStart, selectionEnd) {
+
+  if(!this.options.doBrush) // no brush here, so react to the brush wherever it is
+  {
+// console.log("See the update");
+    this.filters.start_date = stripTime(selectionStart);
+    this.filters.end_date = stripTime(selectionEnd);
+
+    if(this.filters.start_date === this.filters.end_date)
+    {
+        this.filters.start_date = "1900-01-01";
+        this.filters.end_date = stripTime(new Date());
+    }
+
+// console.log("Should call wrangleData next");
+// console.log("Filters are:");
+// console.log(this.filters);
+
     this.wrangleData();
     this.updateVis();
+  }
+  // otherwise, do nothing
 };
+
