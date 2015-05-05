@@ -115,37 +115,7 @@
     max-width: 300px;
 }
 
-.root {
-    fill: white;
-}
 
-.sunburst .group {
-    fill: #1E3248;
-}
-
-.sunburst .spec[caniuse="0"] {
-    fill: #97A2B8;
-}
-.sunburst .spec[caniuse="1"] {
-    fill: #8F9299;
-}
-.sunburst .spec[caniuse="2"] {
-    fill: #6CAED7;
-}
-.sunburst .spec[caniuse="3"] {
-    fill: #C9B3A2;
-}
-.sunburst .spec[caniuse="4"] {
-    fill: #888499;
-}
-
-.HTML {
-    fill: #145184;
-}
-
-.Tests {
-    fill: #142335;
-}
 
 /* spec published */
 .PUB {
@@ -155,6 +125,18 @@
 .PUB.REC {
     fill: black;
 
+}
+
+
+.sunburst .root {
+    fill: white;
+}
+
+.sunburst .HTML {
+    fill: #145184;
+}
+.sunburst .Tests {
+    fill: #142335;
 }
 
 .sunburst .group {
