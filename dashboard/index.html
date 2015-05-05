@@ -301,37 +301,62 @@
                 steps: [
                     {
                         element: '.navbar-collapse collapse ',
-                        intro: 'This guided tour will explain Git the Web Forward interface.<br><br>Use the arrow keys for navigation or hit ESC to exit the tour immediately.',
+                        intro: 'Welcome to our visualization of W3C’s GitHub-hosted specification work.<br><br>This guided tour explains the Git the Web Forward interface.<br><br>Use the arrow keys for navigation, or hit ESC to exit the tour immediately.',
                         position: 'bottom'
                     },
                     {
                         element: '#specVis',
-                        intro: 'This is Sunburst/SpecVis view....',
+                        intro: 'W3C is made up of many working groups.  The ones that do their work on GitHub are listed in the innermost ring of this sunburst diagram.',
                         position: 'bottom'
                     },
                     {
-                        element: '#timelineVis',
-                        intro: 'This is Timeline view...',
+                        element: '#specVis',
+                        intro: 'Each working group works on many specs.  These are listed along the next-most inner ring, just outside from the working group responsible for it. <br> <br>When one spec is worked on by more than one working group, it appears in the circle twice. <br> <br>The color of the spec in the ring relates to how well it has been implemented so far – at least, according to www.caniuse.com.',
+                        position: 'bottom'
+                    },
+                    {
+                        element: '#specVis',
+                        intro: 'The third ring shows the kind of work being done on that particular spec – either the spec’s text is getting edited, or the spec’s test suite is getting updated.<br><br>Spec text edits are shown in blue while test suite efforts are shown in black. ',
+                        position: 'bottom'
+                    },
+                    {
+                        element: '#specVis',
+                        intro: 'The outermost ring shows exactly what work was done.  There are different kinds of work - commiting code directly, opening a pull request, closing an open pull request, opening an issue, or closing an issue.<br><br>The number of items of work done determines the size of the arc of the parent category.  This feeds in towards the center, determining the relative sizes of each spec and of each working group.',
+                        position: 'bottom'
+                    },
+                    {
+                        element: '#specVis',
+                        intro: 'Click on any item of interest to zoom in.<br><br>Click the center to zoom back out.<br><br>Every click you make also adds or removes a filter to our other views of the data.',
                         position: 'bottom'
                     },
                     {
                         element: '#whoVis',
-                        intro: 'This is Who view...',
+                        intro: 'Our Contributors graph displays how much code a person has touched and how many issues that person has opened or closed.<br><br>Clicking on a bar to see only the work that that one person did displayed in the other graphs.',
                         position: 'right'
                     },
                     {
                         element: '#cssmenu',
-                        intro: "This is navigation menu for sorting/filtering...",
+                        intro: "Use the menu to choose how to sort the list.",
+                        position: 'bottom'
+                    },
+                    {
+                        element: '#timelineVis-whole',
+                        intro: 'You can use the timeline to filter the data, too.<br><br>Select your timeframe using the bottom timeline. The top timeline will magnify that selection, and the other graphs will automatically update..<br><br>The gray lines on the bottom timeline show the last published date for specifications that are not yet Recommendation status..<br><br>The black lines show the last published dates of specs that <b>are</b> Recommendations..<br><br>By default, spec edits display above the axis, while test suite contributions display below the axis',
+                        position: 'bottom'
+                    },
+                    {
+                        element: '#cssmenu',
+                        intro: "However, if you use the menu to view only test suite work, test suite work will flip to the positive side of the axis.  <br><br>You can also use the menu to view only the work that is currently outstanding – pull requests waiting to be merged, and issues that still need to be addressed.  To do this, choose to view Unresolved Items..  <br><br>The sunburst then shows which specs have outstanding issues, and which ones don’t.  .  <br><br>The contributors list turns into a list of who is waiting most for an issue to be solved or code to be merged..  <br><br>And the timeline shows how old those unresolved issues are getting.",
                         position: 'bottom'
                     },
                     {
                         element: '#whereAmI',
-                        intro: "This is Where Am I part...",
+                        intro: "You can always remind yourself of your filtering choices here.",
                         position: 'bottom'
                     },
                     {
-                        element: '#legend',
-                        intro: "The legend shows colors...",
+                        element: '.navbar-collapse collapse ',
+                        intro: 'Thank you for walking through our visualization.  We hope that you enjoy exploring it!',
                         position: 'bottom'
                     }
                 ]
