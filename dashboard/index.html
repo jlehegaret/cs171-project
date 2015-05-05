@@ -136,8 +136,7 @@
         <div style="float:left" id="specVis"></div>
 
         <div id="whereAmI">
-            <p>Where am I? </p>
-            <p>Viewing: <span id="viewingLabel">All Work Done</span></p>
+            <p>Viewing: <span id="statusLabel">All Work Done</span>, <span id="categoryLabel">All Categories</span></p>
             <p>Timeframe: <span id="timeframeLabelStart">Date</span> to <span id="timeframeLabelEnd">Date</span></p>
             <p>Working Group: <span id="wgLabel">All</span></p>
             <p>Spec: <span id="specLabel">All</span></p>
@@ -228,6 +227,7 @@
             $(filterHandler).bind("filterChanged", function(event, filters) {
  //                console.log("Filters changed");
  //                console.log(filters);
+                filter_ui.onFilterChange(filters);
                 spec_vis.onFilterChange(filters);
                 timeline_zoom.onFilterChange(filters);
                 who_vis.onFilterChange(filters);
