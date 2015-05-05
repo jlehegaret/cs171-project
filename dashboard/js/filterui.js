@@ -96,7 +96,6 @@ FilterUI.prototype.initHashString = function() {
         this.filters.state = hashFilters.state;
     }
     if(hashFilters.category) {
-        console.log(hashFilters.category.split(","));
         this.filters.category = hashFilters.category.split(",");
     }
     if(hashFilters.who_sort) {
