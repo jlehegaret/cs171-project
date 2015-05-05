@@ -64,6 +64,12 @@ SpecVis.prototype.initVis = function () {
             }
     };
 
+    //This scale maps a canIuse score of 0..2
+    //to a set of 5 classes
+    this.caniuseScale = d3.scale.linear()
+        .domain([0,2])
+        .rangeRound([0,4]);
+
     this.x = d3.scale.linear()
         .range([0, 2 * Math.PI]);
     this.y = d3.scale.sqrt()
@@ -130,7 +136,7 @@ SpecVis.prototype.wrangleData = function (_filters) {
         spec = {};
         spec.url = d.url;
         spec.name = d.title;
-        spec.score = d.score;  // this is here now, but I don't see it showing up elsewhere
+        spec.score = d.score;
         if (d.issues && categoryFilter("issue")) {
             spec.issues = d.issues.filter(filterChain);
         }
@@ -182,7 +188,7 @@ SpecVis.prototype.updateVis = function () {
             return d.key;
         });
 
-     var path_enter = path
+    var path_enter = path
         .enter()
         .append("path")
         .attr("class", function (d) {
@@ -194,10 +200,14 @@ SpecVis.prototype.updateVis = function () {
         .classed("closed", function(d) {
             return d.state === "closed"
         })
-        .style("opacity", function(d) {
-             return that.caniuse(d);
-         })
-        .style("fill", this.sunburstFill)
+        .attr("caniuse", function(d) {
+            if(d.type == "spec") {
+                return that.caniuseScale(d.score);
+            } else {
+                return null;
+            }
+        })
+ //       .style("fill", this.sunburstFill)
         .on("click", click)
         .on("mouseover", this.tip.show);
         // .on("mouseout", this.tip.hide);
@@ -258,6 +268,7 @@ SpecVis.prototype.createHierarchy = function(group_lookup, spec_lookup, test_loo
                     }];
 
                 spec.name = _fullSpec.name;
+                spec.score = _fullSpec.score;
                 if (_fullSpec.issues) {
                     _fullSpec.issues.forEach(function (_issue) {
                         var issue = {};
@@ -558,16 +569,6 @@ SpecVis.prototype.countIssues = function () {
     return totalIssues();
 };
 
-//Can i use function
-//TODO: always returns 1 as a placeholder for future function
-SpecVis.prototype.caniuse = function (d) {
-    if(d.type=="spec") {
-        return 1;
-    } else {
-        return 1;
-    }
-};
-
 //Sets up the tooltip function
 SpecVis.prototype.tooltip = function() {
     return d3.tip()
@@ -640,38 +641,4 @@ SpecVis.prototype.tooltip = function() {
 
             return tooltip;
         });
-};
-
-// Color filling method for sunburst
-// Note most colors are in vis.css
-SpecVis.prototype.sunburstFill = function(d,i) {
-    var that = this;
-
-    this.colorGroups = d3.scale.ordinal()
-        .range(['#485F7A', '#2A3C4E', '#1E3248']);
-
-    if (d.type === "group") {
-        return that.colorGroups(i);
-    }
-    if (d.type === "spec") {
-        //console.log(d.parent.name)
-        //console.log(d)
-        if (d.parent.name == "Web Applications Working Group") {
-            return '#97A2B8';
-        } else if (d.parent.name == "HTML Working Group") {
-            return '#8F9299';
-        } else if (d.parent.name == "Device APIs Working Group") {
-            return '#6CAED7';
-        } else if (d.parent.name == "Web Performance Working Group") {
-            return '#C9B3A2';
-        } else if (d.parent.name == "Web Real-Time Communications Working Group") {
-            return '#888499';
-        } else if (d.parent.name == "Web Application Security Working Group") {
-            return '#6CAED7';
-        } else {
-            var colors = ['#97A2B8', '#B2BDC7'];
-            var random_color = colors[Math.floor(Math.random() * colors.length)];
-            return random_color;
-        }
-    }
 };
