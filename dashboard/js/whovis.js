@@ -4,7 +4,7 @@ WhoVis = function(_parentElement, _data, _eventHandler, _filters, _options) {
     this.eventHandler = _eventHandler;
     this.options = _options || {
         "width"       : 700,
-        "height"      : 300
+        "height"      : 390
     };
 
     this.filters = _filters || {
@@ -42,7 +42,7 @@ WhoVis = function(_parentElement, _data, _eventHandler, _filters, _options) {
     // width is going to be as big as it needs to be for all bars
     //  but here is a default
     this.height = this.options.height - this.margin.top - this.margin.bottom;
-    this.y_for_axis = this.height/2; // we give bars half the space, names the other half
+    this.y_for_axis = this.height/1.8; // we give bars half the space, names the other half
 
     this.barWidth = 3;
     this.barPadding = 2;
@@ -59,6 +59,8 @@ WhoVis.prototype.initVis = function() {
     this.exclusions = [ "Robin Berjon", "rberjon","darobin",
         "plehegar", "Philippe Le Hegaret",
         "unknown", undefined];
+
+    this.currentSelection = this.filters.who;
 
     this.svg = this.parentElement.append("svg")
         .attr("width", this.width + this.margin.left + this.margin.right)
@@ -106,7 +108,6 @@ WhoVis.prototype.updateVis = function() {
 
     var that = this;
     var who_enter;
-
 
     // if want more space between bars, change this.barPadding
     //   here, we display two bars per person, so we need the "2"
@@ -159,6 +160,19 @@ WhoVis.prototype.updateVis = function() {
     this.y_issues.domain([0, this.max]);
 
 
+
+    var doSelect = function(who) {
+         whos
+            .attr("selected", function(d) {
+                if (that.filters.who === null) {
+                    return "true";
+                } else if (that.filters.who === d.who) {
+                    return "true";
+                } else {
+                    return "false";
+                }
+            });
+    };
     // this.svg.select(".x.axis")
     //     .call(this.xAxis)
     //     .selectAll("text");
@@ -168,32 +182,45 @@ WhoVis.prototype.updateVis = function() {
                         .data(this.displayData,
                             function(d) { return d.who; });
 
-if(this.displayData.length > 0)
-{
-    whos.enter()
-        .append("g")
-        .attr("class", "who")
-        .on("click",function(d) {
-                if(!d.selected) {
-                    d.selected = true;
+    if(this.displayData.length > 0) {
+        whos.enter()
+            .append("g")
+            .attr("class", "who")
+            .attr("selected", function(d) {
+                if (that.filters.who === null) {
+                    return "true";
+                } else if (that.filters.who === d.who) {
+                    return "true";
+                } else {
+                    return "false";
+                }
+            })
+            .on("click", function(d) {
+                if (that.currentSelection != d.who) {
+                    that.currentSelection = d.who;
                     $(that.eventHandler).trigger("authorChanged", d.who);
                     that.filters.who = d.who;
+                    doSelect(that.filters.who);
                 } else { // If author has already been selected, reset selection
-                    d.selected = false;
+                    that.currentSelection = null;
                     $(that.eventHandler).trigger("authorChanged", null);
                     that.filters.who = null;
+                    doSelect(that.filters.who);
                 }
-        })
-        .on("mouseover", this.tip.show)
-        .on("mouseout", this.tip.hide)
-        .append("text") // every who has a name
-        .text(function(d){return d.who})
-        .style("font-size", "8px")
-        .style("text-anchor", "end")
-        .attr("dx", "-19em")
-        .attr("dy", "0.7em")
-        .style("font-family", "sans-serif")
-        .attr("transform", "rotate(-90)");
+            })
+            .on("mouseover", this.tip.show)
+            .on("mouseout", this.tip.hide)
+            .append("text") // every who has a name
+            .text(function(d){
+                return d.who
+            })
+            .style("font-size", "8px")
+            .style("letter-spacing", "1px")
+            .style("text-anchor", "end")
+            .attr("dx", "-26em")
+            .attr("dy", "0.7em")
+            .style("font-family", "sans-serif")
+            .attr("transform", "rotate(-90)");
 
     // move groups as needed
     whos.transition()
@@ -563,6 +590,22 @@ WhoVis.prototype.tooltip = function() {
                 + "</div>";
         });
 };
+
+WhoVis.prototype.select = function(d) {
+    var that = this;
+    console.log(d);
+    console.log(this.filters);
+    if(!d.selected) {
+        d.selected = true;
+        $(that.eventHandler).trigger("authorChanged", d.who);
+        that.filters.who = d.who;
+    } else { // If author has already been selected, reset selection
+        d.selected = false;
+        $(that.eventHandler).trigger("authorChanged", null);
+        that.filters.who = null;
+    }
+};
+
 
 // EVENT HANDLERS
 

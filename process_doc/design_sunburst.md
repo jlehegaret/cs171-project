@@ -48,4 +48,6 @@ We also added outward-going interaction - as the user zooms in and out of the di
 
 In our final version,  -- inward interaction, final tooltip format.
 
-
+<p align="center">
+    <img src="images/FINAL_Sunburst.png" width="600"/>
+</p>

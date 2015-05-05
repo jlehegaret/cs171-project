@@ -42,14 +42,14 @@ FilterUI.prototype.addEventHandlers = function() {
         $(that.eventHandler).trigger("filterChanged", that.filters);
     });
 
-    document.getElementById("caniuse_true").addEventListener("click", function(d) {
-        that.filters.caniuse = "true";
-        $(that.eventHandler).trigger("filterChanged", that.filters);
-    });
-    document.getElementById("caniuse_false").addEventListener("click", function(d) {
-        that.filters.caniuse = "false";
-        $(that.eventHandler).trigger("filterChanged", that.filters);
-    });
+    //document.getElementById("caniuse_true").addEventListener("click", function(d) {
+    //    that.filters.caniuse = "true";
+    //    $(that.eventHandler).trigger("filterChanged", that.filters);
+    //});
+    //document.getElementById("caniuse_false").addEventListener("click", function(d) {
+    //    that.filters.caniuse = "false";
+    //    $(that.eventHandler).trigger("filterChanged", that.filters);
+    //});
 };
 
 FilterUI.prototype.initUI = function() {
