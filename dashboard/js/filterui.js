@@ -5,10 +5,41 @@ FilterUI = function  (_parentElement, _filters, _eventHandler) {
     this.filters = _filters;
     this.parentElement = _parentElement;
 
-    this.addEventHandlers();
+    this.dateFormatter = d3.time.format("%Y-%m-%d");
+
     this.initUI();
 };
 
+FilterUI.prototype.initUI = function() {
+    this.addEventHandlers();
+
+    //grabs any query string filters and sets global filters object
+    this.initHashString();
+    //sets a new hash string with all the filters
+    this.setHashString(this.filters);
+
+
+    this.specLabel = this.parentElement.select("#specLabel");
+    this.wgLabel = this.parentElement.select("#wgLabel");
+
+    this.timelineLabelStart = this.parentElement.select("#timeframeLabelStart");
+    this.timelineLabelEnd = this.parentElement.select("#timeframeLabelEnd");
+    this.whoLabel = this.parentElement.select("#whoLabel");
+    this.categoryLabel = this.parentElement.select("#categoryLabel");
+    this.statusLabel = this.parentElement.select("#statusLabel");
+
+    //Initialize all the display fields to properties of the initial filters object
+    this.timelineLabelStart.text(this.dateFormatter(new Date(this.filters.start_date)));
+    this.timelineLabelEnd.text(this.dateFormatter(new Date(this.filters.end_date)));
+    this.whoLabel.text(this.getAuthorText(this.filters.who));
+    this.categoryLabel.text(this.getCategoryText(this.filters.category));
+    this.statusLabel.text(this.getStatusText(this.filters.state));
+
+};
+
+//////
+//Event handling code for the ui triggered filters
+//////
 FilterUI.prototype.addEventHandlers = function() {
     var that = this;
     document.getElementById("state_open").addEventListener("click", function(d) {
@@ -41,51 +72,54 @@ FilterUI.prototype.addEventHandlers = function() {
         that.filters.who_sort = "issues";
         $(that.eventHandler).trigger("filterChanged", that.filters);
     });
-
-    //document.getElementById("caniuse_true").addEventListener("click", function(d) {
-    //    that.filters.caniuse = "true";
-    //    $(that.eventHandler).trigger("filterChanged", that.filters);
-    //});
-    //document.getElementById("caniuse_false").addEventListener("click", function(d) {
-    //    that.filters.caniuse = "false";
-    //    $(that.eventHandler).trigger("filterChanged", that.filters);
-    //});
 };
 
-FilterUI.prototype.initUI = function() {
-    this.dateFormatter = d3.time.format("%Y-%m-%d");
+//Updates the hash query string with the current filters
+FilterUI.prototype.setHashString = function(_filters) {
+    jHash.val(_filters);
+};
 
-    this.timelineLabelStart = this.parentElement.select("#timeframeLabelStart");
-    this.timelineLabelEnd = this.parentElement.select("#timeframeLabelEnd");
-    this.whoLabel = this.parentElement.select("#whoLabel");
-    this.specLabel = this.parentElement.select("#specLabel");
-    this.wgLabel = this.parentElement.select("#wgLabel");
-    this.categoryLabel = this.parentElement.select("#categoryLabel");
-    this.statusLabel = this.parentElement.select("#statusLabel");
+//Grabs any hash string query variables that are present and updates the global filters object accordingly
+FilterUI.prototype.initHashString = function() {
+    var hashFilters = jHash.val();
 
-
-    this.timelineLabelStart.text(this.dateFormatter(new Date(this.filters.start_date)));
-    this.timelineLabelEnd.text(this.dateFormatter(new Date(this.filters.end_date)));
-    this.whoLabel.text(this.getAuthorText(this.filters.who));
-    this.categoryLabel.text(this.getCategoryText(this.filters.category));
-    this.statusLabel.text(this.getStatusText(this.filters.state));
+    if(hashFilters.start_date) {
+        this.filters.start_date = hashFilters.start_date;
+    }
+    if(hashFilters.end_date) {
+        this.filters.end_date = hashFilters.end_date;
+    }
+    if(hashFilters.who) {
+        this.filters.who = hashFilters.who
+    }
+    if(hashFilters.state) {
+        this.filters.state = hashFilters.state;
+    }
+    if(hashFilters.category) {
+        console.log(hashFilters.category.split(","));
+        this.filters.category = hashFilters.category.split(",");
+    }
+    if(hashFilters.who_sort) {
+        this.filters.who_sort = hashFilters.who_sort;
+    }
 };
 
 FilterUI.prototype.onAuthorChange = function(author) {
-    this.whoLabel.text(this.getAuthorText(this.filters.who));
-};
+    this.whoLabel.text(this.getAuthorText(author));
 
-FilterUI.prototype.getAuthorText = function(author) {
-    if(!author) {
-        return "All"
-    } else {
-        return author;
-    }
+    var queryHash = jHash.val();
+    queryHash.who = author;
+    jHash.val(queryHash);
 };
 
 FilterUI.prototype.onTimelineChange = function(startDate, endDate) {
     this.timelineLabelStart.text(this.dateFormatter(startDate));
     this.timelineLabelEnd.text(this.dateFormatter(endDate));
+
+    var queryHash = jHash.val();
+    queryHash.start_date = this.dateFormatter(startDate);
+    queryHash.end_date = this.dateFormatter(endDate);
+    jHash.val(queryHash);
 };
 
 FilterUI.prototype.onSelectionChange = function(sunburstSelection) {
@@ -96,6 +130,23 @@ FilterUI.prototype.onSelectionChange = function(sunburstSelection) {
 FilterUI.prototype.onFilterChange = function(_filters) {
     this.categoryLabel.text(this.getCategoryText(_filters.category));
     this.statusLabel.text(this.getStatusText(_filters.state));
+
+    var queryHash = jHash.val();
+    queryHash.category = _filters.category;
+    queryHash.state = _filters.state;
+    queryHash.who_sort = _filters.who_sort;
+    jHash.val(queryHash);
+};
+
+///////
+///Formatting functions to output text for different filter states
+///////
+FilterUI.prototype.getAuthorText = function(author) {
+    if(!author) {
+        return "All"
+    } else {
+        return author;
+    }
 };
 
 FilterUI.prototype.getCategoryText = function(category) {
@@ -143,4 +194,3 @@ FilterUI.prototype.getSpecText = function(sunburstSelection) {
             return sunburstSelection.parent.parent.name;
     }
 };
-

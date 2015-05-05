@@ -9,6 +9,7 @@
     <script src="js/lib/queue.v1.js"></script>
     <script src="js/lib/d3.tip.v0.6.6.js"></script>
     <script src="js/lib/intro.js"></script>
+    <script src="js/lib/jhash-2.1.js"></script>
 
 
     <!--
@@ -63,42 +64,42 @@
         <nav id='cssmenu'>
             <ul>
 
-                <li class='active'><a class="links" id="one" href='#'><span>View By Status</span></a>
+                <li class='active'><a class="links" id="one"><span>View By Status</span></a>
                     <ul class='child'>
-                        <li class='has-sub'><a id="state_all" href='#'><span>All</span></a>
+                        <li class='has-sub'><a id="state_all"><span>All</span></a>
                         </li>
-                        <li class='has-sub'><a id="state_open" href='#'><span>Unresolved Items</span></a>
+                        <li class='has-sub'><a id="state_open"><span>Unresolved Items</span></a>
                         </li>
                     </ul>
                 </li>
 
-                <li class='active'><a class="links" href='#'><span>View By Category</span></a>
+                <li class='active'><a class="links"><span>View By Category</span></a>
                     <ul class='child'>
-                        <li class='has-sub'><a id="cat_all" href='#'><span>All </span></a>
+                        <li class='has-sub'><a id="cat_all"><span>All </span></a>
 
                         </li>
-                        <li class='has-sub'><a id="cat_spec" href='#'><span>Spec Edits</span></a>
+                        <li class='has-sub'><a id="cat_spec"><span>Spec Edits</span></a>
                         </li>
 
-                        <li class='has-sub'><a id= "cat_test" href='#'><span>Test Suite Updates</span></a>
+                        <li class='has-sub'><a id= "cat_test"><span>Test Suite Updates</span></a>
                         </li>
 
                     </ul>
                 </li>
 
 
-                <li class='active'><a class="links" href='#'><span>Sort Contributors</span></a>
+                <li class='active'><a class="links"><span>Sort Contributors</span></a>
                     <ul class='child'>
-                        <li class='has-sub'><a id="sort_code" href='#'><span>By Lines of Code Touched</span></a>
+                        <li class='has-sub'><a id="sort_code"><span>By Lines of Code Touched</span></a>
 
                         </li>
-                        <li class='has-sub'><a id="sort_issue" href='#'><span>By Issues Raised</span></a>
+                        <li class='has-sub'><a id="sort_issue"><span>By Issues Raised</span></a>
                         </li>
                     </ul>
                 </li>
 
 
-                <li class='active'><a class="links" href='#'><span>About</span></a>
+                <li class='active'><a class="links"><span>About</span></a>
                     <ul class='child'>
                         <li class='has-sub'><a href='https://github.com/jlehegaret/cs171-project/tree/master/dashboard/data'><span>Our Data</span></a>
                         </li>
@@ -158,23 +159,29 @@
         var allData = {caniuse: [], groups: [], specs: [], tests: []};
 
         //If this object is passed to visualization, it will override the default filters
-       var today = new Date();
-       var before = new Date();
-       var before = before.setMonth(before.getMonth() - 3);
-        var initialFilters = {
 
+        var today = new Date();
+        var before = new Date();
+        before = before.setMonth(before.getMonth() - 3);
+
+        //NOTE:These filters are overrode by any options specified in the hash query string
+        var initialFilters = {
             start_date: stripTime(before),
             end_date: stripTime(today),    // needs to be in this format
-            // new Date() breaks whovis filtering code
             state: "all",           //open or all
             category: ["spec", "test"],        // all, spec, or test
             specs: [],          // array of which specs to show.
                                 //    empty = all.
-            caniuse: false,     // change sunburst color
+  //          caniuse: false,     // change sunburst color
                                 // to reflect caniuse score
-            who: null,          // or can be one name
+            who: "none",          // or can be one name
             who_sort: "code"   // or issues
         };
+
+
+        //Handles filter options from UI and gets and sets hash query strings
+        var filterHandler = {};
+        var filter_ui = new FilterUI(d3.select("#whereAmI"), initialFilters, filterHandler);
 
         var initVis = function () {
             //Handles timeline brushing
@@ -183,17 +190,12 @@
             var selectionHandler = {};
             //Handles whovis author selection changing
             var authorHandler = {};
-            //Handles filter options from UI
-            var filterHandler = {};
-
-
             //Create visualizations
-            filter_ui = new FilterUI(d3.select("#whereAmI"), initialFilters, filterHandler);
-            spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler, initialFilters);
-            who_vis = new WhoVis(d3.select("#whoVis"), allData, authorHandler, initialFilters);
-            timeline_zoom = new TimelineVis(d3.select("#timelineVis-zoom"), allData, {}, initialFilters,
+            var spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler, initialFilters);
+            var who_vis = new WhoVis(d3.select("#whoVis"), allData, authorHandler, initialFilters);
+            var timeline_zoom = new TimelineVis(d3.select("#timelineVis-zoom"), allData, {}, initialFilters,
                 { width:1200, height:200, doBrush: false, doTooltips: true});
-            timeline_whole = new TimelineVis(d3.select("#timelineVis-whole"), allData, brushHandler, initialFilters,
+            var timeline_whole = new TimelineVis(d3.select("#timelineVis-whole"), allData, brushHandler, initialFilters,
                 { width:1200, height:200, doBrush: true, doTooltips: false});
 
 
