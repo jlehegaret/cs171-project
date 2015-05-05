@@ -114,7 +114,7 @@
                     </ul>
                 </li>
             </ul>
-          
+
         </nav>
           <div style="position: absolute; margin-top:380px; width:285px; height:108;"> <img src="images/legend.jpg"> </div>
 
@@ -142,7 +142,7 @@
 
         <div id="timelineVis-zoom"></div>
         <div  id="timelineVis-whole"></div>
-        
+
 
     </div>
 
@@ -162,7 +162,7 @@
        var before = new Date();
        var before = before.setMonth(before.getMonth() - 3);
         var initialFilters = {
-          
+
             start_date: stripTime(before),
             end_date: stripTime(today),    // needs to be in this format
             // new Date() breaks whovis filtering code
@@ -331,7 +331,7 @@
                     },
                     {
                         element: '#whoVis',
-                        intro: 'Our Contributors graph displays how much code a person has touched and how many issues that person has opened or closed.<br><br>Clicking on a bar to see only the work that that one person did displayed in the other graphs.',
+                        intro: 'Our Contributors graph displays how much code a person has touched and how many issues that person has opened or closed.<br><br>Click on a bar to see only the work by that one person displayed in the other graphs.',
                         position: 'right'
                     },
                     {
@@ -342,12 +342,12 @@
                     {
                         element: '#timelineVis-whole',
                         intro: 'You can use the timeline to filter the data, too.<br><br>Select your timeframe using the bottom timeline. The top timeline will magnify that selection, and the other graphs will automatically update..<br><br>The gray lines on the bottom timeline show the last published date for specifications that are not yet Recommendation status..<br><br>The black lines show the last published dates of specs that <b>are</b> Recommendations..<br><br>By default, spec edits display above the axis, while test suite contributions display below the axis',
-                        position: 'bottom'
+                        position: 'top'
                     },
                     {
                         element: '#cssmenu',
                         intro: "However, if you use the menu to view only test suite work, test suite work will flip to the positive side of the axis.  <br><br>You can also use the menu to view only the work that is currently outstanding – pull requests waiting to be merged, and issues that still need to be addressed.  To do this, choose to view Unresolved Items..  <br><br>The sunburst then shows which specs have outstanding issues, and which ones don’t.  .  <br><br>The contributors list turns into a list of who is waiting most for an issue to be solved or code to be merged..  <br><br>And the timeline shows how old those unresolved issues are getting.",
-                        position: 'bottom'
+                        position: 'right'
                     },
                     {
                         element: '#whereAmI',
