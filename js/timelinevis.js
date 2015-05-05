@@ -39,7 +39,7 @@ TimelineVis = function(_parentElement, _data, _eventHandler, _filters, _options)
     }
 
     // defines constants
-    this.margin = {top: 20, right: 20, bottom: 20, left: 40};
+    this.margin = {top: 20, right: 20, bottom: 0, left: 40};
     this.width = this.options.width - this.margin.left - this.margin.right;
     this.height = this.options.height - this.margin.top - this.margin.bottom;
 
@@ -352,8 +352,7 @@ TimelineVis.prototype.wrangleData = function() {
                && that.filters.actions.indexOf(dd.type) !== -1)
             {
               //  We may want to see this item
-              if( (that.filters.who === null
-                      && that.filters.specs.length == 0))
+              if( (that.filters.who === null || that.filters.who === "none") && that.filters.specs.length == 0)
                   // || dd.type == "PUB")
                   // sometimes it seems like it's handy to view these
                   //  all the time.  other times, not.
