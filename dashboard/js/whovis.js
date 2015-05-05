@@ -215,14 +215,9 @@ WhoVis.prototype.updateVis = function() {
                 return d.who
             })
             .style("font-size", "8px")
-<<<<<<< HEAD
             .style("letter-spacing", "1px")
             .style("text-anchor", "end")
             .attr("dx", "-26em")
-=======
-            .style("text-anchor", "end")
-            .attr("dx", "-19em")
->>>>>>> f2575f294769491fdacb78ed055c43bf9b226c89
             .attr("dy", "0.7em")
             .style("font-family", "sans-serif")
             .attr("transform", "rotate(-90)");

@@ -158,17 +158,14 @@
         var allData = {caniuse: [], groups: [], specs: [], tests: []};
 
         //If this object is passed to visualization, it will override the default filters
-        var today = new Date();
-        var before = new Date();
-        var before = before.setMonth(before.getMonth() - 3);
+       var today = new Date();
+       var before = new Date();
+       var before = before.setMonth(before.getMonth() - 3);
         var initialFilters = {
+          
             start_date: stripTime(before),
             end_date: stripTime(today),    // needs to be in this format
-<<<<<<< HEAD
             // new Date() breaks whovis filtering code
-=======
-                            // new Date() breaks whovis filtering code
->>>>>>> f2575f294769491fdacb78ed055c43bf9b226c89
             state: "all",           //open or all
             category: ["spec", "test"],        // all, spec, or test
             specs: [],          // array of which specs to show.
