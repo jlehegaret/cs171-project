@@ -4,7 +4,7 @@ WhoVis = function(_parentElement, _data, _eventHandler, _filters, _options) {
     this.eventHandler = _eventHandler;
     this.options = _options || {
         "width"       : 700,
-        "height"      : 300
+        "height"      : 390
     };
 
     this.filters = _filters || {
@@ -42,7 +42,7 @@ WhoVis = function(_parentElement, _data, _eventHandler, _filters, _options) {
     // width is going to be as big as it needs to be for all bars
     //  but here is a default
     this.height = this.options.height - this.margin.top - this.margin.bottom;
-    this.y_for_axis = this.height/2; // we give bars half the space, names the other half
+    this.y_for_axis = this.height/1.8; // we give bars half the space, names the other half
 
     this.barWidth = 3;
     this.barPadding = 2;
@@ -164,7 +164,7 @@ WhoVis.prototype.updateVis = function() {
     var doSelect = function(who) {
          whos
             .attr("selected", function(d) {
-                if (that.filters.who === null) {
+                if (that.filters.who === null || that.filters.who === "none") {
                     return "true";
                 } else if (that.filters.who === d.who) {
                     return "true";
@@ -187,7 +187,7 @@ WhoVis.prototype.updateVis = function() {
             .append("g")
             .attr("class", "who")
             .attr("selected", function(d) {
-                if (that.filters.who === null) {
+                if (that.filters.who === null || that.filters.who === "none") {
                     return "true";
                 } else if (that.filters.who === d.who) {
                     return "true";
@@ -202,9 +202,9 @@ WhoVis.prototype.updateVis = function() {
                     that.filters.who = d.who;
                     doSelect(that.filters.who);
                 } else { // If author has already been selected, reset selection
-                    that.currentSelection = null;
-                    $(that.eventHandler).trigger("authorChanged", null);
-                    that.filters.who = null;
+                    that.currentSelection = "none";
+                    $(that.eventHandler).trigger("authorChanged", "none");
+                    that.filters.who = "none";
                     doSelect(that.filters.who);
                 }
             })
@@ -215,8 +215,9 @@ WhoVis.prototype.updateVis = function() {
                 return d.who
             })
             .style("font-size", "8px")
+            .style("letter-spacing", "1px")
             .style("text-anchor", "end")
-            .attr("dx", "-19em")
+            .attr("dx", "-26em")
             .attr("dy", "0.7em")
             .style("font-family", "sans-serif")
             .attr("transform", "rotate(-90)");

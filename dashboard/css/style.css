@@ -12,9 +12,8 @@ body {
 	font-family: 'Open Sans', Arial, sans-serif;
 	font-size: 14px;
 	font-weight: 300;
-	background-image: none;
-	background-repeat: no-repeat;
-	background-position: center;
+	
+
 }
 
 a:active {
@@ -44,18 +43,21 @@ h1,h2, h3, h4, h5, h6 {
 #wrapper{
 min-height: 100%;
 height: auto !important;
-height: 100%;
+/*background-image: url(../images/bckg.jpg);*/
+background-repeat:repeat-y;
+background-position:center;
+
 position: relative;
 }
 
 .footer {
-clear: both;
- position: absolute;
- z-index: 10;
- height: 5em;
- bottom:0;
- background-color:#142336;
- width:100%;
+    clear: both;
+    position: absolute;
+    z-index: 10;
+    height: 2em;
+    bottom:0;
+    background-color:#142336;
+    width:100%;
 }
 
 
@@ -70,7 +72,7 @@ header .navbar {
 header .navbar-collapse  ul.navbar-nav {
 	float: right;
 	margin-right: 20px;
-	padding-top: 20px;
+	padding-top: 10px;
 }
 
 header .navbar-default{
@@ -149,6 +151,24 @@ header .navigation {
 	display:none;
 }
 
+.title{
+    font-family: 'Lato', sans-serif;
+    font-size: 16px;
+    float: right;
+    margin-right:25px;
+    margin-top:8px;
+}
+
+.names{
+    font-family: 'Lato', sans-serif;
+    font-size: 10px;
+    float: right;
+    margin-right:25px;
+    font-style: italic;
+    border-bottom: 1px solid grey;
+}
+
+
 #wrapper .container #specVis {
 	margin-left:80px;
 	margin-top:0;
@@ -216,7 +236,7 @@ header .navigation {
     font-weight: normal;
 }
 /* Custom CSS Styles */
-#cssmenu {
+#cssmenu{
     font-family: 'Lato', sans-serif;
     font-size: 11px;
     width: 200px;
@@ -242,7 +262,7 @@ header .navigation {
 }
 
 #cssmenu > ul > li > a {
-    padding: 5px 20px;
+    padding: 4px 10px;
 }
 #cssmenu > ul > li:hover {
     border-left: 2px solid #1F6EA9;
@@ -253,7 +273,7 @@ header .navigation {
 }
 
 /*#cssmenu > ul > li:hover {*/
-    /*background: #eff2f5;*/
+/*background: #eff2f5;*/
 /*}*/
 
 /* Sub Menu */
@@ -268,18 +288,17 @@ header .navigation {
     border-left: 20px solid transparent;
 }
 #cssmenu ul ul a {
-    padding: 8px 0;
+    padding: 6px 0;
     border-bottom: 1px solid #eeeeee;
 }
 #cssmenu ul ul li {
-    padding: 0px 20px;
+    padding: 0 20px;
 }
+#cssmenu ul ul li:last-child {
 
-#cssmenu ul ul {
-    padding: 3px;
+    padding-bottom: 5px;
 }
 
 #cssmenu ul ul li:last-child > a {
     border-bottom: none;
 }
-
