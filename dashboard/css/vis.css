@@ -127,7 +127,7 @@
 
 }
 
-
+/*Sunburst - specific styles */
 .sunburst .root {
     fill: white;
 }
@@ -150,12 +150,10 @@
     fill: #41658C;
 }
 .sunburst .spec[caniuse="2"] {
-
     fill: #C9B3A2;
 }
 .sunburst .spec[caniuse="3"] {
     fill: #52a5ae;
-
 }
 .sunburst .spec[caniuse="4"] {
     fill: #6CAED7;
@@ -194,6 +192,9 @@
 */
 
 /* WhoVis bars */
-.unselected {
+.who[selected="false"] {
     opacity: .5;
+}
+.who[selected="true"] {
+
 }
