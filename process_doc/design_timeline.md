@@ -42,6 +42,8 @@ Gray lines represent "last published" dates of non-Recommendation-status specs, 
 
 Tooltips list all of the pieces that went into forming each bar help identify what happened when, and which specs were published when.
 
+As there are some huge outliers of code movement when repos were at times moved, we use a power scale to allow us still to see the "normal" range of activity even while representing those huge outliers on the same axis.  (Thank you, Homework 3!)
+
 <p align="center">
     <img src="images/Timeline3.png" width="600"/>
 </p>
@@ -56,8 +58,7 @@ However, at this point, the timeline has had its tooltips deactivated, as they d
     <img src="images/Timeline4.png" width="600"/>
 </p>
 
-
-WITH FOCUS AND CONTEXT AXIS
+Unfortunately, the focus and context axis proved actually quite difficult to implement, and days passed without progress.  Luckily, as the deadline approached and things on that front looked grim, Jennifer had the idea just to harness our existing timeline vis code twice in order to create the same effect ourselves - one above to provide the focus, and one below to provide the overview.  The top graph could offer tooltips while the bottom one offered the brushing.  (Thank you, Section 3!)
 
 <p align="center">
     <img src="images/Timeline5.png" width="600"/>
@@ -66,5 +67,5 @@ WITH FOCUS AND CONTEXT AXIS
 IN THE END - what tooltips are there.
 
 <p align="center">
-    <img src="images/Timeline6.png" width="600"/>
+    <img src="images/FINAL_Timeline.png" width="600"/>
 </p>

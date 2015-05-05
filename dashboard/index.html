@@ -48,7 +48,8 @@
                 <div class="navbar-collapse collapse ">
 
                     <ul style="float:right" class="navbar-header">
-                       <h1><span class="navbar-header"><img src="images/cs.jpg" width="100%" height="100%"></span></h1>
+                    <div>   <span class="title">CS-171 Final Project</span></div>
+                   <div>  <span class="names">Jennifer Le Hegaret, Zona Kostic, John Greeley</span></div>
                     </ul>
                 </div>
             </div>
@@ -96,14 +97,6 @@
                     </ul>
                 </li>
 
-                <li class='active'><a class="links" href='#'><span>CanIUse</span></a>
-                    <ul class='child'>
-                        <li class='has-sub'><a id="caniuse_true" href='#'><span>Show</span></a>
-                        </li>
-                        <li class='has-sub'><a id="caniuse_false" href='#'><span>Hide</span></a>
-                        </li>
-                    </ul>
-                </li>
 
                 <li class='active'><a class="links" href='#'><span>About</span></a>
                     <ul class='child'>
@@ -121,8 +114,9 @@
                     </ul>
                 </li>
             </ul>
+          
         </nav>
-
+          <div style="position: absolute; margin-top:380px; width:285px; height:108;"> <img src="images/legend.jpg"> </div>
 
         <!--<div id="loader-wrapper">-->
             <!--<div id="loader"></div>-->
@@ -136,24 +130,20 @@
         <div style="float:left" id="specVis"></div>
 
         <div id="whereAmI">
-            <p>Viewing: <span id="statusLabel">All Work Done</span>, <span id="categoryLabel">All Categories</span></p>
-            <p>Timeframe: <span id="timeframeLabelStart">Date</span> to <span id="timeframeLabelEnd">Date</span></p>
-            <p>Working Group: <span id="wgLabel">All</span></p>
-            <p>Spec: <span id="specLabel">All</span></p>
-            <p>Contributor: <span id="whoLabel">All</span></p>
-        </div>
+            <p><i><span id="statusLabel">All Work Done</span>, <span id="categoryLabel">All Categories</span></i> <strong>- VIEWING</strong></p>
+            <p><i><span id="timeframeLabelStart">Date</span> to <span id="timeframeLabelEnd">Date</span></i><strong>- TIMEFRAME</strong></p>
+            <p><i><span id="wgLabel">All</span></i><strong>- WORKING GROUP</strong></p>
+            <p><i><span id="specLabel">All</span> </i><strong>- SPEC</strong></p>
+            <p><i><span id="whoLabel">All</span> </i><strong>- CONTRIBUTOR</strong></p>
 
-        <div id="legend"> <img src="images/legend.png" width="100%" height="100%"> </div>
-        <div>
-            <p class="whoHeadline" style="float:right; margin-bottom: 0px; margin-top: 20px; margin-right: 15px;"> Contributors </p>
-            <!--<p class="whoHeadline" id="line" style="float:right; margin-bottom: 0px; margin-top: 20px; margin-right: 15px;" onclick="slide()"> linear </p>-->
-            <!--<p class="whoHeadline" id="fish" style="float:right; margin-bottom: 0px; margin-top: 20px; margin-right: 15px;"> fisheye </p>-->
-        </div>
         <div id="whoVis">
+        </div>
         </div>
 
         <div id="timelineVis-zoom"></div>
-        <div id="timelineVis-whole"></div>
+        <div  id="timelineVis-whole"></div>
+        
+
     </div>
 
     <div class="footer">
@@ -168,10 +158,14 @@
         var allData = {caniuse: [], groups: [], specs: [], tests: []};
 
         //If this object is passed to visualization, it will override the default filters
+       var today = new Date();
+       var before = new Date();
+       var before = before.setMonth(before.getMonth() - 3);
         var initialFilters = {
-            start_date: "2014-01-01",
-            end_date: "2015-05-05",    // needs to be in this format
-                            // new Date() breaks whovis filtering code
+          
+            start_date: stripTime(before),
+            end_date: stripTime(today),    // needs to be in this format
+            // new Date() breaks whovis filtering code
             state: "all",           //open or all
             category: ["spec", "test"],        // all, spec, or test
             specs: [],          // array of which specs to show.

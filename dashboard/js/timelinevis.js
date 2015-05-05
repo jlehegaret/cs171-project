@@ -39,7 +39,7 @@ TimelineVis = function(_parentElement, _data, _eventHandler, _filters, _options)
     }
 
     // defines constants
-    this.margin = {top: 20, right: 20, bottom: 20, left: 40};
+    this.margin = {top: 20, right: 20, bottom: 0, left: 40};
     this.width = this.options.width - this.margin.left - this.margin.right;
     this.height = this.options.height - this.margin.top - this.margin.bottom;
 

@@ -4,7 +4,7 @@ SpecVis = function (_parentElement, _data, _eventHandler, _filters, _options) {
     this.eventHandler = _eventHandler;
     //NOTE: these options are overridden if _options is not null
     this.options = _options || {
-        width: 500, height: 500
+        width: 600, height: 500
     };
     //NOTE: these filters are overridden if _filters is not null
     this.filters = _filters || {

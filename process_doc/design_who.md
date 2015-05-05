@@ -34,8 +34,14 @@ Tooltips currently allow the user to learn the absolute number of the lines of c
     <img src="images/Who2.png"/>
 </p>
 
-Its final look is this:
+We hoped to use a fisheye view rather than slider view.  While it looked sleeker, it proved remarkably hard to use and tweak to our liking.  The invisible slider would activate as we attempted to select a bar, and moved way too fast.  The bars did not increase in size to make selecting them more easy - and just one bar increased in size once we managed to hover over it without triggering the slider.  The names were very hard to read.  And we would get "stuck" in the lower values of the range and not be able to return to the head of the list.
 
 <p align="center">
     <img src="images/Who3.png"/>
+</p>
+
+So, we went back to our slider approach.
+
+<p align="center">
+    <img src="images/Final_Who.png"/>
 </p>
