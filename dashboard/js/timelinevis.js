@@ -352,8 +352,7 @@ TimelineVis.prototype.wrangleData = function() {
                && that.filters.actions.indexOf(dd.type) !== -1)
             {
               //  We may want to see this item
-              if( (that.filters.who === null
-                      && that.filters.specs.length == 0))
+              if( (that.filters.who === null || that.filters.who === "none") && that.filters.specs.length == 0)
                   // || dd.type == "PUB")
                   // sometimes it seems like it's handy to view these
                   //  all the time.  other times, not.
