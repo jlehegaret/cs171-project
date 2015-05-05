@@ -33,13 +33,13 @@ SpecVis.prototype.initVis = function () {
     this.dateFormatter = d3.time.format("%Y-%m-%d");
     this.radius = Math.min(this.width, this.height) / 2;
 
-    // sets up a default date filter (returns from a given date till now)
+    // sets up a initial date filter
     this.currentDateFilter = this.dateFilter(new Date(this.filters.start_date), new Date(this.filters.end_date));
-    // sets up default author filter (returns all)
-    this.currentAuthorFilter = this.authorFilter(null);
-    // sets up default state filter
+    // sets up initial author filter
+    this.currentAuthorFilter = this.authorFilter(this.filters.who);
+    // sets up initial state filter
     this.currentStateFilter = this.stateFilter(this.filters.state);
-
+    //sets up initial category filter
     this.currentCategoryFilter = this.categoryFilter(this.filters.category);
 
 
@@ -214,8 +214,8 @@ SpecVis.prototype.updateVis = function () {
     //       .each(this.stash);
 
     path
-        .transition()
-        .duration(that.transitionDuration)
+        //.transition()
+        //.duration(that.transitionDuration)
         .attr("d", this.arc)
         .call(this.tip);
     //       .attrTween("d", this.arcTweenData);
