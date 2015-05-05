@@ -46,8 +46,16 @@ We also added outward-going interaction - as the user zooms in and out of the di
 </p>
 
 
-In our final version,  -- inward interaction, final tooltip format.
+In our final version, the sunburst's coloring of the spec successfully translates our derived CanIUse score into a color scheme.
 
 <p align="center">
     <img src="images/FINAL_Sunburst.png" width="600"/>
 </p>
+
+It also reacts to all of the other filtering events which occur on the page.  It always displays every Working Group and Spec, but it only displays elements in the outer most ring when work has been done that meets the criteria:
+
+<p align="center">
+    <img src="images/FINAL_Sunburst_Filtered.png" width="600"/>
+</p>
+
+Here, we can see that contributor Ms2ger does a lot of work for the HTML Working Group and also helps out other Working Groups (via all of the closed pull requests displayed for those), and we can also see what that contributor DOESN'T work on (via all of the gaps).

@@ -33,4 +33,7 @@ As we continued work on each visualization within the pages, improving focus cap
     <img src="images/FINAL_Dashboard.png" width="600"/>
 </p>
 
+We have a lot of informative elements now as well as our actual graphs.  We have a legend just under our menu options, and we have a listing in the upper right to summarize all of the applied filters.
+
+All elements on the page communicate with each other and even update the URL, so that we can (pretty much) bookmark a page to show our favorite view of the data.  The one limitation to that is currently the sunburst graph, which does not take an argument as to "zoom level" upon loading.
 
