@@ -1,22 +1,22 @@
 #whoVis {
-    height: 310px;
-    width: 310px;
+    height: 360px;
+    width: 300px;
     margin-top:50px;
     overflow-x: scroll;
     overflow-y: hidden;
 }
 
 #whereAmI{
-
-    background-color:#E8E8E8;
-    color:darkgrey;
+    color:black;
     text-align:right;
     float:right;
     height:150px;
-    width:300px;
+    width: 300px;
     margin-right:20px;
     margin-top:10px;
     font-size: 11px;
+    margin-bottom: 20px;
+    font-family: 'Lato', sans-serif;
 
 }
 
@@ -31,6 +31,21 @@
     font-size: 11px;
 
 }
+
+#timelineVis-zoom{
+
+    margin-top:500px;
+    position:absolute;
+
+}
+
+#timelineVis-whole{
+
+    margin-top:680px;
+    position:absolute;
+
+}
+
 
 /*#legend:hover, #legend:focus {*/
     /*z-index: 200;*/
@@ -100,25 +115,7 @@
     max-width: 300px;
 }
 
-.root {
-    fill: white;
-}
 
-.sunburst.group {
-    fill: #1E3248;
-}
-
-.sunburst.spec {
-    fill: crimson;
-}
-
-.HTML {
-    fill: #145184;
-}
-
-.Tests {
-    fill: #142335;
-}
 
 /* spec published */
 .PUB {
@@ -130,19 +127,52 @@
 
 }
 
-/* commit made */
-.commit, .COM {
-    fill: #DC7A2E;
+/*Sunburst - specific styles */
+.sunburst .root {
+    fill: white;
 }
 
-/* Pull Request opened */
-.pull.open, .test.open, .PR_O {
-    fill: #B2BDC7;
+.sunburst .HTML {
+    fill: #145184;
+}
+.sunburst .Tests {
+    fill: #142335;
+}
+
+.sunburst .group {
+    fill: #1E3248;
+}
+
+.sunburst .spec[caniuse="0"] {
+    fill: #8F9299;
+}
+.sunburst .spec[caniuse="1"] {
+    fill: #41658C;
+}
+.sunburst .spec[caniuse="2"] {
+    fill: #C9B3A2;
+}
+.sunburst .spec[caniuse="3"] {
+    fill: #52a5ae;
+}
+.sunburst .spec[caniuse="4"] {
+    fill: #6CAED7;
+
+}
+
+/* commit made */
+.commit, .COM {
+    fill: rgba(78, 78, 78, 0.38);
 }
 
 /* Pull Request closed */
 .pull.closed, .test.closed, .PR_C {
     fill: rgb(91, 87, 106);
+}
+
+/* Pull Request opened */
+.pull.open, .test.open, .PR_O {
+    fill: #DC7A2E;
 }
 
 /* issue opened */
@@ -162,6 +192,9 @@
 */
 
 /* WhoVis bars */
-.unselected {
+.who[selected="false"] {
     opacity: .5;
+}
+.who[selected="true"] {
+
 }

@@ -9,6 +9,7 @@
     <script src="js/lib/queue.v1.js"></script>
     <script src="js/lib/d3.tip.v0.6.6.js"></script>
     <script src="js/lib/intro.js"></script>
+    <script src="js/lib/jhash-2.1.js"></script>
 
 
     <!--
@@ -48,7 +49,8 @@
                 <div class="navbar-collapse collapse ">
 
                     <ul style="float:right" class="navbar-header">
-                       <h1><span class="navbar-header"><img src="images/cs.jpg" width="100%" height="100%"></span></h1>
+                    <div>   <span class="title">CS-171 Final Project</span></div>
+                   <div>  <span class="names">Jennifer Le Hegaret, Zona Kostic, John Greeley</span></div>
                     </ul>
                 </div>
             </div>
@@ -62,50 +64,42 @@
         <nav id='cssmenu'>
             <ul>
 
-                <li class='active'><a class="links" id="one" href='#'><span>View By Status</span></a>
+                <li class='active'><a class="links" id="one"><span>View By Status</span></a>
                     <ul class='child'>
-                        <li class='has-sub'><a id="state_all" href='#'><span>All</span></a>
+                        <li class='has-sub'><a id="state_all"><span>All</span></a>
                         </li>
-                        <li class='has-sub'><a id="state_open" href='#'><span>Unresolved Items</span></a>
+                        <li class='has-sub'><a id="state_open"><span>Unresolved Items</span></a>
                         </li>
                     </ul>
                 </li>
 
-                <li class='active'><a class="links" href='#'><span>View By Category</span></a>
+                <li class='active'><a class="links"><span>View By Category</span></a>
                     <ul class='child'>
-                        <li class='has-sub'><a id="cat_all" href='#'><span>All </span></a>
+                        <li class='has-sub'><a id="cat_all"><span>All </span></a>
 
                         </li>
-                        <li class='has-sub'><a id="cat_spec" href='#'><span>Spec Edits</span></a>
+                        <li class='has-sub'><a id="cat_spec"><span>Spec Edits</span></a>
                         </li>
 
-                        <li class='has-sub'><a id= "cat_test" href='#'><span>Test Suite Updates</span></a>
+                        <li class='has-sub'><a id= "cat_test"><span>Test Suite Updates</span></a>
                         </li>
 
                     </ul>
                 </li>
 
 
-                <li class='active'><a class="links" href='#'><span>Sort Contributors</span></a>
+                <li class='active'><a class="links"><span>Sort Contributors</span></a>
                     <ul class='child'>
-                        <li class='has-sub'><a id="sort_code" href='#'><span>By Lines of Code Touched</span></a>
+                        <li class='has-sub'><a id="sort_code"><span>By Lines of Code Touched</span></a>
 
                         </li>
-                        <li class='has-sub'><a id="sort_issue" href='#'><span>By Issues Raised</span></a>
+                        <li class='has-sub'><a id="sort_issue"><span>By Issues Raised</span></a>
                         </li>
                     </ul>
                 </li>
 
-                <li class='active'><a class="links" href='#'><span>CanIUse</span></a>
-                    <ul class='child'>
-                        <li class='has-sub'><a id="caniuse_true" href='#'><span>Show</span></a>
-                        </li>
-                        <li class='has-sub'><a id="caniuse_false" href='#'><span>Hide</span></a>
-                        </li>
-                    </ul>
-                </li>
 
-                <li class='active'><a class="links" href='#'><span>About</span></a>
+                <li class='active'><a class="links"><span>About</span></a>
                     <ul class='child'>
                         <li class='has-sub'><a href='https://github.com/jlehegaret/cs171-project/tree/master/dashboard/data'><span>Our Data</span></a>
                         </li>
@@ -121,8 +115,9 @@
                     </ul>
                 </li>
             </ul>
-        </nav>
 
+        </nav>
+          <div style="position: absolute; margin-top:380px; width:285px; height:108;"> <img src="images/legend.jpg"> </div>
 
         <!--<div id="loader-wrapper">-->
             <!--<div id="loader"></div>-->
@@ -136,25 +131,20 @@
         <div style="float:left" id="specVis"></div>
 
         <div id="whereAmI">
-            <p>Where am I? </p>
-            <p>Viewing: <span id="viewingLabel">All Work Done</span></p>
-            <p>Timeframe: <span id="timeframeLabelStart">Date</span> to <span id="timeframeLabelEnd">Date</span></p>
-            <p>Working Group: <span id="wgLabel">All</span></p>
-            <p>Spec: <span id="specLabel">All</span></p>
-            <p>Contributor: <span id="whoLabel">All</span></p>
-        </div>
+            <p><i><span id="statusLabel">All Work Done</span>, <span id="categoryLabel">All Categories</span></i> <strong>- VIEWING</strong></p>
+            <p><i><span id="timeframeLabelStart">Date</span> to <span id="timeframeLabelEnd">Date</span></i><strong>- TIMEFRAME</strong></p>
+            <p><i><span id="wgLabel">All</span></i><strong>- WORKING GROUP</strong></p>
+            <p><i><span id="specLabel">All</span> </i><strong>- SPEC</strong></p>
+            <p><i><span id="whoLabel">All</span> </i><strong>- CONTRIBUTOR</strong></p>
 
-        <div id="legend"> <img src="images/legend.png" width="100%" height="100%"> </div>
-        <div>
-            <p class="whoHeadline" style="float:right; margin-bottom: 0px; margin-top: 20px; margin-right: 15px;"> Contributors </p>
-            <!--<p class="whoHeadline" id="line" style="float:right; margin-bottom: 0px; margin-top: 20px; margin-right: 15px;" onclick="slide()"> linear </p>-->
-            <!--<p class="whoHeadline" id="fish" style="float:right; margin-bottom: 0px; margin-top: 20px; margin-right: 15px;"> fisheye </p>-->
-        </div>
         <div id="whoVis">
+        </div>
         </div>
 
         <div id="timelineVis-zoom"></div>
-        <div id="timelineVis-whole"></div>
+        <div  id="timelineVis-whole"></div>
+
+
     </div>
 
     <div class="footer">
@@ -169,19 +159,29 @@
         var allData = {caniuse: [], groups: [], specs: [], tests: []};
 
         //If this object is passed to visualization, it will override the default filters
+
+        var today = new Date();
+        var before = new Date();
+        before = before.setMonth(before.getMonth() - 3);
+
+        //NOTE:These filters are overrode by any options specified in the hash query string
         var initialFilters = {
-            start_date: "2014-01-01",
-            end_date: "2015-05-05",    // needs to be in this format
-                            // new Date() breaks whovis filtering code
+            start_date: stripTime(before),
+            end_date: stripTime(today),    // needs to be in this format
             state: "all",           //open or all
             category: ["spec", "test"],        // all, spec, or test
             specs: [],          // array of which specs to show.
                                 //    empty = all.
-            caniuse: false,     // change sunburst color
+  //          caniuse: false,     // change sunburst color
                                 // to reflect caniuse score
-            who: null,          // or can be one name
+            who: "none",          // or can be one name
             who_sort: "code"   // or issues
         };
+
+
+        //Handles filter options from UI and gets and sets hash query strings
+        var filterHandler = {};
+        var filter_ui = new FilterUI(d3.select("#whereAmI"), initialFilters, filterHandler);
 
         var initVis = function () {
             //Handles timeline brushing
@@ -190,17 +190,12 @@
             var selectionHandler = {};
             //Handles whovis author selection changing
             var authorHandler = {};
-            //Handles filter options from UI
-            var filterHandler = {};
-
-
             //Create visualizations
-            filter_ui = new FilterUI(d3.select("#whereAmI"), initialFilters, filterHandler);
-            spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler, initialFilters);
-            who_vis = new WhoVis(d3.select("#whoVis"), allData, authorHandler, initialFilters);
-            timeline_zoom = new TimelineVis(d3.select("#timelineVis-zoom"), allData, {}, initialFilters,
+            var spec_vis = new SpecVis(d3.select("#specVis"), allData, selectionHandler, initialFilters);
+            var who_vis = new WhoVis(d3.select("#whoVis"), allData, authorHandler, initialFilters);
+            var timeline_zoom = new TimelineVis(d3.select("#timelineVis-zoom"), allData, {}, initialFilters,
                 { width:1200, height:200, doBrush: false, doTooltips: true});
-            timeline_whole = new TimelineVis(d3.select("#timelineVis-whole"), allData, brushHandler, initialFilters,
+            var timeline_whole = new TimelineVis(d3.select("#timelineVis-whole"), allData, brushHandler, initialFilters,
                 { width:1200, height:200, doBrush: true, doTooltips: false});
 
 
@@ -228,6 +223,7 @@
             $(filterHandler).bind("filterChanged", function(event, filters) {
  //                console.log("Filters changed");
  //                console.log(filters);
+                filter_ui.onFilterChange(filters);
                 spec_vis.onFilterChange(filters);
                 timeline_zoom.onFilterChange(filters);
                 who_vis.onFilterChange(filters);
@@ -307,37 +303,62 @@
                 steps: [
                     {
                         element: '.navbar-collapse collapse ',
-                        intro: 'This guided tour will explain Git the Web Forward interface.<br><br>Use the arrow keys for navigation or hit ESC to exit the tour immediately.',
+                        intro: 'Welcome to our visualization of W3C’s GitHub-hosted specification work.<br><br>This guided tour explains the Git the Web Forward interface.<br><br>Use the arrow keys for navigation, or hit ESC to exit the tour immediately.',
                         position: 'bottom'
                     },
                     {
                         element: '#specVis',
-                        intro: 'This is Sunburst/SpecVis view....',
+                        intro: 'W3C is made up of many working groups.  The ones that do their work on GitHub are listed in the innermost ring of this sunburst diagram.',
                         position: 'bottom'
                     },
                     {
-                        element: '#timelineVis',
-                        intro: 'This is Timeline view...',
+                        element: '#specVis',
+                        intro: 'Each working group works on many specs.  These are listed along the next-most inner ring, just outside from the working group responsible for it. <br> <br>When one spec is worked on by more than one working group, it appears in the circle twice. <br> <br>The color of the spec in the ring relates to how well it has been implemented so far – at least, according to www.caniuse.com.',
+                        position: 'bottom'
+                    },
+                    {
+                        element: '#specVis',
+                        intro: 'The third ring shows the kind of work being done on that particular spec – either the spec’s text is getting edited, or the spec’s test suite is getting updated.<br><br>Spec text edits are shown in blue while test suite efforts are shown in black. ',
+                        position: 'bottom'
+                    },
+                    {
+                        element: '#specVis',
+                        intro: 'The outermost ring shows exactly what work was done.  There are different kinds of work - commiting code directly, opening a pull request, closing an open pull request, opening an issue, or closing an issue.<br><br>The number of items of work done determines the size of the arc of the parent category.  This feeds in towards the center, determining the relative sizes of each spec and of each working group.',
+                        position: 'bottom'
+                    },
+                    {
+                        element: '#specVis',
+                        intro: 'Click on any item of interest to zoom in.<br><br>Click the center to zoom back out.<br><br>Every click you make also adds or removes a filter to our other views of the data.',
                         position: 'bottom'
                     },
                     {
                         element: '#whoVis',
-                        intro: 'This is Who view...',
+                        intro: 'Our Contributors graph displays how much code a person has touched and how many issues that person has opened or closed.<br><br>Click on a bar to see only the work by that one person displayed in the other graphs.',
                         position: 'right'
                     },
                     {
                         element: '#cssmenu',
-                        intro: "This is navigation menu for sorting/filtering...",
+                        intro: "Use the menu to choose how to sort the list.",
                         position: 'bottom'
+                    },
+                    {
+                        element: '#timelineVis-whole',
+                        intro: 'You can use the timeline to filter the data, too.<br><br>Select your timeframe using the bottom timeline. The top timeline will magnify that selection, and the other graphs will automatically update..<br><br>The gray lines on the bottom timeline show the last published date for specifications that are not yet Recommendation status..<br><br>The black lines show the last published dates of specs that <b>are</b> Recommendations..<br><br>By default, spec edits display above the axis, while test suite contributions display below the axis',
+                        position: 'top'
+                    },
+                    {
+                        element: '#cssmenu',
+                        intro: "However, if you use the menu to view only test suite work, test suite work will flip to the positive side of the axis.  <br><br>You can also use the menu to view only the work that is currently outstanding – pull requests waiting to be merged, and issues that still need to be addressed.  To do this, choose to view Unresolved Items..  <br><br>The sunburst then shows which specs have outstanding issues, and which ones don’t.  .  <br><br>The contributors list turns into a list of who is waiting most for an issue to be solved or code to be merged..  <br><br>And the timeline shows how old those unresolved issues are getting.",
+                        position: 'right'
                     },
                     {
                         element: '#whereAmI',
-                        intro: "This is Where Am I part...",
+                        intro: "You can always remind yourself of your filtering choices here.",
                         position: 'bottom'
                     },
                     {
-                        element: '#legend',
-                        intro: "The legend shows colors...",
+                        element: '.navbar-collapse collapse ',
+                        intro: 'Thank you for walking through our visualization.  We hope that you enjoy exploring it!',
                         position: 'bottom'
                     }
                 ]
