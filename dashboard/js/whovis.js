@@ -202,9 +202,9 @@ WhoVis.prototype.updateVis = function() {
                     that.filters.who = d.who;
                     doSelect(that.filters.who);
                 } else { // If author has already been selected, reset selection
-                    that.currentSelection = null;
-                    $(that.eventHandler).trigger("authorChanged", null);
-                    that.filters.who = null;
+                    that.currentSelection = "none";
+                    $(that.eventHandler).trigger("authorChanged", "none");
+                    that.filters.who = "none";
                     doSelect(that.filters.who);
                 }
             })
