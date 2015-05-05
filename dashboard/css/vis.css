@@ -119,12 +119,24 @@
     fill: white;
 }
 
-.sunburst.group {
+.sunburst .group {
     fill: #1E3248;
 }
 
-.sunburst.spec {
-    fill: crimson;
+.sunburst .spec[caniuse="0"] {
+    fill: #97A2B8;
+}
+.sunburst .spec[caniuse="1"] {
+    fill: #8F9299;
+}
+.sunburst .spec[caniuse="2"] {
+    fill: #6CAED7;
+}
+.sunburst .spec[caniuse="3"] {
+    fill: #C9B3A2;
+}
+.sunburst .spec[caniuse="4"] {
+    fill: #888499;
 }
 
 .HTML {
