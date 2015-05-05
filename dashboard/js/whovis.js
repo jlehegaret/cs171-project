@@ -164,7 +164,7 @@ WhoVis.prototype.updateVis = function() {
     var doSelect = function(who) {
          whos
             .attr("selected", function(d) {
-                if (that.filters.who === null) {
+                if (that.filters.who === null || that.filters.who === "none") {
                     return "true";
                 } else if (that.filters.who === d.who) {
                     return "true";
@@ -187,7 +187,7 @@ WhoVis.prototype.updateVis = function() {
             .append("g")
             .attr("class", "who")
             .attr("selected", function(d) {
-                if (that.filters.who === null) {
+                if (that.filters.who === null || that.filters.who === "none") {
                     return "true";
                 } else if (that.filters.who === d.who) {
                     return "true";

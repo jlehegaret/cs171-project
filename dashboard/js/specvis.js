@@ -438,7 +438,7 @@ SpecVis.prototype.dateFilter = function(startDate, endDate) {
 // returns closure with filter for author
 SpecVis.prototype.authorFilter = function(who) {
     // always returns true if no author is selected
-    if(!who) {
+    if(!who || who == "none") {
         return function(d) {
             return true;
         }
