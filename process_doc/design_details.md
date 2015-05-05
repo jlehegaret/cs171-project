@@ -66,7 +66,7 @@ By organizing components like this, we successfully establish a visual balance. 
 We were fortunate to receive feedback directly from W3C as to our three-part Visualization as it stood so far:
 
 <p align="center">
-    <img src="images/SCREENSHOT AT ROBIN SAW IT" width="600"/>
+    <img src="images/Robins_Review.png" width="600"/>
 </p>
 
 *Given the data that we have, what are the questions you envision
@@ -136,14 +136,14 @@ At this meeting, we reviewed where we were compared to where we wanted to end up
 Some discussions were made about specific visualizations, which are detailed in their specific histories.  Also, some new elements did need to be added: a user selection tool for choosing some of our filter options, and an area in which we could display text summarizing the chosen filter options.  Luckily, both of these promised to fit in well with our current layout.  We also discussed adding a splash screen that would display as our data loads.
 
 <p align="center">
-    <img src="images/SCREENSHOT AS OF NOW" width="600"/>
+    <img src="images/CheckIn_0430.png" width="600"/>
 </p>
 
-We find it rather remarkable, really, how closely this matches the ambitious original vision.
+We find it rather remarkable, really, how closely this already matches the ambitious original vision.
 
 ## Final Iteration, 5/5/15
 
 <p align="center">
-    <img src="images/FINAL" width="600"/>
+    <img src="images/FINAL_Dashboard.png" width="600"/>
 </p>
 
