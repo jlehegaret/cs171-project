@@ -12,9 +12,9 @@ Our screencast video may be viewed from [this page](http://jlehegaret.github.io/
 
 ### Less Obvious Features of the Visualization
 
-%&%&%  TO DO  %&%&%
+As you enjoy our visualization, please note that filters you add will update the URL, and that you can return almost to the exact view you create by bookmarking the page with its URL at that point in time.  (The radial tree does not currently accept zoom parameters upon initialization, all other parameters are respected).
 
-As you enjoy our visualization, please note ... ????
+Also, you can use the regular "Find" function within the webpage to find an contributor listed anywhere in the Contributors list, even if not currently visible on the screen.
 
 ### Deliverables
 
