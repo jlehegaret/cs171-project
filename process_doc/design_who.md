@@ -40,8 +40,8 @@ We hoped to use a fisheye view rather than slider view.  While it looked sleeker
     <img src="images/Who3.png"/>
 </p>
 
-So, we went back to our slider approach.
+So, we went back to our slider approach.  We also added a selection effect, so that when a "who" filter is activated, all other bars become more transparent.
 
 <p align="center">
-    <img src="images/Final_Who.png"/>
+    <img src="images/FINAL_Who.png"/>
 </p>

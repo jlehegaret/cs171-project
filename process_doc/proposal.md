@@ -1,7 +1,7 @@
 # Section 5 - Our Proposed Feature Set
 
 * *return to [Section 4, The Design Process](design.md)*
-* *proceed to [Section 6, The End Result](evolution.md)*
+* *proceed to [Section 6, Discoveries](discoveries.md)*
 
 ## Proposal
 
@@ -23,14 +23,20 @@ Also, we hoped to offer a view about “who” is doing what over time, given th
 
 ## Reality
 
-Of the Must-Have Features, we successfully implemented:
+Of the Must-Have Features, we successfully implemented all of them.  We implemented:
 
-[ to do, and why not for any we missed ]
+- All hoped-for data:  the test suite work, plus specification work, plus a sense of the CanIUse status of a spec.
+- Improved navigation.  Rather than scroll through a very long dropdown list, guessing at what is a spec and what is a working group, the user can click on a section of our sunburst graph while viewing a more informative name for what they are choosing.
 
-Of the Optional Features, we successfully implmented:
+Of the Optional Features, we successfully implemented all of them:
 
-[ to do, and why not for any we missed ]
+- all of our views of the data interact with each other via straightforward clicking and brushing
+- our tooltips on the outer ring of the sunburst allow the user to visit the relevant GitHub page for any specific piece of work
+- our dual timelines allow the user to see the oldest "last published" specs at the same time as viewing the details of the last two weeks.  It is indeed possible to see what work has been done on a spec since its last published date.
+- and our "who" graph allows us to see who is doing what, and, in conjunction with our timeline brushing, to watch the evolution of the rankings over time.
+
 
 In addition to the items we had first imagined, we also managed to:
 
-[ to do ]
+- provide "pointing" capability by reading from the URL as we load our initial data, and updating the URL as we apply filters.
+

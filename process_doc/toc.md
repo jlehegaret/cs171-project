@@ -11,8 +11,6 @@ Jennifer Le Hegaret, Zona Kostic, and John Greeley
 * [What W3C Has So Far ](existing.md)
 * [Our Design Ideas](design.md)
 * [Our Proposed Feature Set ](proposal.md)
-* [Our Coding Experience](coding.md)
-* [The Evolution of the Visualization](evolution.md)
 * [Interesting Discoveries Through the Visualization](discoveries.md)
 * [Self-Evaluation of the Visualization](evaluation.md)
 
