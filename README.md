@@ -8,7 +8,7 @@ Jennifer Le Hegaret, Zona Kostic, and John Greeley
 
 Our project is published at [http://jlehegaret.github.io/cs171-project/#](http://jlehegaret.github.io/cs171-project/#).
 
-Our screencast video may be viewed from [this page](http://jlehegaret.github.io/cs171-project/about.html).
+Our screencast video may be viewed from [this page](http://jlehegaret.github.io/cs171-project/screencastPage.html).
 
 ### Less Obvious Features of the Visualization
 
