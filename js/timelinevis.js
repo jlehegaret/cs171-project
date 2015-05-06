@@ -6,9 +6,15 @@ TimelineVis = function(_parentElement, _data, _eventHandler, _filters, _options)
     this.eventHandler = _eventHandler;
     this.filters = _filters;
     this.options = _options;
-    if(this.options.doBrush)
-    {
-      this.filters = {
+
+    //Sets up static filters for brushing timelines
+    //however takes initial dates to setup brushing given initial timeline
+    if(this.options.doBrush) {
+        //Used to setup brush
+        this.initialDateRange = [new Date(this.filters.start_date), new Date(this.filters.end_date)];
+
+        //Reinitializes filters, ignores passed filters
+        this.filters = {
                         "start_date"  : "1900-01-01",
                         "end_date"    : stripTime(new Date()),
                         "category"  : ["spec", "test"],
@@ -128,21 +134,22 @@ TimelineVis.prototype.initVis = function() {
     // define our tooltip function
     // this.tip = this.tooltip();
 
-    if(this.options.doBrush)
-    {
-      // we have a constant range of dates - the maximum
-      this.x0.domain([
-                    Date.parse(d3.min(this.processedData.map(function(d){
-                                        return d.date; }))),
+    if(this.options.doBrush) {
+     // we have a constant range of dates - the maximum
+        this.x0.domain([
+                    Date.parse(d3.min(this.processedData.map(function(d) {
+                        return d.date; }))),
                     Date.parse(stripTime(new Date()))
                    ]);
 
-      // brushing
+     // Sets up brush (takes initial date range)
       this.brush = d3.svg.brush()
            .on("brush", function(){
-               $(that.eventHandler).trigger("brushChanged",
-               that.brush.extent());
-          });
+               $(that.eventHandler).trigger("brushChanged", that.brush.extent());
+          })
+          .x(this.x0)
+          .extent(this.initialDateRange);
+
       this.context.append("g")
            .attr("class", "brush");
     }
@@ -397,7 +404,7 @@ TimelineVis.prototype.wrangleData = function() {
                   // check if we're interested in this spec
                   if(keep_going)
                   {
-                    if(!that.filters.who) // it's just null
+                    if(!that.filters.who || that.filters.who === "none") // it's just null
                     {
                       yes = true;
                     } else { // need to check who as well

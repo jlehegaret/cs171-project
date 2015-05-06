@@ -141,7 +141,7 @@ FilterUI.prototype.onFilterChange = function(_filters) {
 ///Formatting functions to output text for different filter states
 ///////
 FilterUI.prototype.getAuthorText = function(author) {
-    if(!author) {
+    if(!author || author === "none") {
         return "All"
     } else {
         return author;
