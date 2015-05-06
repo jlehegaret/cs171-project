@@ -404,7 +404,7 @@ TimelineVis.prototype.wrangleData = function() {
                   // check if we're interested in this spec
                   if(keep_going)
                   {
-                    if(!that.filters.who) // it's just null
+                    if(!that.filters.who || that.filters.who === "none") // it's just null
                     {
                       yes = true;
                     } else { // need to check who as well
