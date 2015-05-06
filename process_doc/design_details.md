@@ -59,7 +59,7 @@ We realized that we could also provide a bar chart demonstrating how much code a
 
 See [here](design_who.md) for further information about the evolution of the who graph.
 
-By organizing components like this, we successfully establish a visual balance. By placing the W3C logo in the upper left corner and more of the components on the right, we followed the visual diagonal (upper left - lower right corner) that is natural to all users.
+By organizing components like this, we successfully established a visual balance. By placing the W3C logo in the upper left corner and more of the components on the right, we followed the visual diagonal (upper left - lower right corner) that is natural to all users.
 
 ## W3C Feedback, 4/23/15
 

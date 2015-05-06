@@ -32,7 +32,7 @@ Of the Optional Features, we successfully implemented all of them:
 
 - all of our views of the data interact with each other via straightforward clicking and brushing
 - our tooltips on the outer ring of the sunburst allow the user to visit the relevant GitHub page for any specific piece of work
-- our dual timelines allow the user to see the oldest "last published" specs at the same time as viewing the details of the last two weeks.  It is indeed possible to see what work has been done on a spec since its last published date.
+- our dual timelines allow the user to see the oldest "last published" specs at the same time as viewing the details of a chosen time frame.  It is indeed possible to see what work has been done on a spec since its last published date.
 - and our "who" graph allows us to see who is doing what, and, in conjunction with our timeline brushing, to watch the evolution of the rankings over time.
 
 

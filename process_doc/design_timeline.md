@@ -58,7 +58,7 @@ However, at this point, the timeline has had its tooltips deactivated, as they d
     <img src="images/Timeline4.png" width="600"/>
 </p>
 
-Unfortunately, the focus and context axis proved actually quite difficult to implement, and days passed without progress.  Luckily, as the deadline approached and things on that front looked grim, Jennifer had the idea just to harness our existing timeline vis code twice in order to create the same effect ourselves - one above to provide the focus, and one below to provide the overview.  The top graph could offer tooltips while the bottom one offered the brushing.  (Thank you, CS171's Section 3!)
+Unfortunately, the focus and context axis proved actually quite difficult to implement, and days passed without progress.  Luckily, as the deadline approached and things on that front looked grim, Jennifer had the idea just to harness our existing timeline vis code twice in order to create the same effect ourselves - one above to provide the focus, and one below to provide the overview.  The top graph could offer tooltips while the bottom one offered the brushing.  (Thank you, CS171's Section 5!)
 
 <p align="center">
     <img src="images/FINAL_Timeline.png" width="600"/>
