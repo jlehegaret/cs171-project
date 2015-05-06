@@ -7,7 +7,9 @@
     <img src="images/FINAL_Dashboard.png" width="600"/>
 </p>
 
-## What Does a Working Group Work On?
+Now that we have built this tool, let's imagine what people might want to learn from it.  While using it, let's keep our eyes open for any interesting patterns, too.
+
+### What Does a Working Group Work On?
 
 Our mandate from W3C was to develop something to allow users to see what a Working Group has been working on.
 
@@ -19,7 +21,7 @@ The exceptions to this rule are the Web IDL, URL, UI Events, and Service Workers
 
 I would imagine, from W3C's point of view, that they would want to investigate why the other "gray" specs are NOT getting test efforts at the moment.
 
-## Who's Ready to Step Up to the Plate?
+### Who's Ready to Step Up?
 
 Within our feedback from W3C, we learned that W3C is also interested to identify contributors who are changing their contribution level.  Ones who increase their contributions may be likely candidates to chair a Working Group.  W3C may also want to reach out to those who have been active but who are now contributing less, to make sure not to lose them.
 
@@ -29,12 +31,12 @@ As we do this, we see that, while Erica Doyle was the hugest overall contributor
 
 The HTML Working Group always has a very long and healthy list of contributors, no matter what the timeframe.  However, the Web Performance Working Group does not.  If we select 2014 on for that group, we see several people actually work with the code and a whole lot of people just raise issues.  As we narrow the timeframe into 2015 and on, we see that we have lost about half of our contributors, including some of the previously highest contributors.  This working group seems to have just one core person left in it in recent months to touch the code, and only a handful of others raising issues.  Is this because the spec is quite mature?  It doesn't seem so, as its Can I Use score seems quite low.  Perhaps there are other factors at play.
 
-## Can I Use It?  What Can I Do?
+### Can I Use It?
 
 - The Can I Use data, as derived, seems less interesting than I had hoped.  A spec seems either to be in very good shape or not even on the map.  But then, at least even this is information that was perhaps not previously known for sure.
 
 
-## Talk To Me!  Differences between spec work and test suite work.
+### Talk To Me!  Differences between spec work and test suite work.
 
 One thing that I found quite interesting is just how much more the specs are worked on than the test suites.  Editing the spec texts requires even more lines of code than the thousands of JavaScript tests under development -- impressive.
 
