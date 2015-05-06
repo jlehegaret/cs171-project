@@ -69,6 +69,8 @@ We were fortunate to receive feedback directly from W3C as to our three-part Vis
     <img src="images/Robins_Review.png" width="600"/>
 </p>
 
+We asked Robin Berjon:
+
 *Given the data that we have, what are the questions you envision
 asking of it most often?*
 
@@ -147,3 +149,6 @@ We find it rather remarkable, really, how closely this already matches the ambit
     <img src="images/FINAL_Dashboard.png" width="600"/>
 </p>
 
+While this last iteration is a bit busier than the original vision, it packs in even more information while also providing more "focus and context" information to the user.  In addition to the doubled timeline, we also fit filter summary text, a more extensive and visible legend than first imagined, and more menu options than first imagined.
+
+While additional time might help us gain additional sleekness by implementing multiple fisheye views and collapsing menus by default, it is an attractive and effective, elegant visualization of a huge amount of connected data which was, up until now, quite unmanageably dispersed.

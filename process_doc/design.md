@@ -71,6 +71,8 @@ These are the steps, per row of her diagram:
 3. Different kinds of work are done to get a Specification to Recommendation status.
 4. We can then conglomerate all of those pieces of work to see the summary at the overall W3C level.
 
+She chose a very blue-oriented color scheme to complement W3C's logo.  Blue could represent code while red would represent issues raised.
+
 For the main page, which needs to show thousands of datapoints across multiple categories, Zona envisioned the dashboard along these lines:
 
 <p align="center">

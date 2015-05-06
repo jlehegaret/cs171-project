@@ -38,5 +38,5 @@ Of the Optional Features, we successfully implemented all of them:
 
 In addition to the items we had first imagined, we also managed to:
 
-- provide "pointing" capability by reading from the URL as we load our initial data, and updating the URL as we apply filters.
+- come very close to providing "pointing" capability by reading from the URL as we load our initial data, and updating the URL as we apply filters.  However, it is uncertain whether this feature will appear in our delivered version, as it and the sunburst view currently do not seem to work well together.
 
