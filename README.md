@@ -16,6 +16,8 @@ As you enjoy our visualization, please note that filters you add will update the
 
 Also, you can use the regular "Find" function within the webpage to find an contributor listed anywhere in the Contributors list, even if not currently visible on the screen.
 
+Lastly, we would like to mention the absence of something - huge lag.  Despite the fact that we have thousands of data points represented four times over, our webpage is remarkably responsive.  We would like to give John Greeley full credit for that!
+
 ### Deliverables
 
 * **[Our Project](https://github.com/jlehegaret/cs171-project/tree/master/dashboard)** is in the Repo's [dashboard](https://github.com/jlehegaret/cs171-project/tree/master/dashboard) folder.
